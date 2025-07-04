@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrfToken }}">
+    <title>Senior Full Stack Developer - TechVision Solutions</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=inter:400,500,600,700"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [ "Inter", "sans-serif" ]
+            },
+            colors: {
+              primary: {
+                DEFAULT: "#2563eb",
+                50: "#eff6ff",
+                100: "#dbeafe",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                900: "#1e3a8a"
+              }
+            }
+          }
+        }
+      };
+    </script>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('dumper')
+  </head>
+  <body class="min-h-screen bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <a href="/" class="text-xl sm:text-2xl font-bold text-primary-600">TechVision</a>
+            </div>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a href="/" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+              <a href="/#about" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+              <a href="/#culture" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Culture</a>
+            </div>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button type="button" class="mobile-menu-button bg-gray-100 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500" aria-controls="mobile-menu" aria-expanded="false">
+              <span class="sr-only">Open main menu</span>
+              <!-- Hamburger icon -->
+              <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <!-- Close icon (hidden by default) -->
+              <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+            <a href="/" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Home</a>
+            <a href="/#about" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">About</a>
+            <a href="/#culture" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors">Culture</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Job Header -->
+    <div class="bg-gradient-to-br from-primary-50 to-blue-100">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div class="text-center">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 px-4 sm:px-0 leading-tight">
+            Senior Full Stack Developer
+          </h1>
+          <div class="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 sm:gap-4 text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 px-4 sm:px-0">
+            <span class="flex items-center justify-center sm:justify-start">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              Remote / San Francisco, CA
+            </span>
+            <span class="flex items-center justify-center sm:justify-start">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Full-time
+            </span>
+            <span class="flex items-center justify-center sm:justify-start">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+              $120k - $180k
+            </span>
+          </div>
+          <button id="uploadBtn" class="bg-primary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base">
+            Apply Now - Upload CV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="bg-white rounded-lg shadow-sm p-8">
+        <div class="prose max-w-none">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">About the Role</h2>
+          <p class="text-gray-600 mb-6">
+            We're looking for a passionate Senior Full Stack Developer to join our growing engineering team. 
+            You'll be working on cutting-edge projects that impact millions of users worldwide, building scalable 
+            web applications and contributing to our AI-driven platform architecture.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Key Responsibilities</h3>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>Design and develop full-stack web applications using modern frameworks</li>
+            <li>Collaborate with cross-functional teams to define and implement new features</li>
+            <li>Write clean, maintainable, and well-tested code</li>
+            <li>Optimize applications for maximum speed and scalability</li>
+            <li>Mentor junior developers and contribute to technical decision-making</li>
+            <li>Participate in code reviews and maintain high coding standards</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Required Qualifications</h3>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>5+ years of experience in full-stack development</li>
+            <li>Proficiency in JavaScript/TypeScript, React, Node.js</li>
+            <li>Experience with modern databases (PostgreSQL, MongoDB)</li>
+            <li>Knowledge of cloud platforms (AWS, GCP, or Azure)</li>
+            <li>Strong understanding of RESTful APIs and microservices architecture</li>
+            <li>Experience with version control systems (Git)</li>
+            <li>Bachelor's degree in Computer Science or equivalent experience</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Preferred Qualifications</h3>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>Experience with AI/ML frameworks and libraries</li>
+            <li>Knowledge of containerization (Docker, Kubernetes)</li>
+            <li>Experience with CI/CD pipelines</li>
+            <li>Familiarity with Agile development methodologies</li>
+            <li>Open source contributions</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">What We Offer</h3>
+          <ul class="list-disc list-inside text-gray-600 mb-8 space-y-2">
+            <li>Competitive salary and equity package</li>
+            <li>Comprehensive health, dental, and vision insurance</li>
+            <li>Flexible working hours and remote work options</li>
+            <li>Annual learning and development budget ($3,000)</li>
+            <li>Unlimited PTO policy</li>
+            <li>Top-tier equipment and home office setup allowance</li>
+            <li>Regular team events and company retreats</li>
+          </ul>
+
+          <div class="text-center">
+            <button id="uploadBtn2" class="bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition duration-200">
+              Apply Now - Upload CV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CV Upload Modal -->
+    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Upload Your CV</h3>
+            <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="uploadLoading" class="hidden text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Uploading and processing your CV...</p>
+          </div>
+
+          <!-- Upload Form -->
+          <form id="cvUploadForm" enctype="multipart/form-data">
+            {{ csrfField() }}
+            <div class="mb-4">
+              <label for="applicant_name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+              <input type="text" id="applicant_name" name="applicant_name" required
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <div class="mb-4">
+              <label for="applicant_email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <input type="email" id="applicant_email" name="applicant_email" required
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <div class="mb-6">
+              <label for="cv_file" class="block text-sm font-medium text-gray-700 mb-2">CV File (PDF, DOC, DOCX)</label>
+              <input type="file" id="cv_file" name="cv_file" accept=".pdf,.doc,.docx" required
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <p class="text-xs text-gray-500 mt-1">Maximum file size: 10MB</p>
+            </div>
+
+            <div class="flex gap-3">
+              <button type="submit" id="uploadSubmitBtn" class="flex-1 bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 transition duration-200">
+                Upload CV
+              </button>
+              <button type="button" id="cancelUpload" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-200">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screening Questionnaire Modal -->
+    <div id="questionnaireModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold text-gray-900">Screening Questionnaire</h3>
+            <button id="closeQuestionnaireModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+            <p class="text-sm text-blue-800">
+              <strong>Great!</strong> Your CV has been uploaded successfully. Please answer the following questions to complete your application.
+            </p>
+          </div>
+
+          <!-- Loading State -->
+          <div id="questionnaireLoading" class="hidden text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Submitting your application...</p>
+          </div>
+
+          <!-- Questionnaire Form -->
+          <form id="questionnaireForm">
+            {{ csrfField() }}
+            <input type="hidden" id="submission_id" name="submission_id" value="">
+
+            <div class="mb-6">
+              <label for="question1_answer" class="block text-sm font-medium text-gray-700 mb-2">
+                1. Why do you want to join this company? *
+              </label>
+              <textarea id="question1_answer" name="question1_answer" rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="Share your motivation for wanting to work with TechVision Solutions..."></textarea>
+              <div class="flex justify-between mt-1">
+                <span id="q1-char-count" class="text-xs text-gray-500">0 characters</span>
+                <span class="text-xs text-gray-500">Min: 50, Max: 500 characters</span>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <label for="question2_answer" class="block text-sm font-medium text-gray-700 mb-2">
+                2. What is your favorite aspect of company culture? *
+              </label>
+              <textarea id="question2_answer" name="question2_answer" rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="Tell us what aspects of our company culture appeal to you most..."></textarea>
+              <div class="flex justify-between mt-1">
+                <span id="q2-char-count" class="text-xs text-gray-500">0 characters</span>
+                <span class="text-xs text-gray-500">Min: 50, Max: 500 characters</span>
+              </div>
+            </div>
+
+            <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p class="text-sm text-yellow-800">
+                <strong>Disclaimer:</strong> Answering these questions is optional, but providing thoughtful responses can increase your chances of being contacted for an interview.
+              </p>
+            </div>
+
+            <div class="flex gap-3">
+              <button type="submit" id="questionnaireSubmitBtn" class="flex-1 bg-primary-600 text-white py-3 px-4 rounded-md hover:bg-primary-700 transition duration-200 font-semibold">
+                Submit Application
+              </button>
+              <button type="button" id="skipQuestionnaire" class="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-400 transition duration-200 font-semibold">
+                Skip Questions
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Debug logging
+      console.log('CV Upload Modal Script Loading...');
+
+      // Wait for DOM to be fully loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        // Mobile Menu Functionality
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+          const hamburgerIcon = mobileMenuButton.querySelector('svg:first-child');
+          const closeIcon = mobileMenuButton.querySelector('svg:last-child');
+
+          mobileMenuButton.addEventListener('click', function() {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+
+            // Toggle menu visibility
+            mobileMenu.classList.toggle('hidden');
+
+            // Toggle icons
+            hamburgerIcon.classList.toggle('hidden');
+            hamburgerIcon.classList.toggle('block');
+            closeIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('block');
+
+            // Update aria-expanded
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+          });
+
+          // Close mobile menu when clicking on links
+          const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+          mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+              mobileMenu.classList.add('hidden');
+              hamburgerIcon.classList.remove('hidden');
+              hamburgerIcon.classList.add('block');
+              closeIcon.classList.add('hidden');
+              closeIcon.classList.remove('block');
+              mobileMenuButton.setAttribute('aria-expanded', 'false');
+            });
+          });
+        }
+        console.log('DOM Content Loaded - Initializing CV Upload Modal...');
+
+        // Modal elements
+        const uploadBtns = document.querySelectorAll('#uploadBtn, #uploadBtn2');
+        const uploadModal = document.getElementById('uploadModal');
+        const questionnaireModal = document.getElementById('questionnaireModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelUpload = document.getElementById('cancelUpload');
+        const closeQuestionnaireModal = document.getElementById('closeQuestionnaireModal');
+        const skipQuestionnaire = document.getElementById('skipQuestionnaire');
+
+        // Debug element existence
+        console.log('Upload buttons found:', uploadBtns.length);
+        console.log('Upload modal found:', !!uploadModal);
+        console.log('Questionnaire modal found:', !!questionnaireModal);
+        console.log('Close modal button found:', !!closeModal);
+        console.log('Cancel upload button found:', !!cancelUpload);
+
+        // Check if modal is initially hidden
+        if (uploadModal) {
+          console.log('Upload modal classes:', uploadModal.className);
+          console.log('Upload modal is hidden:', uploadModal.classList.contains('hidden'));
+        }
+
+        // Add a test function to window for debugging
+        window.testModal = function() {
+          console.log('Test modal function called');
+          if (uploadModal) {
+            uploadModal.classList.remove('hidden');
+            console.log('Modal should now be visible');
+          } else {
+            console.log('Upload modal not found!');
+          }
+        };
+
+        console.log('Test function added to window. You can call window.testModal() in console.');
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        console.log('CSRF token found:', !!csrfToken);
+
+      // Loading states
+      const uploadLoading = document.getElementById('uploadLoading');
+      const questionnaireLoading = document.getElementById('questionnaireLoading');
+      const cvUploadForm = document.getElementById('cvUploadForm');
+      const questionnaireForm = document.getElementById('questionnaireForm');
+
+      // Character counters
+      const q1TextArea = document.getElementById('question1_answer');
+      const q2TextArea = document.getElementById('question2_answer');
+      const q1CharCount = document.getElementById('q1-char-count');
+      const q2CharCount = document.getElementById('q2-char-count');
+
+      // Current submission data
+      let currentSubmissionId = '';
+
+      // Open upload modal
+      uploadBtns.forEach((btn, index) => {
+        console.log(`Adding click listener to button ${index + 1}:`, btn);
+        btn.addEventListener('click', (e) => {
+          console.log('Upload button clicked!', e.target);
+          console.log('Opening upload modal...');
+          uploadModal.classList.remove('hidden');
+          resetUploadForm();
+          console.log('Upload modal should now be visible');
+        });
+      });
+
+      // Close modals
+      [closeModal, cancelUpload].forEach(btn => {
+        btn.addEventListener('click', () => {
+          uploadModal.classList.add('hidden');
+          resetUploadForm();
+        });
+      });
+
+      [closeQuestionnaireModal].forEach(btn => {
+        btn.addEventListener('click', () => {
+          questionnaireModal.classList.add('hidden');
+          resetQuestionnaireForm();
+        });
+      });
+
+      // Close modals when clicking outside
+      uploadModal.addEventListener('click', (e) => {
+        if (e.target === uploadModal) {
+          uploadModal.classList.add('hidden');
+          resetUploadForm();
+        }
+      });
+
+      questionnaireModal.addEventListener('click', (e) => {
+        if (e.target === questionnaireModal) {
+          questionnaireModal.classList.add('hidden');
+          resetQuestionnaireForm();
+        }
+      });
+
+      // Character counting
+      function updateCharCount(textArea, countElement) {
+        const count = textArea.value.length;
+        countElement.textContent = `${count} characters`;
+
+        if (count < 50) {
+          countElement.className = 'text-xs text-red-500';
+        } else if (count > 500) {
+          countElement.className = 'text-xs text-red-500';
+        } else {
+          countElement.className = 'text-xs text-green-600';
+        }
+      }
+
+      q1TextArea.addEventListener('input', () => updateCharCount(q1TextArea, q1CharCount));
+      q2TextArea.addEventListener('input', () => updateCharCount(q2TextArea, q2CharCount));
+
+      // Reset forms
+      function resetUploadForm() {
+        cvUploadForm.reset();
+        uploadLoading.classList.add('hidden');
+        cvUploadForm.classList.remove('hidden');
+      }
+
+      function resetQuestionnaireForm() {
+        questionnaireForm.reset();
+        questionnaireLoading.classList.add('hidden');
+        questionnaireForm.classList.remove('hidden');
+        updateCharCount(q1TextArea, q1CharCount);
+        updateCharCount(q2TextArea, q2CharCount);
+      }
+
+      // CV Upload form submission
+      cvUploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(cvUploadForm);
+        const submitBtn = document.getElementById('uploadSubmitBtn');
+
+        // Debug: Log form data
+        console.log('Form data being sent:');
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value);
+        }
+
+        // Remove CSRF token from form data since we're sending it in headers
+        formData.delete('_csrf');
+
+        // Show loading state
+        cvUploadForm.classList.add('hidden');
+        uploadLoading.classList.remove('hidden');
+        submitBtn.disabled = true;
+
+        try {
+          console.log('Sending CV upload request...');
+          const response = await fetch('/api/cv/upload', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-Token': csrfToken
+            }
+          });
+
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Store submission ID for questionnaire
+            currentSubmissionId = result.data.submissionId;
+            document.getElementById('submission_id').value = currentSubmissionId;
+
+            // Close upload modal and open questionnaire modal
+            uploadModal.classList.add('hidden');
+            questionnaireModal.classList.remove('hidden');
+            resetUploadForm();
+          } else {
+            throw new Error(result.message || 'Upload failed');
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          alert('Failed to upload CV: ' + error.message);
+
+          // Reset form state
+          cvUploadForm.classList.remove('hidden');
+          uploadLoading.classList.add('hidden');
+          submitBtn.disabled = false;
+        }
+      });
+
+      // Questionnaire form submission
+      questionnaireForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await submitQuestionnaire(false);
+      });
+
+      // Skip questionnaire
+      skipQuestionnaire.addEventListener('click', async () => {
+        await submitQuestionnaire(true);
+      });
+
+      async function submitQuestionnaire(skip = false) {
+        const formData = new FormData();
+        formData.append('submission_id', currentSubmissionId);
+
+        if (!skip) {
+          const q1Answer = q1TextArea.value.trim();
+          const q2Answer = q2TextArea.value.trim();
+
+          // Validate character limits
+          if (q1Answer.length > 0 && (q1Answer.length < 50 || q1Answer.length > 500)) {
+            alert('Question 1 answer must be between 50 and 500 characters if provided.');
+            return;
+          }
+
+          if (q2Answer.length > 0 && (q2Answer.length < 50 || q2Answer.length > 500)) {
+            alert('Question 2 answer must be between 50 and 500 characters if provided.');
+            return;
+          }
+
+          formData.append('question1_answer', q1Answer);
+          formData.append('question2_answer', q2Answer);
+        } else {
+          formData.append('question1_answer', '');
+          formData.append('question2_answer', '');
+        }
+
+        // Show loading state
+        questionnaireForm.classList.add('hidden');
+        questionnaireLoading.classList.remove('hidden');
+
+        try {
+          const response = await fetch('/api/cv/questionnaire', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-Token': csrfToken
+            }
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Redirect to success page
+            window.location.href = `/success/${currentSubmissionId}`;
+          } else {
+            throw new Error(result.message || 'Submission failed');
+          }
+        } catch (error) {
+          console.error('Questionnaire submission error:', error);
+          alert('Failed to submit questionnaire: ' + error.message);
+
+          // Reset form state
+          questionnaireForm.classList.remove('hidden');
+          questionnaireLoading.classList.add('hidden');
+        }
+      }
+
+      }); // End DOMContentLoaded event listener
+    </script>
+  </body>
+</html>
