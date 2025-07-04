@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: hr_scanning_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: TypeScript compilation check
+      run: npm run typecheck
+
+    - name: ESLint check
+      run: npm run lint
+
+    - name: Setup test environment
+      run: |
+        cp .env.example .env || echo "No .env.example found, creating basic .env"
+        echo "NODE_ENV=test" >> .env
+        echo "APP_KEY=$(openssl rand -base64 32)" >> .env
+        echo "DB_CONNECTION=pg" >> .env
+        echo "DB_HOST=localhost" >> .env
+        echo "DB_PORT=5432" >> .env
+        echo "DB_USER=postgres" >> .env
+        echo "DB_PASSWORD=postgres" >> .env
+        echo "DB_DATABASE=hr_scanning_test" >> .env
+
+    - name: Run database migrations
+      run: node ace migration:run --force
+
+    - name: Run tests
+      run: npm test
