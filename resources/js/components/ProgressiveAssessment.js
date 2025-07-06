@@ -97,6 +97,9 @@ class ProgressiveAssessment {
                 <button id="skipBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800 hidden">
                   Skip Question
                 </button>
+                <button id="skipAllBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                  Not Answer Question
+                </button>
                 <button id="nextBtn" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
                   Next →
                 </button>
@@ -139,6 +142,7 @@ class ProgressiveAssessment {
     const previousBtn = document.getElementById('previousBtn')
     const nextBtn = document.getElementById('nextBtn')
     const skipBtn = document.getElementById('skipBtn')
+    const skipAllBtn = document.getElementById('skipAllBtn')
     const finishBtn = document.getElementById('finishBtn')
     const textAnswer = document.getElementById('textAnswer')
 
@@ -154,6 +158,7 @@ class ProgressiveAssessment {
     previousBtn?.addEventListener('click', () => this.goToPrevious())
     nextBtn?.addEventListener('click', () => this.goToNext())
     skipBtn?.addEventListener('click', () => this.skipQuestion())
+    skipAllBtn?.addEventListener('click', () => this.skipAllQuestions())
     finishBtn?.addEventListener('click', () => this.finish())
 
     // Text input character counting
@@ -460,6 +465,13 @@ class ProgressiveAssessment {
 
   async skipQuestion() {
     await this.submitAnswer('skip')
+  }
+
+  async skipAllQuestions() {
+    // Show confirmation dialog
+    if (confirm('Are you sure you want to skip all remaining questions and complete the assessment? This action cannot be undone.')) {
+      await this.submitAnswer('skip_all')
+    }
   }
 
   finish() {

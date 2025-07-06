@@ -37,7 +37,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring database
   |----------------------------------------------------------
   */
-  DB_CONNECTION: Env.schema.enum(['sqlite', 'postgres'] as const),
+  DB_CONNECTION: Env.schema.enum(['postgres'] as const),
   DB_HOST: Env.schema.string.optional(),
   DB_PORT: Env.schema.number.optional(),
   DB_USERNAME: Env.schema.string.optional(),

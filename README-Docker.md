@@ -111,7 +111,7 @@ This document provides comprehensive instructions for running the HR Scanning ap
 
 ### Database Configuration
 ```bash
-DB_CONNECTION=postgres          # Database type (sqlite/postgres)
+DB_CONNECTION=postgres          # Database type (PostgreSQL only)
 DB_HOST=localhost              # Database host
 DB_PORT=5433                   # Database port (5433 for dev, 5432 for prod)
 DB_USERNAME=hr_user            # Database username
@@ -296,31 +296,9 @@ The production configuration includes optimized settings:
 - Resource limits to prevent resource exhaustion
 - Health checks for automatic recovery
 
-## 🔄 Migration from SQLite
+## 🗃️ Database Management
 
-To migrate existing SQLite data to PostgreSQL:
-
-1. **Export SQLite data:**
-   ```bash
-   # Switch to SQLite temporarily
-   DB_CONNECTION=sqlite npm run dev
-   # Export your data using your preferred method
-   ```
-
-2. **Switch to PostgreSQL:**
-   ```bash
-   # Update .env
-   DB_CONNECTION=postgres
-   
-   # Run migrations
-   npm run migration:run
-   ```
-
-3. **Import data to PostgreSQL:**
-   ```bash
-   # Use your preferred data import method
-   # or recreate data through the application
-   ```
+This application uses PostgreSQL as the primary and only supported database. All database operations are optimized for PostgreSQL's features and performance characteristics.
 
 ## 📞 Support
 

@@ -269,7 +269,7 @@ export default class AssessmentController {
       const assessmentId = request.param('assessmentId')
       const questionId = request.input('question_id')
       const answer = request.input('answer')
-      const action = request.input('action', 'next') // 'next', 'previous', 'skip'
+      const action = request.input('action', 'next') // 'next', 'previous', 'skip', 'skip_all'
 
       const questionnaireResponse = await QuestionnaireResponse.findBy('submissionId', assessmentId)
       if (!questionnaireResponse) {
@@ -328,18 +328,34 @@ export default class AssessmentController {
 
       if (action === 'previous') {
         nextQuestionId = Math.max(1, questionnaireResponse.currentQuestion - 1)
+        // Update current question for previous navigation
+        questionnaireResponse.currentQuestion = nextQuestionId
+      } else if (action === 'skip_all') {
+        // Skip all remaining questions and complete the assessment
+        questionnaireResponse.currentQuestion = ASSESSMENT_CONFIG.totalQuestions + 1
+        questionnaireResponse.questionsCompleted = ASSESSMENT_CONFIG.totalQuestions
+        questionnaireResponse.isCompleted = true
+        questionnaireResponse.completedAt = DateTime.now()
+
+        // Calculate final score based on existing responses
+        const scoring = questionnaireResponse.calculateScore()
+        questionnaireResponse.totalScore = scoring.totalScore
+        questionnaireResponse.assessmentResult = scoring.assessmentResult
+
+        nextQuestionId = questionnaireResponse.currentQuestion
       } else if (action === 'next' || action === 'skip') {
         // Save answer if provided
         if (answer !== null && answer !== undefined && action !== 'skip') {
           const responseUpdate = { [currentQuestion.key]: answer }
           questionnaireResponse.updateProgress(questionId, responseUpdate)
+          // updateProgress already increments currentQuestion, so use that value
+          nextQuestionId = questionnaireResponse.currentQuestion
+        } else {
+          // For skip action or when no answer provided, manually increment
+          nextQuestionId = questionnaireResponse.currentQuestion + 1
+          questionnaireResponse.currentQuestion = nextQuestionId
         }
-        
-        nextQuestionId = questionnaireResponse.currentQuestion + 1
       }
-
-      // Update current question
-      questionnaireResponse.currentQuestion = nextQuestionId
       questionnaireResponse.lastActivityAt = DateTime.now()
       await questionnaireResponse.save()
 

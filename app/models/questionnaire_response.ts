@@ -20,7 +20,7 @@ export default class QuestionnaireResponse extends BaseModel {
       return typeof value === 'string' ? value : JSON.stringify(value)
     },
     consume: (value: any) => {
-      // Handle both string (SQLite) and object (PostgreSQL) cases
+      // Handle JSON data from PostgreSQL database
       if (typeof value === 'string') {
         try {
           return JSON.parse(value)
@@ -42,7 +42,9 @@ export default class QuestionnaireResponse extends BaseModel {
   @column()
   declare questionsCompleted: number
 
-  @column()
+  @column({
+    consume: (value: any) => Boolean(value)
+  })
   declare isCompleted: boolean
 
   @column()

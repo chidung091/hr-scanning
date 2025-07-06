@@ -143,9 +143,9 @@ test.group('Assessment API', (group) => {
     const data = response.body()
     
     assert.isTrue(data.success)
-    assert.equal(data.data.currentQuestion, 3)
+    assert.equal(data.data.currentQuestion, 2)
     assert.exists(data.data.question)
-    assert.equal(data.data.question.id, 3)
+    assert.equal(data.data.question.id, 2)
     assert.isFalse(data.data.completed)
 
     // Verify the response was saved
@@ -363,5 +363,48 @@ test.group('Assessment API', (group) => {
     
     assert.isFalse(data.success)
     assert.include(data.message.toLowerCase(), 'completed')
+  })
+
+  test('should skip all remaining questions with skip_all action', async ({ client, assert }) => {
+    // Create assessment with only 2 questions completed
+    const questionnaireResponse = await QuestionnaireResponse.create({
+      submissionId: 'test-skip-all-123',
+      cvSubmissionId: testSubmission.id,
+      responses: {
+        work_style_environment: 'hybrid',
+        overtime_commitment: 'reasonable_notice'
+      },
+      currentQuestion: 3,
+      questionsCompleted: 2,
+      isCompleted: false,
+      languagePreference: 'en',
+      startedAt: DateTime.now(),
+      lastActivityAt: DateTime.now(),
+    })
+
+    const response = await client
+      .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
+      .json({
+        question_id: 3,
+        answer: null,
+        action: 'skip_all'
+      })
+
+    response.assertStatus(200)
+    const data = response.body()
+
+    assert.isTrue(data.success)
+    assert.isTrue(data.data.completed)
+    assert.exists(data.data.totalScore)
+    assert.exists(data.data.assessmentResult)
+
+    // Verify the assessment is marked as completed
+    await questionnaireResponse.refresh()
+    assert.isTrue(questionnaireResponse.isCompleted)
+    assert.exists(questionnaireResponse.completedAt)
+    assert.exists(questionnaireResponse.totalScore)
+    assert.exists(questionnaireResponse.assessmentResult)
+    assert.equal(questionnaireResponse.questionsCompleted, 6) // Should be set to total questions
+    assert.equal(questionnaireResponse.currentQuestion, 7) // Should be set to total + 1
   })
 })

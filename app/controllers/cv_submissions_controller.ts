@@ -218,7 +218,7 @@ export default class CvSubmissionsController {
       }
       console.log('================================')
 
-      // Save to database (skip base64 content for now to avoid SQLite size issues)
+      // Save to database
       console.log('Preparing to save to database...')
       console.log('Data sizes:', {
         extractedTextLength: extractedText.length,
