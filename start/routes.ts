@@ -43,6 +43,12 @@ router.post('/api/cv/upload', [CvSubmissionsController, 'upload']).use(fileUploa
 router.post('/api/cv/questionnaire', [CvSubmissionsController, 'submitQuestionnaire']) // Legacy endpoint
 router.get('/success/:id', [CvSubmissionsController, 'success'])
 
+// OpenAI CV Processing routes
+router.get('/api/cv/:submissionId/processing-status', [CvSubmissionsController, 'getProcessingStatus'])
+router.get('/api/cv/:submissionId/extracted-data', [CvSubmissionsController, 'getExtractedData'])
+router.post('/api/cv/:submissionId/retry-processing', [CvSubmissionsController, 'retryProcessing'])
+router.get('/api/cv/processing-stats', [CvSubmissionsController, 'getProcessingStats'])
+
 // Progressive Assessment API routes (with rate limiting for assessment actions)
 router.post('/api/assessment/start', [AssessmentController, 'startAssessment']).use(assessmentStartThrottle)
 router.get('/api/assessment/:assessmentId/question', [AssessmentController, 'getCurrentQuestion']).use(assessmentViewThrottle)

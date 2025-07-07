@@ -7,6 +7,7 @@ import mammoth from 'mammoth'
 import OpenAI from 'openai'
 import env from '#start/env'
 import { cvUploadValidator } from '#validators/cv_submission_validator'
+import cvProcessingService from '#services/cv_processing_service'
 
 // Initialize OpenAI client (currently unused but available for PDF processing)
 // const openai = new OpenAI({
@@ -247,6 +248,45 @@ export default class CvSubmissionsController {
         throw dbError
       }
 
+      // Process CV through OpenAI if text extraction was successful
+      let openaiProcessingResult = null
+      if (extractionStatus.includes('success') && extractedText && extractedText.length > 50) {
+        try {
+          console.log('Starting OpenAI processing for CV...')
+
+          // Process asynchronously to avoid blocking the response
+          cvProcessingService.processCvSubmission(cvSubmission.id)
+            .then((result) => {
+              if (result.success) {
+                console.log('OpenAI processing completed successfully', {
+                  cvSubmissionId: cvSubmission.id,
+                  processedCvId: result.processedCvId,
+                  tokensUsed: result.tokensUsed,
+                })
+              } else {
+                console.error('OpenAI processing failed', {
+                  cvSubmissionId: cvSubmission.id,
+                  error: result.error,
+                })
+              }
+            })
+            .catch((error) => {
+              console.error('OpenAI processing error', {
+                cvSubmissionId: cvSubmission.id,
+                error: error.message,
+              })
+            })
+
+          openaiProcessingResult = { status: 'initiated' }
+        } catch (error) {
+          console.error('Failed to initiate OpenAI processing:', error.message)
+          openaiProcessingResult = { status: 'failed', error: error.message }
+        }
+      } else {
+        console.log('Skipping OpenAI processing - insufficient text content or extraction failed')
+        openaiProcessingResult = { status: 'skipped', reason: 'insufficient_text_or_extraction_failed' }
+      }
+
       return response.json({
         success: true,
         message: 'CV uploaded successfully',
@@ -254,6 +294,7 @@ export default class CvSubmissionsController {
           submissionId: cvSubmission.submissionId,
           filename: cvSubmission.originalFilename,
           extractedTextLength: extractedText.length,
+          openaiProcessing: openaiProcessingResult,
         },
       })
 
@@ -373,5 +414,341 @@ export default class CvSubmissionsController {
       questionsAnswered: cvSubmission.questionnaireResponse ?
         Object.values(cvSubmission.questionnaireResponse.responses).filter((q: any) => q.answered).length : 0,
     })
+  }
+
+  /**
+   * Get OpenAI processing status for a CV submission
+   * @swagger
+   * /api/cv/{submissionId}/processing-status:
+   *   get:
+   *     tags:
+   *       - OpenAI Processing
+   *     summary: Get processing status for a CV submission
+   *     description: Retrieve the current OpenAI processing status and details for a specific CV submission
+   *     parameters:
+   *       - in: path
+   *         name: submissionId
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: The submission ID of the CV
+   *         example: clx1234567890
+   *     responses:
+   *       200:
+   *         description: Processing status retrieved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   $ref: '#/components/schemas/ProcessingStatus'
+   *       404:
+   *         description: CV submission not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  async getProcessingStatus({ params, response }: HttpContext) {
+    try {
+      const submissionId = params.submissionId
+
+      // Find CV submission by submission ID
+      const cvSubmission = await CvSubmission.query()
+        .where('submission_id', submissionId)
+        .first()
+
+      if (!cvSubmission) {
+        return response.status(404).json({
+          success: false,
+          message: 'CV submission not found',
+        })
+      }
+
+      const status = await cvProcessingService.getProcessingStatus(cvSubmission.id)
+
+      return response.json({
+        success: true,
+        data: {
+          submissionId,
+          processingStatus: status.status,
+          canRetry: status.canRetry || false,
+          processedCv: status.processedCv ? {
+            id: status.processedCv.id,
+            processingStartedAt: status.processedCv.processingStartedAt,
+            processingCompletedAt: status.processedCv.processingCompletedAt,
+            tokensUsed: status.processedCv.tokensUsed,
+            processingTimeMs: status.processedCv.processingTimeMs,
+            retryCount: status.processedCv.retryCount,
+            errorMessage: status.processedCv.errorMessage,
+            dataValidated: status.processedCv.dataValidated,
+          } : null,
+        },
+      })
+    } catch (error) {
+      console.error('Error getting processing status:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to get processing status',
+      })
+    }
+  }
+
+  /**
+   * Get extracted CV data from OpenAI processing
+   * @swagger
+   * /api/cv/{submissionId}/extracted-data:
+   *   get:
+   *     tags:
+   *       - OpenAI Processing
+   *     summary: Get extracted CV data
+   *     description: Retrieve the structured data extracted from a CV using OpenAI processing
+   *     parameters:
+   *       - in: path
+   *         name: submissionId
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: The submission ID of the CV
+   *         example: clx1234567890
+   *     responses:
+   *       200:
+   *         description: Extracted data retrieved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   $ref: '#/components/schemas/ExtractedCvData'
+   *       404:
+   *         description: CV submission not found or not processed
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  async getExtractedData({ params, response }: HttpContext) {
+    try {
+      const submissionId = params.submissionId
+
+      // Find CV submission by submission ID
+      const cvSubmission = await CvSubmission.query()
+        .where('submission_id', submissionId)
+        .preload('processedCv')
+        .first()
+
+      if (!cvSubmission) {
+        return response.status(404).json({
+          success: false,
+          message: 'CV submission not found',
+        })
+      }
+
+      if (!cvSubmission.processedCv || cvSubmission.processedCv.processingStatus !== 'completed') {
+        return response.status(404).json({
+          success: false,
+          message: 'CV has not been successfully processed yet',
+        })
+      }
+
+      return response.json({
+        success: true,
+        data: {
+          submissionId,
+          extractedData: cvSubmission.processedCv.extractedData,
+          processingMetadata: {
+            processingCompletedAt: cvSubmission.processedCv.processingCompletedAt,
+            tokensUsed: cvSubmission.processedCv.tokensUsed,
+            processingTimeMs: cvSubmission.processedCv.processingTimeMs,
+            openaiModel: cvSubmission.processedCv.openaiModel,
+            dataValidated: cvSubmission.processedCv.dataValidated,
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Error getting extracted data:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to get extracted data',
+      })
+    }
+  }
+
+  /**
+   * Retry failed OpenAI processing
+   * @swagger
+   * /api/cv/{submissionId}/retry-processing:
+   *   post:
+   *     tags:
+   *       - OpenAI Processing
+   *     summary: Retry failed CV processing
+   *     description: Retry OpenAI processing for a CV submission that previously failed
+   *     parameters:
+   *       - in: path
+   *         name: submissionId
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: The submission ID of the CV
+   *         example: clx1234567890
+   *     responses:
+   *       200:
+   *         description: Processing retry initiated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: Processing retry initiated successfully
+   *                 data:
+   *                   $ref: '#/components/schemas/ProcessingStatus'
+   *       400:
+   *         description: Cannot retry processing (not eligible or already processing)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       404:
+   *         description: CV submission not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  async retryProcessing({ params, response }: HttpContext) {
+    try {
+      const submissionId = params.submissionId
+
+      // Find CV submission by submission ID
+      const cvSubmission = await CvSubmission.query()
+        .where('submission_id', submissionId)
+        .preload('processedCv')
+        .first()
+
+      if (!cvSubmission) {
+        return response.status(404).json({
+          success: false,
+          message: 'CV submission not found',
+        })
+      }
+
+      if (!cvSubmission.processedCv) {
+        return response.status(400).json({
+          success: false,
+          message: 'CV has not been processed yet',
+        })
+      }
+
+      if (!cvSubmission.processedCv.canRetry()) {
+        return response.status(400).json({
+          success: false,
+          message: 'CV processing cannot be retried (max attempts reached or not in failed state)',
+        })
+      }
+
+      const result = await cvProcessingService.retryFailedProcessing(cvSubmission.processedCv.id)
+
+      if (result.success) {
+        return response.json({
+          success: true,
+          message: 'CV processing retry initiated successfully',
+          data: {
+            submissionId,
+            processedCvId: result.processedCvId,
+            tokensUsed: result.tokensUsed,
+            processingTime: result.processingTime,
+          },
+        })
+      } else {
+        return response.status(500).json({
+          success: false,
+          message: 'Failed to retry CV processing',
+          error: result.error,
+        })
+      }
+    } catch (error) {
+      console.error('Error retrying processing:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to retry processing',
+      })
+    }
+  }
+
+  /**
+   * Get processing statistics
+   * @swagger
+   * /api/cv/processing-stats:
+   *   get:
+   *     tags:
+   *       - OpenAI Processing
+   *     summary: Get OpenAI processing statistics
+   *     description: Retrieve overall statistics for OpenAI CV processing including success rates and counts
+   *     responses:
+   *       200:
+   *         description: Processing statistics retrieved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   $ref: '#/components/schemas/ProcessingStats'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  async getProcessingStats({ response }: HttpContext) {
+    try {
+      const stats = await cvProcessingService.getProcessingStats()
+
+      return response.json({
+        success: true,
+        data: stats,
+      })
+    } catch (error) {
+      console.error('Error getting processing stats:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to get processing statistics',
+      })
+    }
   }
 }

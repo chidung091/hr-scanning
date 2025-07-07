@@ -3,6 +3,7 @@ import { BaseModel, column, hasOne, belongsTo } from '@adonisjs/lucid/orm'
 import type { HasOne, BelongsTo } from '@adonisjs/lucid/types/relations'
 import QuestionnaireResponse from './questionnaire_response.js'
 import Job from './job.js'
+import ProcessedCv from './processed_cv.js'
 
 export default class CvSubmission extends BaseModel {
   @column({ isPrimary: true })
@@ -47,6 +48,9 @@ export default class CvSubmission extends BaseModel {
   @hasOne(() => QuestionnaireResponse)
   declare questionnaireResponse: HasOne<typeof QuestionnaireResponse>
 
+  @hasOne(() => ProcessedCv)
+  declare processedCv: HasOne<typeof ProcessedCv>
+
   @belongsTo(() => Job)
   declare job: BelongsTo<typeof Job>
 
@@ -81,6 +85,17 @@ export default class CvSubmission extends BaseModel {
     return this.query()
       .preload('job')
       .preload('questionnaireResponse')
+      .preload('processedCv')
+  }
+
+  static withProcessedCv() {
+    return this.query().preload('processedCv')
+  }
+
+  static withSuccessfullyProcessedCv() {
+    return this.query().preload('processedCv', (processedQuery) => {
+      processedQuery.where('processing_status', 'completed')
+    })
   }
 
   static recentFirst() {

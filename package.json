@@ -13,7 +13,10 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "migration:run": "node ace migration:run",
-    "migration:rollback": "node ace migration:rollback"
+    "migration:rollback": "node ace migration:rollback --batch=0",
+    "migration:rollback-step": "node ace migration:rollback",
+    "migration:reset": "node ace migration:reset",
+    "migration:status": "node ace migration:status"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",

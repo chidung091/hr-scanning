@@ -14,6 +14,7 @@ const swaggerDefinition = {
 
       ### Features
       - **File Upload**: Support for PDF, DOC, and DOCX CV uploads with text extraction
+      - **OpenAI Integration**: Automated CV data extraction using GPT-4o-mini for structured data processing
       - **Progressive Assessment**: Multi-step questionnaire system with scoring
       - **Job Management**: Complete job posting and application management
       - **Real-time Processing**: Automated text extraction and analysis
@@ -178,6 +179,183 @@ const swaggerDefinition = {
           message: { type: 'string', example: 'An error occurred' },
           error: { type: 'string', example: 'Detailed error message' }
         }
+      },
+      ProcessedCv: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 1 },
+          cvSubmissionId: { type: 'integer', example: 1 },
+          processingStatus: {
+            type: 'string',
+            enum: ['pending', 'processing', 'completed', 'failed'],
+            example: 'completed'
+          },
+          processingStartedAt: { type: 'string', format: 'date-time', nullable: true },
+          processingCompletedAt: { type: 'string', format: 'date-time', nullable: true },
+          openaiModel: { type: 'string', example: 'gpt-4o-mini', nullable: true },
+          tokensUsed: { type: 'integer', example: 1500, nullable: true },
+          processingTimeMs: { type: 'integer', example: 5000, nullable: true },
+          extractedData: { $ref: '#/components/schemas/ExtractedCvData' },
+          errorMessage: { type: 'string', nullable: true },
+          retryCount: { type: 'integer', example: 0 },
+          lastRetryAt: { type: 'string', format: 'date-time', nullable: true },
+          dataValidated: { type: 'boolean', example: true },
+          validationNotes: { type: 'string', nullable: true },
+          searchableText: { type: 'string', nullable: true },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' }
+        }
+      },
+      ExtractedCvData: {
+        type: 'object',
+        properties: {
+          PersonalInformation: {
+            type: 'object',
+            properties: {
+              Name: { type: 'string', example: 'John Doe', nullable: true },
+              DateOfBirth: { type: 'string', format: 'date', example: '1990-01-15', nullable: true },
+              Gender: { type: 'string', example: 'male', nullable: true },
+              PhoneNumber: { type: 'string', example: '+1-555-123-4567', nullable: true },
+              Email: { type: 'string', format: 'email', example: 'john.doe@email.com', nullable: true },
+              Address: { type: 'string', example: '123 Main St, City, State 12345', nullable: true }
+            }
+          },
+          JobObjective: {
+            type: 'object',
+            properties: {
+              DesiredPosition: { type: 'string', example: 'Senior Software Engineer', nullable: true },
+              CareerGoals: { type: 'string', example: 'To lead innovative software development projects', nullable: true }
+            }
+          },
+          Education: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                School: { type: 'string', example: 'University of Technology', nullable: true },
+                Major: { type: 'string', example: 'Computer Science', nullable: true },
+                DegreeLevel: { type: 'string', example: 'Bachelor', nullable: true },
+                StartDate: { type: 'string', example: '2016-09', nullable: true },
+                EndDate: { type: 'string', example: '2020-06', nullable: true },
+                GPA: { type: 'string', example: '3.8', nullable: true }
+              }
+            }
+          },
+          WorkExperience: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                Company: { type: 'string', example: 'TechCorp Inc.', nullable: true },
+                JobTitle: { type: 'string', example: 'Software Engineer', nullable: true },
+                Duration: { type: 'string', example: '2020-2023', nullable: true },
+                Description: { type: 'string', example: 'Developed web applications using React and Node.js', nullable: true },
+                KeyAchievements: { type: 'string', example: 'Led team of 5 developers, increased performance by 40%', nullable: true }
+              }
+            }
+          },
+          Skills: {
+            type: 'object',
+            properties: {
+              Technical: {
+                type: 'array',
+                items: { type: 'string' },
+                example: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python']
+              },
+              Soft: {
+                type: 'array',
+                items: { type: 'string' },
+                example: ['Leadership', 'Communication', 'Problem Solving']
+              }
+            }
+          },
+          Certifications: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                Name: { type: 'string', example: 'AWS Certified Solutions Architect', nullable: true },
+                IssuingOrganization: { type: 'string', example: 'Amazon Web Services', nullable: true },
+                IssueDate: { type: 'string', format: 'date', example: '2023-01-15', nullable: true },
+                ExpirationDate: { type: 'string', format: 'date', example: '2026-01-15', nullable: true }
+              }
+            }
+          },
+          Projects: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                ProjectName: { type: 'string', example: 'E-commerce Platform', nullable: true },
+                Role: { type: 'string', example: 'Lead Developer', nullable: true },
+                Description: { type: 'string', example: 'Built scalable e-commerce platform', nullable: true },
+                Technologies: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['React', 'Express.js', 'MongoDB']
+                }
+              }
+            }
+          },
+          Languages: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                Name: { type: 'string', example: 'English', nullable: true },
+                Proficiency: { type: 'string', example: 'Native', nullable: true }
+              }
+            }
+          },
+          ExtracurricularAwards: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                Title: { type: 'string', example: 'Best Innovation Award', nullable: true },
+                Organization: { type: 'string', example: 'Tech Conference 2023', nullable: true },
+                Date: { type: 'string', format: 'date', example: '2023-06-15', nullable: true },
+                Description: { type: 'string', example: 'Awarded for innovative AI solution', nullable: true }
+              }
+            }
+          },
+          Interests: {
+            type: 'array',
+            items: { type: 'string' },
+            example: ['Machine Learning', 'Open Source', 'Photography']
+          },
+          YearExperience: { type: 'integer', example: 5, nullable: true },
+          TechnologyExperience: {
+            type: 'array',
+            items: { type: 'string' },
+            example: ['JavaScript', 'Python', 'React', 'Node.js', 'AWS']
+          },
+          CareerPath: { type: 'string', example: 'Full Stack Development', nullable: true }
+        }
+      },
+      ProcessingStatus: {
+        type: 'object',
+        properties: {
+          submissionId: { type: 'string', example: 'clx1234567890' },
+          processingStatus: {
+            type: 'string',
+            enum: ['not_started', 'pending', 'processing', 'completed', 'failed'],
+            example: 'completed'
+          },
+          canRetry: { type: 'boolean', example: false },
+          processedCv: { $ref: '#/components/schemas/ProcessedCv' }
+        }
+      },
+      ProcessingStats: {
+        type: 'object',
+        properties: {
+          total: { type: 'integer', example: 150 },
+          completed: { type: 'integer', example: 120 },
+          failed: { type: 'integer', example: 15 },
+          pending: { type: 'integer', example: 10 },
+          processing: { type: 'integer', example: 5 },
+          successRate: { type: 'number', format: 'float', example: 80.0 }
+        }
       }
     }
   },
@@ -197,6 +375,10 @@ const swaggerDefinition = {
     {
       name: 'Management',
       description: 'Administrative endpoints for managing applications'
+    },
+    {
+      name: 'OpenAI Processing',
+      description: 'AI-powered CV data extraction and processing endpoints'
     }
   ]
 }
