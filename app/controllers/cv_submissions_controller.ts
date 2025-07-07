@@ -4,10 +4,9 @@ import CvSubmission from '#models/cv_submission'
 import QuestionnaireResponse from '#models/questionnaire_response'
 import drive from '@adonisjs/drive/services/main'
 import mammoth from 'mammoth'
-import OpenAI from 'openai'
-import env from '#start/env'
 import { cvUploadValidator } from '#validators/cv_submission_validator'
 import cvProcessingService from '#services/cv_processing_service'
+import { generateSafeFileKey } from '#utils/filename_sanitizer'
 
 // Initialize OpenAI client (currently unused but available for PDF processing)
 // const openai = new OpenAI({
@@ -118,9 +117,11 @@ export default class CvSubmissionsController {
       // Generate unique submission ID
       const submissionId = cuid()
 
-      // Move file to Drive storage
-      const fileName = `${submissionId}_${file.clientName}`
-      const fileKey = `cvs/${fileName}`
+      // Generate safe file key with sanitized filename to prevent storage errors
+      const fileKey = generateSafeFileKey(submissionId, file.clientName, 'cvs/')
+
+      console.log('Original filename:', file.clientName)
+      console.log('Sanitized file key:', fileKey)
 
       // Use Drive's moveToDisk method for better file handling
       await file.moveToDisk(fileKey)
@@ -200,7 +201,7 @@ export default class CvSubmissionsController {
 
       // Comprehensive debug information
       console.log('=== CV TEXT EXTRACTION DEBUG ===')
-      console.log('File:', fileName)
+      console.log('Original filename:', file.clientName)
       console.log('File Key:', fileKey)
       console.log('File Type:', file.extname)
       console.log('File Size:', file.size, 'bytes')
@@ -230,7 +231,7 @@ export default class CvSubmissionsController {
       try {
         cvSubmission = await CvSubmission.create({
           submissionId,
-          filename: fileName,
+          filename: fileKey.split('/').pop() || fileKey, // Extract filename from file key
           originalFilename: file.clientName,
           filePath: fileKey, // Store the Drive file key instead of local path
           fileSize: file.size,

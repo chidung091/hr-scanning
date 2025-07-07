@@ -407,4 +407,96 @@ test.group('Assessment API', (group) => {
     assert.equal(questionnaireResponse.questionsCompleted, 6) // Should be set to total questions
     assert.equal(questionnaireResponse.currentQuestion, 7) // Should be set to total + 1
   })
+
+  test('should properly calculate progress when skipping individual questions', async ({ client, assert }) => {
+    // Create assessment starting from question 1
+    const questionnaireResponse = await QuestionnaireResponse.create({
+      submissionId: 'test-skip-progress-123',
+      cvSubmissionId: testSubmission.id,
+      responses: {},
+      currentQuestion: 1,
+      questionsCompleted: 0,
+      isCompleted: false,
+      languagePreference: 'en',
+      startedAt: DateTime.now(),
+      lastActivityAt: DateTime.now(),
+    })
+
+    // Skip question 1 - should increment questionsCompleted to 1
+    let response = await client
+      .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
+      .json({
+        question_id: 1,
+        answer: null,
+        action: 'skip'
+      })
+
+    response.assertStatus(200)
+    let data = response.body()
+    assert.isTrue(data.success)
+    assert.equal(data.data.currentQuestion, 2)
+    assert.equal(data.data.progress, 17) // 1/6 * 100 = 16.67 rounded to 17
+
+    // Verify questionsCompleted was incremented
+    await questionnaireResponse.refresh()
+    assert.equal(questionnaireResponse.questionsCompleted, 1)
+
+    // Answer question 2 - should increment questionsCompleted to 2
+    response = await client
+      .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
+      .json({
+        question_id: 2,
+        answer: 'reasonable_notice',
+        action: 'next'
+      })
+
+    response.assertStatus(200)
+    data = response.body()
+    assert.equal(data.data.progress, 33) // 2/6 * 100 = 33.33 rounded to 33
+
+    // Skip questions 3, 4, 5 to get to the final question
+    for (let questionId = 3; questionId <= 5; questionId++) {
+      response = await client
+        .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
+        .json({
+          question_id: questionId,
+          answer: null,
+          action: 'skip'
+        })
+
+      response.assertStatus(200)
+      data = response.body()
+      assert.isFalse(data.data.completed)
+    }
+
+    // Verify we're at question 6 with 83% progress (5/6)
+    await questionnaireResponse.refresh()
+    assert.equal(questionnaireResponse.currentQuestion, 6)
+    assert.equal(questionnaireResponse.questionsCompleted, 5)
+    assert.equal(questionnaireResponse.getProgressPercentage(), 83) // 5/6 * 100 = 83.33 rounded to 83
+
+    // Skip the final question - should complete the assessment with 100% progress
+    response = await client
+      .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
+      .json({
+        question_id: 6,
+        answer: null,
+        action: 'skip'
+      })
+
+    response.assertStatus(200)
+    data = response.body()
+
+    // This should now complete the assessment
+    assert.isTrue(data.data.completed)
+    assert.equal(data.data.progress, 100)
+    assert.exists(data.data.totalScore)
+    assert.exists(data.data.assessmentResult)
+
+    // Verify the assessment is marked as completed
+    await questionnaireResponse.refresh()
+    assert.isTrue(questionnaireResponse.isCompleted)
+    assert.equal(questionnaireResponse.questionsCompleted, 6)
+    assert.equal(questionnaireResponse.getProgressPercentage(), 100)
+  })
 })

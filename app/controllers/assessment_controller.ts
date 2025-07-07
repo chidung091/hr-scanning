@@ -354,6 +354,20 @@ export default class AssessmentController {
           // For skip action or when no answer provided, manually increment
           nextQuestionId = questionnaireResponse.currentQuestion + 1
           questionnaireResponse.currentQuestion = nextQuestionId
+          // IMPORTANT: Also increment questionsCompleted for skipped questions
+          // This ensures progress calculation reaches 100% when all questions are processed
+          questionnaireResponse.questionsCompleted = Math.max(questionnaireResponse.questionsCompleted, questionId)
+
+          // Check if completed after skipping
+          if (questionnaireResponse.questionsCompleted >= ASSESSMENT_CONFIG.totalQuestions) {
+            questionnaireResponse.isCompleted = true
+            questionnaireResponse.completedAt = DateTime.now()
+
+            // Calculate final score based on existing responses
+            const scoring = questionnaireResponse.calculateScore()
+            questionnaireResponse.totalScore = scoring.totalScore
+            questionnaireResponse.assessmentResult = scoring.assessmentResult
+          }
         }
       }
       questionnaireResponse.lastActivityAt = DateTime.now()

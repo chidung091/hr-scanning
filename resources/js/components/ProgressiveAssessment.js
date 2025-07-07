@@ -124,6 +124,10 @@ class ProgressiveAssessment {
                 <div id="assessmentResult" class="text-sm text-gray-600 capitalize">--</div>
               </div>
 
+              <div id="autoRedirectMessage" class="text-sm text-gray-600 mb-4 text-center">
+                Redirecting to success page in <span id="countdown">3</span> seconds...
+              </div>
+
               <button id="finishBtn" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
                 Continue to Success Page
               </button>
@@ -446,13 +450,42 @@ class ProgressiveAssessment {
     this.hideLoading()
     document.getElementById('questionContent').classList.add('hidden')
     document.getElementById('completionScreen').classList.remove('hidden')
-    
+
     if (data.totalScore !== undefined) {
       document.getElementById('finalScore').textContent = data.totalScore
       document.getElementById('assessmentResult').textContent = data.assessmentResult || 'Completed'
     }
-    
+
     this.completionData = data
+
+    // Auto-redirect to success page after 3 seconds with countdown
+    // This provides a better user experience while still allowing manual navigation
+    if (data.submissionId) {
+      let countdown = 3
+      const countdownElement = document.getElementById('countdown')
+      const messageElement = document.getElementById('autoRedirectMessage')
+
+      // Show the countdown message
+      if (messageElement) {
+        messageElement.classList.remove('hidden')
+      }
+
+      // Update countdown every second
+      const countdownInterval = setInterval(() => {
+        countdown--
+        if (countdownElement) {
+          countdownElement.textContent = countdown
+        }
+
+        if (countdown <= 0) {
+          clearInterval(countdownInterval)
+          this.finish()
+        }
+      }, 1000)
+
+      // Store interval ID so it can be cleared if user manually navigates
+      this.countdownInterval = countdownInterval
+    }
   }
 
   async goToPrevious() {
@@ -475,6 +508,12 @@ class ProgressiveAssessment {
   }
 
   finish() {
+    // Clear countdown interval if it exists
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval)
+      this.countdownInterval = null
+    }
+
     if (this.completionData?.submissionId) {
       window.location.href = `/success/${this.completionData.submissionId}`
     } else {
@@ -490,6 +529,12 @@ class ProgressiveAssessment {
   }
 
   close() {
+    // Clear countdown interval if it exists
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval)
+      this.countdownInterval = null
+    }
+
     document.getElementById(this.options.containerId).classList.add('hidden')
     this.reset()
   }
