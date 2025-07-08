@@ -24,6 +24,8 @@ const JobsController = () => import('#controllers/jobs_controller')
 const AssessmentController = () => import('#controllers/assessment_controller')
 const SwaggerController = () => import('#controllers/swagger_controller')
 const ManagementController = () => import('#controllers/management_controller')
+const AdminController = () => import('#controllers/admin_controller')
+const AiCriteriaController = () => import('#controllers/ai_criteria_controller')
 
 router.get('/', [HomeController, 'index'])
 
@@ -82,6 +84,22 @@ router
 router
   .get('/api/management/analytics', [ManagementController, 'getAnalytics'])
   .use(managementAnalyticsThrottle)
+
+// Admin routes
+router.get('/admin', [AdminController, 'dashboard'])
+
+// Admin Jobs API routes
+router.get('/api/admin/jobs', [JobsController, 'apiAdminIndex'])
+router.post('/api/admin/jobs', [JobsController, 'apiStore'])
+router.put('/api/admin/jobs/:id', [JobsController, 'apiUpdate'])
+router.delete('/api/admin/jobs/:id', [JobsController, 'apiDestroy'])
+
+// AI Criteria API routes
+router.get('/api/admin/ai-criteria', [AiCriteriaController, 'index'])
+router.post('/api/admin/ai-criteria', [AiCriteriaController, 'store'])
+router.get('/api/admin/ai-criteria/:id', [AiCriteriaController, 'show'])
+router.put('/api/admin/ai-criteria/:id', [AiCriteriaController, 'update'])
+router.delete('/api/admin/ai-criteria/:id', [AiCriteriaController, 'destroy'])
 
 // API Documentation routes
 router.get('/api/docs', [SwaggerController, 'ui'])
