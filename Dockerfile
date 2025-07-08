@@ -27,15 +27,56 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Development stage
 FROM base AS development
+
+# Create app user for development
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S adonisjs -u 1001
+
+# Install all dependencies (including dev dependencies)
 RUN npm ci
-COPY . .
+
+# Create necessary directories with proper permissions
+RUN mkdir -p uploads/cvs tmp storage/cvs /tmp/.vite && \
+    chown -R adonisjs:nodejs /app /tmp/.vite && \
+    chmod -R 755 /app /tmp/.vite
+
+# Switch to non-root user before copying files
+USER adonisjs
+
+# Copy application files
+COPY --chown=adonisjs:nodejs . .
+
+# Ensure node_modules has proper permissions for Vite cache
+RUN chmod -R 755 node_modules || true
+
 EXPOSE 3333
 CMD ["npm", "run", "dev"]
 
 # Build stage
 FROM base AS build
+
+# Create app user for build stage
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S adonisjs -u 1001
+
+# Install all dependencies (including dev dependencies)
 RUN npm ci
-COPY . .
+
+# Create necessary directories and set permissions
+RUN mkdir -p uploads/cvs tmp storage/cvs /tmp/.vite && \
+    chown -R adonisjs:nodejs /app /tmp/.vite && \
+    chmod -R 755 /app /tmp/.vite
+
+# Switch to non-root user
+USER adonisjs
+
+# Copy application files
+COPY --chown=adonisjs:nodejs . .
+
+# Ensure node_modules has proper permissions for Vite
+RUN chmod -R 755 node_modules || true
+
+# Build the application
 RUN npm run build
 
 # Production stage
