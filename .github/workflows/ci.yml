@@ -67,21 +67,6 @@ jobs:
     needs: check-audit
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: hr_scanning_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,15 +85,8 @@ jobs:
           cp .env.example .env || echo "No .env.example found, creating basic .env"
           echo "NODE_ENV=test" >> .env
           echo "APP_KEY=$(openssl rand -base64 32)" >> .env
-          echo "DB_CONNECTION=postgres" >> .env
-          echo "DB_HOST=localhost" >> .env
-          echo "DB_PORT=5432" >> .env
-          echo "DB_USERNAME=postgres" >> .env
-          echo "DB_PASSWORD=postgres" >> .env
-          echo "DB_DATABASE=hr_scanning_test" >> .env
           echo "DRIVE_DISK=fs" >> .env
           echo "SESSION_DRIVER=cookie" >> .env
-          echo "LIMITER_STORE=database" >> .env
 
       - name: Build application
         run: npm run build
