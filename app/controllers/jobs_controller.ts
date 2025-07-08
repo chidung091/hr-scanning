@@ -62,4 +62,128 @@ export default class JobsController {
       data: job,
     })
   }
+
+  /**
+   * API endpoint to get all jobs for admin (including inactive)
+   */
+  async apiAdminIndex({ response }: HttpContext) {
+    try {
+      const jobs = await Job.query().orderBy('sortOrder', 'asc').orderBy('createdAt', 'desc')
+
+      return response.json({
+        success: true,
+        data: jobs,
+      })
+    } catch (error) {
+      console.error('Error fetching admin jobs:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to fetch jobs',
+      })
+    }
+  }
+
+  /**
+   * API endpoint to create a new job
+   */
+  async apiStore({ request, response }: HttpContext) {
+    try {
+      const data = request.only([
+        'jobTitle',
+        'numberOfEmployees',
+        'startTime',
+        'endTime',
+        'workingTime',
+        'workLocation',
+        'salaryRange',
+        'responsibilities',
+        'requirements',
+        'preferredQualifications',
+        'benefits',
+        'probationPolicy',
+        'equipmentProvided',
+        'otherPerks',
+        'isActive',
+        'sortOrder',
+      ])
+
+      const job = await Job.create(data)
+
+      return response.status(201).json({
+        success: true,
+        data: job,
+        message: 'Job created successfully',
+      })
+    } catch (error) {
+      console.error('Error creating job:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to create job',
+      })
+    }
+  }
+
+  /**
+   * API endpoint to update a job
+   */
+  async apiUpdate({ params, request, response }: HttpContext) {
+    try {
+      const job = await Job.findOrFail(params.id)
+
+      const data = request.only([
+        'jobTitle',
+        'numberOfEmployees',
+        'startTime',
+        'endTime',
+        'workingTime',
+        'workLocation',
+        'salaryRange',
+        'responsibilities',
+        'requirements',
+        'preferredQualifications',
+        'benefits',
+        'probationPolicy',
+        'equipmentProvided',
+        'otherPerks',
+        'isActive',
+        'sortOrder',
+      ])
+
+      job.merge(data)
+      await job.save()
+
+      return response.json({
+        success: true,
+        data: job,
+        message: 'Job updated successfully',
+      })
+    } catch (error) {
+      console.error('Error updating job:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to update job',
+      })
+    }
+  }
+
+  /**
+   * API endpoint to delete a job
+   */
+  async apiDestroy({ params, response }: HttpContext) {
+    try {
+      const job = await Job.findOrFail(params.id)
+      await job.delete()
+
+      return response.json({
+        success: true,
+        message: 'Job deleted successfully',
+      })
+    } catch (error) {
+      console.error('Error deleting job:', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to delete job',
+      })
+    }
+  }
 }

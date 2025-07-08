@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrfToken }}" />
+    <title>
+      Admin Dashboard - TechVision Solutions
+    </title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com">
+      
+    </script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [ "Inter", "sans-serif" ]
+            },
+            colors: {
+              primary: {
+                DEFAULT: "#2563eb",
+                50: "#eff6ff",
+                100: "#dbeafe",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                900: "#1e3a8a"
+              }
+            }
+          }
+        }
+      };
+    </script>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+  </head>
+  <body class="min-h-screen bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <a href="/" class="text-2xl font-bold text-primary-600">TechVision</a>
+            </div>
+            <div class="ml-6 text-sm text-gray-500">
+              / Admin Dashboard
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-600">Admin</span>
+            <a href="/" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+              Back to Site
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+          Admin Dashboard
+        </h1>
+        <p class="mt-2 text-gray-600">
+          Manage jobs, applicants, and AI evaluation criteria
+        </p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="mb-8">
+        <div class="sm:hidden">
+          <select
+            id="tab-select"
+            class="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-primary-500 focus:outline-none focus:ring-primary-500 sm:text-sm"
+          >
+            <option value="jobs">
+              Jobs Management
+            </option>
+            <option value="applicants">
+              Applicant Management
+            </option>
+            <option value="criteria">
+              AI Criteria Management
+            </option>
+          </select>
+        </div>
+        <div class="hidden sm:block">
+          <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8">
+              <button
+                id="jobs-tab"
+                class="tab-button active whitespace-nowrap border-b-2 border-primary-500 py-2 px-1 text-sm font-medium text-primary-600"
+              >
+                Jobs Management
+              </button>
+              <button
+                id="applicants-tab"
+                class="tab-button whitespace-nowrap border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              >
+                Applicant Management
+              </button>
+              <button
+                id="criteria-tab"
+                class="tab-button whitespace-nowrap border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              >
+                AI Criteria Management
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Jobs Management Tab -->
+        <div id="jobs-content" class="tab-panel active">
+          <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">
+                  Jobs Management
+                </h2>
+                <button
+                  id="add-job-btn"
+                  class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700"
+                >
+                  Add New Job
+                </button>
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Job Title
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Location
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Positions
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="jobs-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Jobs will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Applicant Management Tab -->
+        <div id="applicants-content" class="tab-panel hidden">
+          <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">
+                  Applicant Management
+                </h2>
+                <div class="flex space-x-3">
+                  <select
+                    id="status-filter"
+                    class="rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500"
+                  >
+                    <option value="">
+                      All Status
+                    </option>
+                    <option value="pending">
+                      Pending
+                    </option>
+                    <option value="submitted">
+                      Submitted
+                    </option>
+                    <option value="reviewed">
+                      Reviewed
+                    </option>
+                    <option value="accepted">
+                      Accepted
+                    </option>
+                    <option value="rejected">
+                      Rejected
+                    </option>
+                  </select>
+                  <button
+                    id="refresh-applicants-btn"
+                    class="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                  >
+                    Refresh
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Email
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Job Applied
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Assessment
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="applicants-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Applicants will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Criteria Management Tab -->
+        <div id="criteria-content" class="tab-panel hidden">
+          <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">
+                  AI Criteria Management
+                </h2>
+                <button
+                  id="add-criteria-btn"
+                  class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700"
+                >
+                  Add New Criterion
+                </button>
+              </div>
+            </div>
+            <div class="p-6">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Weight
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="criteria-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Criteria will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals will be dynamically added here -->
+    <div id="modal-container">
+    </div>
+
+    <script>
+      // Tab functionality
+      const tabButtons = document.querySelectorAll(".tab-button");
+      
+      const tabPanels = document.querySelectorAll(".tab-panel");
+      
+      const tabSelect = document.getElementById("tab-select");
+      
+      function showTab(tabName) {
+        // Hide all panels
+        tabPanels.forEach(panel => {
+          panel.classList.add("hidden");
+          panel.classList.remove("active");
+        });
+        // Remove active class from all buttons
+        tabButtons.forEach(button => {
+          button.classList.remove("active", "border-primary-500", "text-primary-600");
+          button.classList.add("border-transparent", "text-gray-500");
+        });
+        // Show selected panel
+        const selectedPanel = document.getElementById(tabName + "-content");
+        if (selectedPanel) {
+          selectedPanel.classList.remove("hidden");
+          selectedPanel.classList.add("active");
+        }
+        // Add active class to selected button
+        const selectedButton = document.getElementById(tabName + "-tab");
+        if (selectedButton) {
+          selectedButton.classList.add("active", "border-primary-500", "text-primary-600");
+          selectedButton.classList.remove("border-transparent", "text-gray-500");
+        }
+        // Update select value
+        if (tabSelect) {
+          tabSelect.value = tabName;
+        }
+        // Load data for the selected tab
+        if (tabName === "jobs") {
+          loadJobs();
+        } else if (tabName === "applicants") {
+          loadApplicants();
+        } else if (tabName === "criteria") {
+          loadCriteria();
+        }
+      }
+      // Tab button click handlers
+      
+      tabButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          const tabName = button.id.replace("-tab", "");
+          showTab(tabName);
+        });
+      });
+      // Mobile tab select handler
+      
+      if (tabSelect) {
+        tabSelect.addEventListener("change", e => {
+          showTab(e.target.value);
+        });
+      }
+      // Initialize with jobs tab
+      
+      showTab("jobs");
+      // API Helper functions
+      
+      async function apiRequest(url, options = {}) {
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+            ...options.headers
+          },
+          ...options
+        });
+        return response.json();
+      }
+      // Jobs Management
+      
+      async function loadJobs() {
+        try {
+          const response = await apiRequest("/api/admin/jobs");
+          const jobs = response.data;
+          const tbody = document.getElementById("jobs-table-body");
+          tbody.innerHTML = jobs.map(job => `
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${job.jobTitle}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${job.workLocation || "Remote"}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${job.numberOfEmployees}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${job.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}">
+                        ${job.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button onclick="editJob(${job.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                      <button onclick="deleteJob(${job.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                  </tr>
+                `).join("");
+        } catch (error) {
+          console.error("Error loading jobs:", error);
+        }
+      }
+      // Applicant Management
+      
+      async function loadApplicants() {
+        try {
+          const statusFilter = document.getElementById("status-filter").value;
+          const url = statusFilter ? `/api/management/submissions?status=${statusFilter}` : "/api/management/submissions";
+          const response = await apiRequest(url);
+          const applicants = response.data.submissions;
+          const tbody = document.getElementById("applicants-table-body");
+          tbody.innerHTML = applicants.map(applicant => `
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${applicant.applicantName || "N/A"}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${applicant.applicantEmail || "N/A"}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${applicant.job?.jobTitle || "N/A"}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(applicant.status)}">
+                        ${applicant.status}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      ${applicant.questionnaireResponse?.isCompleted ? `<span class="text-green-600">Completed (${applicant.questionnaireResponse.totalScore || 0})</span>` : '<span class="text-gray-400">Not Completed</span>'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button onclick="viewApplicant('${applicant.submissionId}')" class="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
+                      <button onclick="updateApplicantStatus('${applicant.submissionId}', '${applicant.status}')" class="text-blue-600 hover:text-blue-900">Update</button>
+                    </td>
+                  </tr>
+                `).join("");
+        } catch (error) {
+          console.error("Error loading applicants:", error);
+        }
+      }
+      // AI Criteria Management
+      
+      async function loadCriteria() {
+        try {
+          const response = await apiRequest("/api/admin/ai-criteria");
+          const criteria = response.data;
+          const tbody = document.getElementById("criteria-table-body");
+          tbody.innerHTML = criteria.map(criterion => `
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${criterion.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${criterion.weight}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${criterion.description || "N/A"}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${criterion.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}">
+                        ${criterion.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button onclick="editCriterion(${criterion.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                      <button onclick="deleteCriterion(${criterion.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                  </tr>
+                `).join("");
+        } catch (error) {
+          console.error("Error loading criteria:", error);
+        }
+      }
+      // Helper functions
+      
+      function getStatusColor(status) {
+        switch (status) {
+         case "pending":
+          return "bg-yellow-100 text-yellow-800";
+      
+         case "submitted":
+          return "bg-blue-100 text-blue-800";
+      
+         case "reviewed":
+          return "bg-purple-100 text-purple-800";
+      
+         case "accepted":
+          return "bg-green-100 text-green-800";
+      
+         case "rejected":
+          return "bg-red-100 text-red-800";
+      
+         default:
+          return "bg-gray-100 text-gray-800";
+        }
+      }
+      // Event listeners
+      
+      document.getElementById("refresh-applicants-btn").addEventListener("click", loadApplicants);
+      
+      document.getElementById("status-filter").addEventListener("change", loadApplicants);
+      // Placeholder functions for actions
+      
+      function editJob(id) {
+        alert("Edit job functionality will be implemented");
+      }
+      
+      function deleteJob(id) {
+        if (confirm("Are you sure you want to delete this job?")) {
+          alert("Delete job functionality will be implemented");
+        }
+      }
+      
+      function viewApplicant(submissionId) {
+        alert("View applicant functionality will be implemented");
+      }
+      
+      function updateApplicantStatus(submissionId, currentStatus) {
+        alert("Update applicant status functionality will be implemented");
+      }
+      
+      function editCriterion(id) {
+        alert("Edit criterion functionality will be implemented");
+      }
+      
+      function deleteCriterion(id) {
+        if (confirm("Are you sure you want to delete this criterion?")) {
+          alert("Delete criterion functionality will be implemented");
+        }
+      }
+      
+      document.getElementById("add-job-btn").addEventListener("click", () => {
+        alert("Add job functionality will be implemented");
+      });
+      
+      document.getElementById("add-criteria-btn").addEventListener("click", () => {
+        alert("Add criterion functionality will be implemented");
+      });
+    </script>
+  </body>
+</html>
