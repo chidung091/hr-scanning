@@ -1,40 +1,7 @@
 import { test } from '@japa/runner'
 import sinon from 'sinon'
-import { DateTime } from 'luxon'
 
-// Mock models and data
-const mockJob = {
-  id: 1,
-  jobTitle: 'Test Software Engineer',
-  numberOfEmployees: 1,
-  startTime: '9:00 AM',
-  endTime: '5:00 PM',
-  workingTime: 'Full-time',
-  workLocation: 'Remote',
-  salaryRange: '$100k - $150k',
-  responsibilities: 'Test responsibilities',
-  requirements: 'Test requirements',
-  isActive: true,
-  sortOrder: 0,
-  createdAt: DateTime.now(),
-  updatedAt: DateTime.now(),
-}
-
-const mockCvSubmission = {
-  id: 1,
-  submissionId: 'test-submission-123',
-  filename: 'test-cv.pdf',
-  originalFilename: 'test-cv.pdf',
-  filePath: 'uploads/test-cv.pdf',
-  fileSize: 1024,
-  mimeType: 'application/pdf',
-  applicantName: 'Jane Doe',
-  applicantEmail: 'jane.doe@test.com',
-  status: 'pending',
-  jobId: 1,
-  createdAt: DateTime.now(),
-  updatedAt: DateTime.now(),
-}
+// Mock API responses
 
 // Mock API responses
 const mockApiResponses = {
@@ -125,8 +92,6 @@ test.group('Assessment API', (group) => {
     uploadResponse.assertStatus(200)
     const uploadData = uploadResponse.body()
     assert.isTrue(uploadData.success)
-
-    const submissionId = uploadData.data.submissionId
 
     // Mock assessment start response
     const response = {
@@ -385,7 +350,9 @@ test.group('Assessment API', (group) => {
     assert.exists(data.data.assessmentResult)
   })
 
-  test('should properly calculate progress when skipping individual questions', async ({ assert }) => {
+  test('should properly calculate progress when skipping individual questions', async ({
+    assert,
+  }) => {
     // Mock progressive responses for skipping questions
     const mockProgressResponses = [
       {
@@ -398,7 +365,13 @@ test.group('Assessment API', (group) => {
       },
       {
         success: true,
-        data: { currentQuestion: 7, progress: 100, completed: true, totalScore: 80, assessmentResult: 'good' },
+        data: {
+          currentQuestion: 7,
+          progress: 100,
+          completed: true,
+          totalScore: 80,
+          assessmentResult: 'good',
+        },
       },
     ]
 
