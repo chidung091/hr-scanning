@@ -16,6 +16,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3333,
+    allowedHosts: ['nvcd.xyz'],
     watch: {
       usePolling: isDocker, // chỉ enable polling trong Docker
       interval: 1000,
