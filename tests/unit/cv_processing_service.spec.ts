@@ -5,12 +5,7 @@ import CvSubmission from '#models/cv_submission'
 import ProcessedCv from '#models/processed_cv'
 import Database from '@adonisjs/lucid/services/db'
 import openaiService from '#services/openai_service'
-import {
-  OpenAIMockManager,
-  mockExtractedCvData,
-  mockMinimalCvData,
-  mockOpenAIErrors,
-} from '#tests/utils/openai_mocks'
+import { OpenAIMockManager, mockExtractedCvData } from '#tests/utils/openai_mocks'
 
 test.group('CV Processing Service', (group) => {
   let cvProcessingService: CvProcessingService
@@ -89,7 +84,10 @@ test.group('CV Processing Service', (group) => {
 
     // Verify OpenAI service was called with correct text
     assert.isTrue(openaiStub.calledOnce)
-    assert.equal(openaiStub.firstCall.args[0], 'Test CV content with sufficient length for processing')
+    assert.equal(
+      openaiStub.firstCall.args[0],
+      'Test CV content with sufficient length for processing'
+    )
   })
 
   test('should handle OpenAI processing failure', async ({ assert }) => {

@@ -27,20 +27,25 @@ export const plugins: Config['plugins'] = [assert(), apiClient(), pluginAdonisJS
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
   setup: [
     () => {
+      // Ensure NODE_ENV is set to 'test' for proper rate limiting configuration
+      process.env.NODE_ENV = 'test'
+
       // Set up global environment variable stub for OpenAI API key
       if (!env.get('OPENAI_API_KEY')) {
+        const originalGet = env.get.bind(env)
         sinon.stub(env, 'get').callsFake((key: string, defaultValue?: any) => {
           if (key === 'OPENAI_API_KEY') return 'test-api-key'
-          return env.get.wrappedMethod?.call(env, key, defaultValue) || defaultValue
+          if (key === 'NODE_ENV') return 'test'
+          return originalGet(key, defaultValue) || defaultValue
         })
       }
-    }
+    },
   ],
   teardown: [
     () => {
       // Restore all sinon stubs
       sinon.restore()
-    }
+    },
   ],
 }
 

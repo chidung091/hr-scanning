@@ -154,13 +154,13 @@ test.group('OpenAI Service', (group) => {
   })
 
   test('should handle OpenAI API errors with retry', async ({ assert }) => {
-    const service = new OpenAIService()
-
     // Mock response that fails twice then succeeds
-    const mockStub = mockManager.mockResponseWithRetries(2, mockExtractedCvData, mockOpenAIErrors.rateLimitError)
-
-    // Replace the OpenAI client's method
-    ;(service as any).client.chat.completions.create = mockStub
+    const mockStub = mockManager.mockResponseWithRetries(
+      2,
+      mockExtractedCvData,
+      mockOpenAIErrors.rateLimitError
+    )
+    const service = mockManager.createMockService(mockStub)
 
     const result = await service.extractCvData(sampleCvTexts.comprehensive)
 
@@ -171,13 +171,9 @@ test.group('OpenAI Service', (group) => {
   })
 
   test('should fail after max retries', async ({ assert }) => {
-    const service = new OpenAIService()
-
     // Mock response that always fails
     const mockStub = mockManager.mockErrorResponse(mockOpenAIErrors.rateLimitError)
-
-    // Replace the OpenAI client's method
-    ;(service as any).client.chat.completions.create = mockStub
+    const service = mockManager.createMockService(mockStub)
 
     const result = await service.extractCvData(sampleCvTexts.comprehensive)
 
@@ -203,13 +199,9 @@ test.group('OpenAI Service', (group) => {
   })
 
   test('should handle empty OpenAI response', async ({ assert }) => {
-    const service = new OpenAIService()
-
     // Mock empty response
     const mockStub = mockManager.mockEmptyResponse()
-
-    // Replace the OpenAI client's method
-    ;(service as any).client.chat.completions.create = mockStub
+    const service = mockManager.createMockService(mockStub)
 
     const result = await service.extractCvData(sampleCvTexts.comprehensive)
 
@@ -302,8 +294,6 @@ test.group('OpenAI Service Mocked Integration', (group) => {
   })
 
   test('should validate response data structure', async ({ assert }) => {
-    const service = new OpenAIService()
-
     // Mock response with invalid data structure
     const invalidData = {
       PersonalInformation: null, // Invalid structure
@@ -315,13 +305,12 @@ test.group('OpenAI Service Mocked Integration', (group) => {
       usage: { total_tokens: 100 },
     })
 
-    // Replace the OpenAI client's method
-    ;(service as any).client.chat.completions.create = mockStub
+    const service = mockManager.createMockService(mockStub)
 
     const result = await service.extractCvData(sampleCvTexts.comprehensive)
 
     assert.isFalse(result.success)
-    assert.include(result.error!, 'validation')
+    assert.include(result.error!, 'Missing required property')
     assert.isDefined(result.processingTime)
   })
 })

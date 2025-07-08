@@ -1,7 +1,5 @@
 import { test } from '@japa/runner'
-import sinon from 'sinon'
 import { OpenAIService } from '#services/openai_service'
-import env from '#start/env'
 import type { ExtractedCvData } from '#services/openai_service'
 import {
   OpenAIMockManager,
@@ -27,7 +25,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with extensive work experience', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Create CV data with multiple work experiences
     const extensiveWorkCvData: ExtractedCvData = {
       ...mockExtractedCvData,
@@ -56,7 +54,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
       ],
       YearExperience: 7,
     }
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(extensiveWorkCvData, 2500)
     ;(service as any).client.chat.completions.create = mockStub
 
@@ -71,7 +69,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with multiple education entries', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Create CV data with multiple education entries
     const multiEducationCvData: ExtractedCvData = {
       ...mockExtractedCvData,
@@ -94,7 +92,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
         },
       ],
     }
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(multiEducationCvData, 1800)
     ;(service as any).client.chat.completions.create = mockStub
 
@@ -109,21 +107,43 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with extensive skills and certifications', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Create CV data with extensive skills
     const skillsHeavyCvData: ExtractedCvData = {
       ...mockExtractedCvData,
       Skills: {
         Technical: [
-          'JavaScript', 'TypeScript', 'Python', 'Java', 'C++',
-          'React', 'Angular', 'Vue.js', 'Node.js', 'Express.js',
-          'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes',
-          'AWS', 'Azure', 'GCP', 'Jenkins', 'Git',
+          'JavaScript',
+          'TypeScript',
+          'Python',
+          'Java',
+          'C++',
+          'React',
+          'Angular',
+          'Vue.js',
+          'Node.js',
+          'Express.js',
+          'PostgreSQL',
+          'MongoDB',
+          'Redis',
+          'Docker',
+          'Kubernetes',
+          'AWS',
+          'Azure',
+          'GCP',
+          'Jenkins',
+          'Git',
         ],
         Soft: [
-          'Leadership', 'Communication', 'Problem Solving',
-          'Team Collaboration', 'Project Management', 'Mentoring',
-          'Public Speaking', 'Critical Thinking', 'Adaptability',
+          'Leadership',
+          'Communication',
+          'Problem Solving',
+          'Team Collaboration',
+          'Project Management',
+          'Mentoring',
+          'Public Speaking',
+          'Critical Thinking',
+          'Adaptability',
         ],
       },
       Certifications: [
@@ -147,11 +167,18 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
         },
       ],
       TechnologyExperience: [
-        'JavaScript', 'TypeScript', 'Python', 'React', 'Node.js',
-        'PostgreSQL', 'Docker', 'AWS', 'Kubernetes',
+        'JavaScript',
+        'TypeScript',
+        'Python',
+        'React',
+        'Node.js',
+        'PostgreSQL',
+        'Docker',
+        'AWS',
+        'Kubernetes',
       ],
     }
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(skillsHeavyCvData, 3000)
     ;(service as any).client.chat.completions.create = mockStub
 
@@ -168,7 +195,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with international experience', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Create CV data with international elements
     const internationalCvData: ExtractedCvData = {
       ...mockExtractedCvData,
@@ -208,7 +235,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
         },
       ],
     }
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(internationalCvData, 2200)
     ;(service as any).client.chat.completions.create = mockStub
 
@@ -224,7 +251,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with project-heavy background', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Create CV data with multiple projects
     const projectHeavyCvData: ExtractedCvData = {
       ...mockExtractedCvData,
@@ -255,7 +282,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
         },
       ],
     }
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(projectHeavyCvData, 2800)
     ;(service as any).client.chat.completions.create = mockStub
 
@@ -271,7 +298,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with minimal information', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(mockMinimalCvData, 400)
     ;(service as any).client.chat.completions.create = mockStub
 
@@ -290,7 +317,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
 
   test('should handle CV with academic background', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Create CV data with academic focus
     const academicCvData: ExtractedCvData = {
       ...mockExtractedCvData,
@@ -341,7 +368,7 @@ test.group('OpenAI Service CV Data Scenarios', (group) => {
       YearExperience: 8,
       CareerPath: 'Academic research in artificial intelligence and machine learning',
     }
-    
+
     const mockStub = mockManager.mockSuccessfulResponse(academicCvData, 2100)
     ;(service as any).client.chat.completions.create = mockStub
 

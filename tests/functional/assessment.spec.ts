@@ -33,9 +33,6 @@ test.group('Assessment API', (group) => {
   })
 
   test('should start a new assessment session', async ({ client, assert }) => {
-    // Add delay to avoid rate limiting
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
     // First create a CV submission with a mock PDF file
     const testFileContent = Buffer.from(
       '%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000074 00000 n \n0000000120 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n179\n%%EOF'
@@ -458,9 +455,6 @@ test.group('Assessment API', (group) => {
 
     // Skip questions 3, 4, 5 to get to the final question
     for (let questionId = 3; questionId <= 5; questionId++) {
-      // Add small delay to avoid rate limiting
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
       response = await client
         .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
         .json({

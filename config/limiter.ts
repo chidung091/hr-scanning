@@ -1,8 +1,22 @@
 import env from '#start/env'
 import { defineConfig, stores } from '@adonisjs/limiter'
 
+/**
+ * Check if we're running in test mode
+ */
+function isTestEnvironment(): boolean {
+  return (
+    env.get('NODE_ENV') === 'test' ||
+    process.env.NODE_ENV === 'test' ||
+    process.argv.some((arg) => arg.includes('test')) ||
+    process.argv.some((arg) => arg.includes('japa')) ||
+    !!process.env.CI ||
+    !!process.env.GITHUB_ACTIONS
+  )
+}
+
 const limiterConfig = defineConfig({
-  default: env.get('LIMITER_STORE'),
+  default: isTestEnvironment() ? 'memory' : env.get('LIMITER_STORE'),
   stores: {
     /**
      * Database store to save rate limiting data inside a
@@ -13,8 +27,8 @@ const limiterConfig = defineConfig({
     }),
 
     /**
-     * Memory store could be used during
-     * testing
+     * Memory store used during testing for faster,
+     * isolated rate limiting (bypassed anyway during tests)
      */
     memory: stores.memory({}),
   },

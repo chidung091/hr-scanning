@@ -1,5 +1,6 @@
 import sinon from 'sinon'
 import type { ExtractedCvData } from '#services/openai_service'
+import { OpenAIService } from '#services/openai_service'
 
 /**
  * Mock OpenAI API responses and utilities for testing
@@ -176,7 +177,7 @@ export class OpenAIMockManager {
   }
 
   /**
-   * Mock OpenAI response with retry behavior
+   * Mock OpenAI response with retry behavior (fast for testing)
    */
   mockResponseWithRetries(
     failCount: number,
@@ -184,17 +185,33 @@ export class OpenAIMockManager {
     error: Error = mockOpenAIErrors.rateLimitError
   ) {
     const stub = sinon.stub()
-    
+
     // First `failCount` calls will fail
     for (let i = 0; i < failCount; i++) {
       stub.onCall(i).rejects(error)
     }
-    
+
     // Final call succeeds
     stub.onCall(failCount).resolves(createMockOpenAIResponse(finalData))
-    
+
     this.stubs.push(stub)
     return stub
+  }
+
+  /**
+   * Create a mock service instance with overridden config for fast testing
+   */
+  createMockService(mockStub: sinon.SinonStub) {
+    const service = new OpenAIService()
+
+    // Override the client method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    // Override config for faster testing (no delays)
+    ;(service as any).config.retryDelay = 1 // 1ms instead of 1000ms
+    ;(service as any).config.maxRetries = 3
+
+    return service
   }
 
   /**
@@ -243,7 +260,7 @@ export class OpenAIMockManager {
    * Clean up all stubs
    */
   restore() {
-    this.stubs.forEach(stub => {
+    this.stubs.forEach((stub) => {
       if (stub && typeof stub.restore === 'function') {
         stub.restore()
       }
