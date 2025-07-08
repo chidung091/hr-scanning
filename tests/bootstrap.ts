@@ -4,6 +4,8 @@ import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import testUtils from '@adonisjs/core/services/test_utils'
+import sinon from 'sinon'
+import env from '#start/env'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -23,8 +25,23 @@ export const plugins: Config['plugins'] = [assert(), apiClient(), pluginAdonisJS
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
-  teardown: [],
+  setup: [
+    () => {
+      // Set up global environment variable stub for OpenAI API key
+      if (!env.get('OPENAI_API_KEY')) {
+        sinon.stub(env, 'get').callsFake((key: string, defaultValue?: any) => {
+          if (key === 'OPENAI_API_KEY') return 'test-api-key'
+          return env.get.wrappedMethod?.call(env, key, defaultValue) || defaultValue
+        })
+      }
+    }
+  ],
+  teardown: [
+    () => {
+      // Restore all sinon stubs
+      sinon.restore()
+    }
+  ],
 }
 
 /**

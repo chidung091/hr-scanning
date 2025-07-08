@@ -1,36 +1,53 @@
 import { test } from '@japa/runner'
+import sinon from 'sinon'
 import { OpenAIService } from '#services/openai_service'
 import env from '#start/env'
+import {
+  OpenAIMockManager,
+  mockExtractedCvData,
+  mockMinimalCvData,
+  mockOpenAIErrors,
+  sampleCvTexts,
+} from '#tests/utils/openai_mocks'
 
-test.group('OpenAI Service', () => {
+test.group('OpenAI Service', (group) => {
+  let mockManager: OpenAIMockManager
+
+  group.setup(() => {
+    mockManager = new OpenAIMockManager()
+  })
+
+  group.teardown(() => {
+    mockManager.restore()
+  })
+
+  group.each.teardown(() => {
+    mockManager.restore()
+  })
+
   test('should initialize with API key', ({ assert }) => {
-    // Mock environment variable
-    const originalApiKey = env.get('OPENAI_API_KEY')
-
-    if (!originalApiKey) {
-      // Skip test if no API key is configured
-      assert.plan(0)
-      return
-    }
-
     const service = new OpenAIService()
     assert.isDefined(service)
   })
 
   test('should throw error without API key', ({ assert }) => {
-    // Temporarily remove API key
-    const originalGet = env.get
-    ;(env as any).get = (key: string, defaultValue?: any) => {
+    // Temporarily remove API key by restoring and re-stubbing
+    sinon.restore()
+    const noKeyStub = sinon.stub(env, 'get').callsFake((key: string, defaultValue?: any) => {
       if (key === 'OPENAI_API_KEY') return undefined
-      return originalGet.call(env, key, defaultValue)
-    }
+      return defaultValue
+    })
 
     assert.throws(() => {
       new OpenAIService()
     }, 'OPENAI_API_KEY environment variable is required')
 
-    // Restore original method
-    ;(env as any).get = originalGet
+    // Restore for other tests
+    noKeyStub.restore()
+    sinon.stub(env, 'get').callsFake((key: string, defaultValue?: any) => {
+      if (key === 'OPENAI_API_KEY') return 'test-api-key'
+      return defaultValue
+    })
   })
 
   test('should validate extracted data structure', async ({ assert }) => {
@@ -109,124 +126,202 @@ test.group('OpenAI Service', () => {
   })
 
   test('should handle empty CV text', async ({ assert }) => {
-    if (!env.get('OPENAI_API_KEY')) {
-      assert.plan(0)
-      return
-    }
-
     const service = new OpenAIService()
     const result = await service.extractCvData('')
 
     assert.isFalse(result.success)
-    assert.isDefined(result.error)
+    assert.include(result.error!, 'empty or contains no meaningful content')
     assert.isDefined(result.processingTime)
-  }).timeout(30000)
+    assert.equal(result.tokensUsed, 0)
+  })
 
-  test('should handle very short CV text', async ({ assert }) => {
-    if (!env.get('OPENAI_API_KEY')) {
-      assert.plan(0)
-      return
-    }
-
+  test('should handle very short CV text with mocked response', async ({ assert }) => {
     const service = new OpenAIService()
-    const result = await service.extractCvData('John')
 
-    // Should still attempt processing but may fail due to insufficient data
-    assert.isDefined(result.success)
+    // Mock successful response for minimal data
+    const mockStub = mockManager.mockSuccessfulResponse(mockMinimalCvData, 500)
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.minimal)
+
+    assert.isTrue(result.success)
+    assert.isDefined(result.data)
+    assert.equal(result.data!.PersonalInformation.Name, 'Jane Smith')
     assert.isDefined(result.processingTime)
-  }).timeout(10000)
+    assert.equal(result.tokensUsed, 500)
+  })
+
+  test('should handle OpenAI API errors with retry', async ({ assert }) => {
+    const service = new OpenAIService()
+
+    // Mock response that fails twice then succeeds
+    const mockStub = mockManager.mockResponseWithRetries(2, mockExtractedCvData, mockOpenAIErrors.rateLimitError)
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.comprehensive)
+
+    assert.isTrue(result.success)
+    assert.isDefined(result.data)
+    assert.equal(result.data!.PersonalInformation.Name, 'John Doe')
+    assert.isDefined(result.tokensUsed)
+  })
+
+  test('should fail after max retries', async ({ assert }) => {
+    const service = new OpenAIService()
+
+    // Mock response that always fails
+    const mockStub = mockManager.mockErrorResponse(mockOpenAIErrors.rateLimitError)
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.comprehensive)
+
+    assert.isFalse(result.success)
+    assert.include(result.error!, 'Rate limit exceeded')
+    assert.isDefined(result.processingTime)
+  })
+
+  test('should handle malformed JSON response', async ({ assert }) => {
+    const service = new OpenAIService()
+
+    // Mock malformed JSON response
+    const mockStub = mockManager.mockMalformedJsonResponse()
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.comprehensive)
+
+    assert.isFalse(result.success)
+    assert.include(result.error!, 'JSON')
+    assert.isDefined(result.processingTime)
+  })
+
+  test('should handle empty OpenAI response', async ({ assert }) => {
+    const service = new OpenAIService()
+
+    // Mock empty response
+    const mockStub = mockManager.mockEmptyResponse()
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.comprehensive)
+
+    assert.isFalse(result.success)
+    assert.include(result.error!, 'No content received from OpenAI')
+    assert.isDefined(result.processingTime)
+  })
 })
 
-test.group('OpenAI Service Integration', () => {
-  test('should extract data from sample CV text', async ({ assert }) => {
-    if (!env.get('OPENAI_API_KEY')) {
-      // Skip integration tests if no API key
-      assert.plan(0)
-      return
-    }
+test.group('OpenAI Service Mocked Integration', (group) => {
+  let mockManager: OpenAIMockManager
 
+  group.setup(() => {
+    mockManager = new OpenAIMockManager()
+  })
+
+  group.teardown(() => {
+    mockManager.restore()
+  })
+
+  group.each.teardown(() => {
+    mockManager.restore()
+  })
+
+  test('should extract data from comprehensive CV text', async ({ assert }) => {
     const service = new OpenAIService()
-    const sampleCvText = `
-      John Doe
-      Software Engineer
-      Email: john.doe@example.com
-      Phone: +1-555-123-4567
-      
-      EXPERIENCE
-      Senior Software Engineer at TechCorp (2020-2023)
-      - Developed web applications using React and Node.js
-      - Led a team of 5 developers
-      
-      EDUCATION
-      Bachelor of Computer Science
-      University of Technology (2016-2020)
-      GPA: 3.8
-      
-      SKILLS
-      Technical: JavaScript, TypeScript, React, Node.js, Python
-      Soft Skills: Leadership, Communication, Problem Solving
-      
-      PROJECTS
-      E-commerce Platform
-      - Built using React and Express.js
-      - Implemented payment integration
-    `
 
-    const result = await service.extractCvData(sampleCvText)
+    // Mock successful response with comprehensive data
+    const mockStub = mockManager.mockSuccessfulResponse(mockExtractedCvData, 2000)
 
-    if (result.success && result.data) {
-      assert.isTrue(result.success)
-      assert.isDefined(result.data)
-      assert.isDefined(result.tokensUsed)
-      assert.isDefined(result.processingTime)
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
 
-      // Validate structure
-      assert.isDefined(result.data.PersonalInformation)
-      assert.isDefined(result.data.WorkExperience)
-      assert.isDefined(result.data.Education)
-      assert.isDefined(result.data.Skills)
+    const result = await service.extractCvData(sampleCvTexts.comprehensive)
 
-      // Check if basic information was extracted
-      assert.include(result.data.PersonalInformation.Name || '', 'John')
-      assert.include(result.data.PersonalInformation.Email || '', 'john.doe@example.com')
-
-      // Check skills arrays
-      assert.isArray(result.data.Skills.Technical)
-      assert.isArray(result.data.Skills.Soft)
-
-      // Check work experience
-      assert.isArray(result.data.WorkExperience)
-      if (result.data.WorkExperience.length > 0) {
-        assert.include(result.data.WorkExperience[0].Company || '', 'TechCorp')
-      }
-    } else {
-      // If the test fails due to API issues, log the error but don't fail the test
-      console.warn('OpenAI API test failed:', result.error)
-      assert.plan(0)
-    }
-  }).timeout(30000) // 30 second timeout for API calls
-
-  test('should handle malformed CV text gracefully', async ({ assert }) => {
-    if (!env.get('OPENAI_API_KEY')) {
-      assert.plan(0)
-      return
-    }
-
-    const service = new OpenAIService()
-    const malformedText = '!@#$%^&*()_+{}|:"<>?[]\\;\',./'
-
-    const result = await service.extractCvData(malformedText)
-
-    // Should either succeed with empty/null values or fail gracefully
-    assert.isDefined(result.success)
+    assert.isTrue(result.success)
+    assert.isDefined(result.data)
+    assert.isDefined(result.tokensUsed)
     assert.isDefined(result.processingTime)
 
-    if (result.success && result.data) {
-      // If it succeeds, data should still follow the schema
-      assert.isDefined(result.data.PersonalInformation)
-      assert.isDefined(result.data.Skills)
-      assert.isArray(result.data.Skills.Technical)
-      assert.isArray(result.data.Skills.Soft)
+    // Validate structure
+    assert.isDefined(result.data!.PersonalInformation)
+    assert.isDefined(result.data!.WorkExperience)
+    assert.isDefined(result.data!.Education)
+    assert.isDefined(result.data!.Skills)
+
+    // Check if basic information was extracted
+    assert.equal(result.data!.PersonalInformation.Name, 'John Doe')
+    assert.equal(result.data!.PersonalInformation.Email, 'john.doe@email.com')
+
+    // Check skills arrays
+    assert.isArray(result.data!.Skills.Technical)
+    assert.isArray(result.data!.Skills.Soft)
+    assert.include(result.data!.Skills.Technical, 'JavaScript')
+    assert.include(result.data!.Skills.Soft, 'Leadership')
+
+    // Check work experience
+    assert.isArray(result.data!.WorkExperience)
+    assert.isAtLeast(result.data!.WorkExperience.length, 1)
+    assert.equal(result.data!.WorkExperience[0].Company, 'TechCorp Inc')
+
+    // Check token usage
+    assert.equal(result.tokensUsed, 2000)
+  })
+
+  test('should handle malformed CV text gracefully', async ({ assert }) => {
+    const service = new OpenAIService()
+
+    // Mock response with minimal data for malformed input
+    const mockStub = mockManager.mockSuccessfulResponse(mockMinimalCvData, 300)
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.malformed)
+
+    assert.isTrue(result.success)
+    assert.isDefined(result.data)
+    assert.isDefined(result.processingTime)
+
+    // Should still follow the schema even with malformed input
+    assert.isDefined(result.data!.PersonalInformation)
+    assert.isDefined(result.data!.Skills)
+    assert.isArray(result.data!.Skills.Technical)
+    assert.isArray(result.data!.Skills.Soft)
+
+    // Should have minimal data
+    assert.equal(result.data!.PersonalInformation.Name, 'Jane Smith')
+    assert.equal(result.tokensUsed, 300)
+  })
+
+  test('should validate response data structure', async ({ assert }) => {
+    const service = new OpenAIService()
+
+    // Mock response with invalid data structure
+    const invalidData = {
+      PersonalInformation: null, // Invalid structure
+      Skills: { Technical: [], Soft: [] },
     }
-  }).timeout(30000)
+
+    const mockStub = sinon.stub().resolves({
+      choices: [{ message: { content: JSON.stringify(invalidData) } }],
+      usage: { total_tokens: 100 },
+    })
+
+    // Replace the OpenAI client's method
+    ;(service as any).client.chat.completions.create = mockStub
+
+    const result = await service.extractCvData(sampleCvTexts.comprehensive)
+
+    assert.isFalse(result.success)
+    assert.include(result.error!, 'validation')
+    assert.isDefined(result.processingTime)
+  })
 })

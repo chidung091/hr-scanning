@@ -1,14 +1,29 @@
 import { test } from '@japa/runner'
+import sinon from 'sinon'
 import { CvProcessingService } from '#services/cv_processing_service'
 import CvSubmission from '#models/cv_submission'
 import ProcessedCv from '#models/processed_cv'
 import Database from '@adonisjs/lucid/services/db'
+import openaiService from '#services/openai_service'
+import {
+  OpenAIMockManager,
+  mockExtractedCvData,
+  mockMinimalCvData,
+  mockOpenAIErrors,
+} from '#tests/utils/openai_mocks'
 
 test.group('CV Processing Service', (group) => {
   let cvProcessingService: CvProcessingService
+  let mockManager: OpenAIMockManager
+  let openaiStub: sinon.SinonStub
 
   group.setup(async () => {
     cvProcessingService = new CvProcessingService()
+    mockManager = new OpenAIMockManager()
+  })
+
+  group.teardown(() => {
+    mockManager.restore()
   })
 
   group.each.setup(async () => {
@@ -17,6 +32,11 @@ test.group('CV Processing Service', (group) => {
 
   group.each.teardown(async () => {
     await Database.rollbackGlobalTransaction()
+    // Restore any OpenAI stubs
+    if (openaiStub) {
+      openaiStub.restore()
+      openaiStub = null as any
+    }
   })
 
   test('should get processing status for non-existent CV', async ({ assert }) => {
@@ -27,7 +47,15 @@ test.group('CV Processing Service', (group) => {
     assert.isUndefined(status.canRetry)
   })
 
-  test('should create processing record for new CV submission', async ({ assert }) => {
+  test('should process CV submission successfully with mocked OpenAI', async ({ assert }) => {
+    // Mock successful OpenAI response
+    openaiStub = sinon.stub(openaiService, 'extractCvData').resolves({
+      success: true,
+      data: mockExtractedCvData,
+      tokensUsed: 1500,
+      processingTime: 2000,
+    })
+
     // Create a test CV submission
     const cvSubmission = await CvSubmission.create({
       submissionId: 'test-123',
@@ -44,16 +72,65 @@ test.group('CV Processing Service', (group) => {
 
     const result = await cvProcessingService.processCvSubmission(cvSubmission.id)
 
-    // Should create a processing record even if OpenAI fails
-    assert.isDefined(result)
+    assert.isTrue(result.success)
+    assert.isDefined(result.processedCvId)
     assert.isDefined(result.processingTime)
+    assert.equal(result.tokensUsed, 1500)
 
-    // Check if ProcessedCv record was created
+    // Check if ProcessedCv record was created and marked as completed
     const processedCv = await ProcessedCv.query().where('cv_submission_id', cvSubmission.id).first()
 
     assert.isDefined(processedCv)
     assert.equal(processedCv!.cvSubmissionId, cvSubmission.id)
-  }).timeout(15000)
+    assert.equal(processedCv!.processingStatus, 'completed')
+    assert.equal(processedCv!.tokensUsed, 1500)
+    assert.equal(processedCv!.openaiModel, 'gpt-4o-mini')
+    assert.isDefined(processedCv!.extractedData)
+
+    // Verify OpenAI service was called with correct text
+    assert.isTrue(openaiStub.calledOnce)
+    assert.equal(openaiStub.firstCall.args[0], 'Test CV content with sufficient length for processing')
+  })
+
+  test('should handle OpenAI processing failure', async ({ assert }) => {
+    // Mock failed OpenAI response
+    openaiStub = sinon.stub(openaiService, 'extractCvData').resolves({
+      success: false,
+      error: 'OpenAI API rate limit exceeded',
+      processingTime: 1000,
+    })
+
+    // Create a test CV submission
+    const cvSubmission = await CvSubmission.create({
+      submissionId: 'test-failed-123',
+      filename: 'test.pdf',
+      originalFilename: 'test.pdf',
+      filePath: 'test/test.pdf',
+      fileSize: 1000,
+      mimeType: 'application/pdf',
+      applicantName: 'Test User',
+      applicantEmail: 'test@example.com',
+      extractedText: 'Test CV content for failure scenario',
+      status: 'pending',
+    })
+
+    const result = await cvProcessingService.processCvSubmission(cvSubmission.id)
+
+    assert.isFalse(result.success)
+    assert.include(result.error!, 'OpenAI API rate limit exceeded')
+    assert.isDefined(result.processingTime)
+
+    // Check if ProcessedCv record was created and marked as failed
+    const processedCv = await ProcessedCv.query().where('cv_submission_id', cvSubmission.id).first()
+
+    assert.isDefined(processedCv)
+    assert.equal(processedCv!.cvSubmissionId, cvSubmission.id)
+    assert.equal(processedCv!.processingStatus, 'failed')
+    assert.include(processedCv!.errorMessage!, 'OpenAI API rate limit exceeded')
+
+    // Verify OpenAI service was called
+    assert.isTrue(openaiStub.calledOnce)
+  })
 
   test('should handle CV submission without extracted text', async ({ assert }) => {
     // Create a test CV submission without extracted text
@@ -188,7 +265,21 @@ test.group('CV Processing Service', (group) => {
     assert.isAtLeast(stats.failed, 0) // Changed from 1 to 0
   })
 
-  test('should batch process multiple CV submissions', async ({ assert }) => {
+  test('should batch process multiple CV submissions with mixed results', async ({ assert }) => {
+    // Mock OpenAI responses - first succeeds, second fails
+    openaiStub = sinon.stub(openaiService, 'extractCvData')
+    openaiStub.onFirstCall().resolves({
+      success: true,
+      data: mockExtractedCvData,
+      tokensUsed: 1200,
+      processingTime: 1500,
+    })
+    openaiStub.onSecondCall().resolves({
+      success: false,
+      error: 'Processing failed for batch item',
+      processingTime: 800,
+    })
+
     // Create test CV submissions
     const cvSubmissions = await Promise.all([
       CvSubmission.create({
@@ -200,7 +291,7 @@ test.group('CV Processing Service', (group) => {
         mimeType: 'application/pdf',
         applicantName: 'Batch User 1',
         applicantEmail: 'batch1@example.com',
-        extractedText: 'Batch CV content 1',
+        extractedText: 'Batch CV content 1 with sufficient text for processing',
         status: 'pending',
       }),
       CvSubmission.create({
@@ -212,7 +303,7 @@ test.group('CV Processing Service', (group) => {
         mimeType: 'application/pdf',
         applicantName: 'Batch User 2',
         applicantEmail: 'batch2@example.com',
-        extractedText: null, // This should fail
+        extractedText: 'Batch CV content 2 that will fail processing',
         status: 'pending',
       }),
     ])
@@ -228,10 +319,54 @@ test.group('CV Processing Service', (group) => {
     assert.isArray(result.successful)
     assert.isArray(result.failed)
 
-    // Should have at least one failure (the one without extracted text)
-    assert.isAtLeast(result.failed.length, 1)
+    // Should have one success and one failure
+    assert.equal(result.successful.length, 1)
+    assert.equal(result.failed.length, 1)
+    assert.equal(result.successful[0], cvSubmissions[0].id)
+    assert.equal(result.failed[0].id, cvSubmissions[1].id)
+    assert.include(result.failed[0].error, 'Processing failed for batch item')
+
+    // Verify OpenAI service was called twice
+    assert.equal(openaiStub.callCount, 2)
+  })
+
+  test('should handle batch processing with no extracted text', async ({ assert }) => {
+    // Create a fresh stub for this test to ensure clean state
+    if (openaiStub) {
+      openaiStub.restore()
+    }
+    openaiStub = sinon.stub(openaiService, 'extractCvData')
+
+    // Create test CV submission without extracted text
+    const cvSubmission = await CvSubmission.create({
+      submissionId: 'batch-no-text',
+      filename: 'batch-no-text.pdf',
+      originalFilename: 'batch-no-text.pdf',
+      filePath: 'test/batch-no-text.pdf',
+      fileSize: 1000,
+      mimeType: 'application/pdf',
+      applicantName: 'Batch User No Text',
+      applicantEmail: 'batch-no-text@example.com',
+      extractedText: null, // This should fail immediately
+      status: 'pending',
+    })
+
+    const result = await cvProcessingService.batchProcessCvSubmissions([cvSubmission.id])
+
+    assert.isDefined(result.successful)
+    assert.isDefined(result.failed)
+    assert.isArray(result.successful)
+    assert.isArray(result.failed)
+
+    // Should have one failure
+    assert.equal(result.successful.length, 0)
+    assert.equal(result.failed.length, 1)
+    assert.equal(result.failed[0].id, cvSubmission.id)
     assert.include(result.failed[0].error, 'no extracted text')
-  }).timeout(20000)
+
+    // OpenAI service should not be called for submissions without text
+    assert.isFalse(openaiStub.called)
+  })
 
   test('should retry failed processing', async ({ assert }) => {
     // Create a test CV submission
