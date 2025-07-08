@@ -1,16 +1,71 @@
-name: CI
+name: CI/CD for HR Scanning with Environments
 
 on:
   push:
+    branches:
+      - master # For production
+      - develop # For development
   pull_request:
+    branches:
+      - master
+      - develop
+  workflow_dispatch: # Allow manual trigger for deployments
 
 jobs:
-  test:
+  lint-and-format:
+    name: Lint and Check Code Format
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.x]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript compilation check
+        run: npm run typecheck
+
+      - name: Run ESLint
+        run: npm run lint
+
+  check-audit:
+    name: Check vulnerabilities
+    needs: lint-and-format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step1 Download the Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Step3 Install Dependencies
+        run: npm ci
+
+      - name: Step4 NPM Audit Scan and Generate Report in JSON Format
+        run: npm audit --audit-level=high --json > audit.json
+        continue-on-error: false
+
+      - name: Step5 Upload NPM Audit Scan Report to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-results
+          path: audit.json
+
+  test:
+    name: Run Tests
+    needs: check-audit
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -31,20 +86,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
-
-      - name: TypeScript compilation check
-        run: npm run typecheck
-
-      - name: ESLint check
-        run: npm run lint
 
       - name: Setup test environment
         run: |
@@ -69,3 +118,74 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  build_and_push_dev:
+    name: Build and Push Docker Image for Development
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.PACKAGE_TOKEN }} | docker login ghcr.io -u chidung091 --password-stdin
+
+      - name: Build and push Docker image (Dev)
+        run: |
+          docker build -t ghcr.io/chidung091/hr-scanning:dev-latest .
+          docker push ghcr.io/chidung091/hr-scanning:dev-latest
+
+  build_and_push_prod:
+    name: Build and Push Docker Image for Production
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.PACKAGE_TOKEN }} | docker login ghcr.io -u chidung091 --password-stdin
+
+      - name: Build and push Docker image (Prod)
+        run: |
+          docker build -t ghcr.io/chidung091/hr-scanning:latest .
+          docker push ghcr.io/chidung091/hr-scanning:latest
+
+  # TODO: Uncomment and configure these deployment jobs when ready
+  # deploy_dev:
+  #   name: Deploy to Development (without rebuilding)
+  #   needs: [build_and_push_dev]
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
+  #   runs-on: ubuntu-latest
+  #   environment: dev
+
+  #   steps:
+  #     - name: Trigger deployment repository (Dev)
+  #       run: |
+  #         curl -X POST \
+  #           -H "Authorization: token ${{ secrets.PAT }}" \
+  #           -H "Accept: application/vnd.github.v3+json" \
+  #           https://api.github.com/repos/chidung091/hr-scanning-deployment/dispatches \
+  #           -d '{"event_type":"deploy_dev"}'
+
+  # deploy_prod:
+  #   name: Deploy to Production (without rebuilding)
+  #   needs: [build_and_push_prod]
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+  #   runs-on: ubuntu-latest
+  #   environment: prod
+
+  #   steps:
+  #     - name: Trigger deployment repository (Prod)
+  #       run: |
+  #         curl -X POST \
+  #           -H "Authorization: token ${{ secrets.PAT }}" \
+  #           -H "Accept: application/vnd.github.v3+json" \
+  #           https://api.github.com/repos/chidung091/hr-scanning-deployment/dispatches \
+  #           -d '{"event_type":"deploy_prod"}'
