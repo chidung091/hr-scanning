@@ -158,21 +158,21 @@ jobs:
   #         docker push ghcr.io/chidung091/hr-scanning:latest
 
   # TODO: Uncomment and configure these deployment jobs when ready
-  # deploy_dev:
-  #   name: Deploy to Development (without rebuilding)
-  #   needs: [build_and_push_dev]
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
-  #   runs-on: ubuntu-latest
-  #   environment: dev
+  deploy_dev:
+    name: Deploy to Development (without rebuilding)
+    needs: [build_and_push_dev]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: dev
 
-  #   steps:
-  #     - name: Trigger deployment repository (Dev)
-  #       run: |
-  #         curl -X POST \
-  #           -H "Authorization: token ${{ secrets.PAT }}" \
-  #           -H "Accept: application/vnd.github.v3+json" \
-  #           https://api.github.com/repos/chidung091/hr-scanning-deployment/dispatches \
-  #           -d '{"event_type":"deploy_dev"}'
+    steps:
+      - name: Trigger deployment repository (Dev)
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/chidung091/hr-deployment/dispatches \
+            -d '{"event_type":"deploy_dev"}'
 
   # deploy_prod:
   #   name: Deploy to Production (without rebuilding)
