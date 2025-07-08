@@ -82,17 +82,76 @@ jobs:
 
       - name: Setup test environment
         run: |
+          echo "Setting up test environment..."
           cp .env.example .env || echo "No .env.example found, creating basic .env"
           echo "NODE_ENV=test" >> .env
           echo "APP_KEY=$(openssl rand -base64 32)" >> .env
           echo "DRIVE_DISK=fs" >> .env
           echo "SESSION_DRIVER=cookie" >> .env
+          echo "HOST=localhost" >> .env
+          echo "PORT=0" >> .env
+          echo "LOG_LEVEL=info" >> .env
+          echo "TZ=UTC" >> .env
+          # Database config (even though we use mocks, AdonisJS needs these for initialization)
+          echo "DB_CONNECTION=postgres" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=5432" >> .env
+          echo "DB_USERNAME=test_user" >> .env
+          echo "DB_PASSWORD=test_password" >> .env
+          echo "DB_DATABASE=test_db" >> .env
+          echo "DB_SSL=false" >> .env
+          echo "LIMITER_STORE=memory" >> .env
+          echo "OPENAI_API_KEY=test-api-key" >> .env
+          echo "Environment setup complete. Contents:"
+          cat .env
 
       - name: Build application
-        run: npm run build
+        run: |
+          echo "Building application..."
+          npm run build
+          echo "Build completed successfully"
 
-      - name: Run tests
-        run: npm test
+      - name: Debug environment before tests
+        run: |
+          echo "=== Environment Debug Information ==="
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Current directory: $(pwd)"
+          echo "Available memory: $(free -h || echo 'free command not available')"
+          echo "Available disk space: $(df -h . || echo 'df command not available')"
+          echo "Network interfaces: $(ip addr show || ifconfig || echo 'network info not available')"
+          echo "Environment variables:"
+          echo "NODE_ENV=$NODE_ENV"
+          echo "PORT=$PORT"
+          echo "HOST=$HOST"
+          echo "=== Process Information ==="
+          echo "Running processes: $(ps aux | head -10 || echo 'ps command not available')"
+          echo "=== End Debug Information ==="
+
+      - name: Run tests with verbose output and monitoring
+        run: |
+          echo "Starting test execution at $(date)..."
+
+          # Start background monitoring
+          (
+            while true; do
+              echo "[$(date)] Test still running... Memory: $(free -m | grep Mem | awk '{print $3"/"$2" MB"}' || echo 'N/A')"
+              sleep 10
+            done
+          ) &
+          MONITOR_PID=$!
+
+          # Run tests with timeout
+          timeout 300s npm test || {
+            echo "Test execution failed or timed out at $(date)"
+            echo "Exit code: $?"
+            kill $MONITOR_PID 2>/dev/null || true
+            exit 1
+          }
+
+          # Stop monitoring
+          kill $MONITOR_PID 2>/dev/null || true
+          echo "Tests completed successfully at $(date)"
 
   build_and_push_dev:
     name: Build and Push Docker Image for Development

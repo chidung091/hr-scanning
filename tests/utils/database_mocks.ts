@@ -146,15 +146,32 @@ export class DatabaseMockManager {
    * Initialize all database mocks (call once per test suite)
    */
   async initializeMocks() {
+    console.log('🗄️ DatabaseMockManager: Starting initialization...')
+
     if (this.isInitialized) {
+      console.log('🗄️ DatabaseMockManager: Already initialized, skipping...')
       return
     }
 
-    this.mockDatabaseConnection()
-    await this.mockBaseModel()
-    this.mockCvSubmissionModel()
-    this.mockProcessedCvModel()
-    this.isInitialized = true
+    try {
+      console.log('🗄️ DatabaseMockManager: Mocking database connection...')
+      this.mockDatabaseConnection()
+
+      console.log('🗄️ DatabaseMockManager: Mocking BaseModel...')
+      await this.mockBaseModel()
+
+      console.log('🗄️ DatabaseMockManager: Mocking CvSubmissionModel...')
+      this.mockCvSubmissionModel()
+
+      console.log('🗄️ DatabaseMockManager: Mocking ProcessedCvModel...')
+      this.mockProcessedCvModel()
+
+      this.isInitialized = true
+      console.log('✅ DatabaseMockManager: All mocks initialized successfully')
+    } catch (error) {
+      console.error('❌ DatabaseMockManager: Failed to initialize mocks:', error)
+      throw error
+    }
   }
 
   /**
