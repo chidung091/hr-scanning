@@ -129,6 +129,9 @@ export class DatabaseMockManager {
   private mockData: Map<string, any[]> = new Map()
   private isInitialized: boolean = false
   public createNewProcessedCv: (() => any) | null = null
+  private originalProcessedCv: any = null
+  private mockConnection: any = null
+  private originalBaseModel: any = null
 
   constructor() {
     this.initializeMockData()
@@ -142,12 +145,13 @@ export class DatabaseMockManager {
   /**
    * Initialize all database mocks (call once per test suite)
    */
-  initializeMocks() {
+  async initializeMocks() {
     if (this.isInitialized) {
       return
     }
 
     this.mockDatabaseConnection()
+    await this.mockBaseModel()
     this.mockCvSubmissionModel()
     this.mockProcessedCvModel()
     this.isInitialized = true
@@ -157,30 +161,136 @@ export class DatabaseMockManager {
    * Mock Database connection and transaction methods
    */
   private mockDatabaseConnection() {
-    // Mock Database.connection() to return a mock connection
+    // Create a comprehensive mock connection that satisfies all BaseModel requirements
+    const mockQueryBuilder = {
+      from: sinon.stub().returnsThis(),
+      select: sinon.stub().returnsThis(),
+      where: sinon.stub().returnsThis(),
+      insert: sinon.stub().resolves([{ id: 1 }]),
+      update: sinon.stub().resolves([]),
+      delete: sinon.stub().resolves([]),
+      first: sinon.stub().resolves(null),
+      returning: sinon.stub().returnsThis(),
+      transacting: sinon.stub().returnsThis(),
+    }
+
     const mockConnection = {
       dialect: {
-        name: 'postgres'
+        name: 'postgres',
+        client: 'pg',
+        dateTimeFormat: 'YYYY-MM-DD HH:mm:ss',
       },
       client: {
         config: {
-          client: 'pg'
+          client: 'pg',
+        },
+        modelQuery: sinon.stub().returns(mockQueryBuilder),
+        query: sinon.stub().returns(mockQueryBuilder),
+      },
+      // Add more properties that BaseModel might need
+      schema: {
+        hasTable: sinon.stub().resolves(true),
+        hasColumn: sinon.stub().resolves(true),
+      },
+      raw: sinon.stub().resolves([]),
+      table: sinon.stub().returns(mockQueryBuilder),
+      queryBuilder: sinon.stub().returns(mockQueryBuilder),
+      // Mock transaction support
+      transaction: sinon.stub().callsFake(async (callback) => {
+        if (callback) {
+          return await callback(mockConnection)
         }
-      }
+        return mockConnection
+      }),
     }
+
+    // Store the mock connection for use in BaseModel mocking
+    this.mockConnection = mockConnection
 
     const connectionStub = sinon.stub(Database, 'connection').returns(mockConnection as any)
     this.stubs.push(connectionStub)
 
+    // Mock Database.manager to return a connection manager
+    const mockManager = {
+      get: sinon.stub().returns(mockConnection),
+      connect: sinon.stub().resolves(mockConnection),
+      close: sinon.stub().resolves(),
+      closeAll: sinon.stub().resolves(),
+    }
+
+    if ((Database as any).manager) {
+      const managerStub = sinon.stub(Database as any, 'manager').get(() => mockManager)
+      this.stubs.push(managerStub)
+    }
+
     // Mock transaction methods if they exist
-    if (Database.beginGlobalTransaction) {
-      const beginTransactionStub = sinon.stub(Database, 'beginGlobalTransaction').resolves()
+    if (typeof (Database as any).beginGlobalTransaction === 'function') {
+      const beginTransactionStub = sinon.stub(Database as any, 'beginGlobalTransaction').resolves()
       this.stubs.push(beginTransactionStub)
     }
 
-    if (Database.rollbackGlobalTransaction) {
-      const rollbackTransactionStub = sinon.stub(Database, 'rollbackGlobalTransaction').resolves()
+    if (typeof (Database as any).rollbackGlobalTransaction === 'function') {
+      const rollbackTransactionStub = sinon
+        .stub(Database as any, 'rollbackGlobalTransaction')
+        .resolves()
       this.stubs.push(rollbackTransactionStub)
+    }
+  }
+
+  /**
+   * Mock BaseModel to prevent any database connections during model instantiation
+   */
+  private async mockBaseModel() {
+    try {
+      // Import BaseModel dynamically and mock its connection-related properties
+      const { BaseModel } = await import('@adonisjs/lucid/orm')
+
+      if (BaseModel && !(BaseModel as any)._isMocked) {
+        // Store original properties for restoration
+        this.originalBaseModel = {
+          connection: (BaseModel as any).connection,
+          $adapter: (BaseModel as any).$adapter,
+        }
+
+        // Mock the connection property to return our mock connection
+        Object.defineProperty(BaseModel, 'connection', {
+          get: () => this.mockConnection,
+          configurable: true,
+        })
+
+        // Mock the $adapter property
+        ;(BaseModel as any).$adapter = {
+          query: () => this.createMockQueryBuilder([], 'mock'),
+          insert: sinon.stub().resolves({ id: 1 }),
+          update: sinon.stub().resolves([]),
+          delete: sinon.stub().resolves([]),
+          find: sinon.stub().resolves(null),
+          findOrFail: sinon.stub().rejects(new Error('Row not found')),
+          first: sinon.stub().resolves(null),
+          firstOrFail: sinon.stub().rejects(new Error('Row not found')),
+        }
+
+        // Mark as mocked
+        ;(BaseModel as any)._isMocked = true
+
+        // Add restoration stub
+        this.stubs.push({
+          restore: () => {
+            if (this.originalBaseModel) {
+              Object.defineProperty(BaseModel, 'connection', {
+                value: this.originalBaseModel.connection,
+                writable: true,
+                configurable: true,
+              })
+              ;(BaseModel as any).$adapter = this.originalBaseModel.$adapter
+              delete (BaseModel as any)._isMocked
+            }
+          },
+        } as any)
+      }
+    } catch (error) {
+      // If BaseModel mocking fails, continue with model-specific mocking
+      console.warn('BaseModel mocking failed:', error)
     }
   }
 
@@ -209,16 +319,18 @@ export class DatabaseMockManager {
     this.stubs.push(createStub)
 
     // Mock query builder
-    const queryStub = sinon.stub(CvSubmission, 'query').callsFake(() => {
-      const submissions = this.mockData.get('cv_submissions') || []
-      return this.createMockQueryBuilder(submissions, 'cv_submissions')
-    })
-    this.stubs.push(queryStub)
+    if (!(CvSubmission.query as any).isSinonProxy) {
+      const queryStub = sinon.stub(CvSubmission, 'query').callsFake(() => {
+        const submissions = this.mockData.get('cv_submissions') || []
+        return this.createMockQueryBuilder(submissions, 'cv_submissions') as any
+      })
+      this.stubs.push(queryStub)
+    }
 
     // Mock find method
     const findStub = sinon.stub(CvSubmission, 'find').callsFake(async (id: number) => {
       const submissions = this.mockData.get('cv_submissions') || []
-      const found = submissions.find(s => s.id === id)
+      const found = submissions.find((s) => s.id === id)
       return found ? Object.assign(Object.create(CvSubmission.prototype), found) : null
     })
     this.stubs.push(findStub)
@@ -271,7 +383,7 @@ export class DatabaseMockManager {
         } else {
           // Update existing
           const processedCvs = this.mockData.get('processed_cvs') || []
-          const index = processedCvs.findIndex(cv => cv.id === mockInstance.id)
+          const index = processedCvs.findIndex((cv) => cv.id === mockInstance.id)
           if (index >= 0) {
             mockInstance.updatedAt = DateTime.now()
             processedCvs[index] = { ...mockInstance }
@@ -287,17 +399,77 @@ export class DatabaseMockManager {
     // Store the factory for use in tests
     this.createNewProcessedCv = createNewInstance
 
+    // Mock the ProcessedCv constructor to prevent database connections
+    const originalProcessedCv = ProcessedCv
+    this.originalProcessedCv = originalProcessedCv
+
+    // Create a constructor replacement that uses our factory
+    const MockedProcessedCv = function (this: any, data?: any) {
+      const instance = createNewInstance()
+      if (data) {
+        Object.assign(instance, data)
+      }
+      // Return the instance directly (not using 'new' semantics)
+      return instance
+    } as any
+
+    // Copy all static methods and properties from the original
+    Object.setPrototypeOf(MockedProcessedCv, originalProcessedCv)
+    Object.assign(MockedProcessedCv, originalProcessedCv)
+    MockedProcessedCv.prototype = originalProcessedCv.prototype
+
+    // Replace the constructor in the global scope and try to intercept module imports
+    ;(global as any).ProcessedCv = MockedProcessedCv
+
+    // Also try to replace in the ProcessedCv module itself
+    try {
+      // Replace the default export if it exists
+      if (ProcessedCv.constructor === Function) {
+        Object.defineProperty(ProcessedCv, 'constructor', {
+          value: MockedProcessedCv,
+          writable: true,
+          configurable: true,
+        })
+      }
+    } catch (e) {
+      // Ignore errors in constructor replacement
+    }
+
+    // Create a stub for ProcessedCv.create method if it exists and isn't already stubbed
+    if (
+      typeof (ProcessedCv as any).create === 'function' &&
+      !(ProcessedCv as any).create.isSinonProxy
+    ) {
+      const processedCvCreateStub = sinon
+        .stub(ProcessedCv as any, 'create')
+        .callsFake(async (data: any) => {
+          const instance = createNewInstance()
+          Object.assign(instance, data)
+
+          // Add to mock data
+          const processedCvs = this.mockData.get('processed_cvs') || []
+          const newRecord = { ...instance, id: processedCvs.length + 1 }
+          processedCvs.push(newRecord)
+          this.mockData.set('processed_cvs', processedCvs)
+
+          return Object.assign(instance, newRecord)
+        })
+      this.stubs.push(processedCvCreateStub)
+    }
+
     // Mock query builder
-    const queryStub = sinon.stub(ProcessedCv, 'query').callsFake(() => {
-      const processedCvs = this.mockData.get('processed_cvs') || []
-      return this.createMockQueryBuilder(processedCvs, 'processed_cvs')
-    })
-    this.stubs.push(queryStub)
+    if (!(ProcessedCv.query as any).isSinonProxy) {
+      const queryStub = sinon.stub(ProcessedCv, 'query').callsFake(() => {
+        const processedCvs = this.mockData.get('processed_cvs') || []
+        return this.createMockQueryBuilder(processedCvs, 'processed_cvs') as any
+      })
+      this.stubs.push(queryStub)
+    }
 
     // Mock find method
     const findStub = sinon.stub(ProcessedCv, 'find').callsFake(async (id: number) => {
       const processedCvs = this.mockData.get('processed_cvs') || []
-      const found = processedCvs.find(p => p.id === id)
+      const found = processedCvs.find((p) => p.id === id)
       if (!found) return null
 
       const mockInstance = Object.assign(Object.create(ProcessedCv.prototype), found)
@@ -306,38 +478,43 @@ export class DatabaseMockManager {
       mockInstance.markAsCompleted = ProcessedCv.prototype.markAsCompleted.bind(mockInstance)
       mockInstance.markAsFailed = ProcessedCv.prototype.markAsFailed.bind(mockInstance)
       mockInstance.canRetry = ProcessedCv.prototype.canRetry.bind(mockInstance)
-      mockInstance.generateSearchableText = ProcessedCv.prototype.generateSearchableText.bind(mockInstance)
+      // Access private method using type assertion
+      mockInstance.generateSearchableText = (
+        ProcessedCv.prototype as any
+      ).generateSearchableText.bind(mockInstance)
 
       return mockInstance
     })
     this.stubs.push(findStub)
 
-    // Mock static query scope methods
-    const completedStub = sinon.stub(ProcessedCv, 'completed').callsFake(async () => {
+    // Mock static query scope methods - these should return query builders
+    const completedStub = sinon.stub(ProcessedCv, 'completed').callsFake(() => {
       const processedCvs = this.mockData.get('processed_cvs') || []
-      return processedCvs.filter(cv => cv.processingStatus === 'completed')
-        .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+      const filtered = processedCvs.filter((cv) => cv.processingStatus === 'completed')
+      return this.createMockQueryBuilder(filtered, 'processed_cvs') as any
     })
     this.stubs.push(completedStub)
 
-    const failedStub = sinon.stub(ProcessedCv, 'failed').callsFake(async () => {
+    const failedStub = sinon.stub(ProcessedCv, 'failed').callsFake(() => {
       const processedCvs = this.mockData.get('processed_cvs') || []
-      return processedCvs.filter(cv => cv.processingStatus === 'failed')
-        .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+      const filtered = processedCvs.filter((cv) => cv.processingStatus === 'failed')
+      return this.createMockQueryBuilder(filtered, 'processed_cvs') as any
     })
     this.stubs.push(failedStub)
 
-    const canRetryStub = sinon.stub(ProcessedCv, 'canRetry').callsFake(async () => {
+    const canRetryStub = sinon.stub(ProcessedCv, 'canRetry').callsFake(() => {
       const processedCvs = this.mockData.get('processed_cvs') || []
-      return processedCvs.filter(cv => cv.processingStatus === 'failed' && cv.retryCount < 3)
-        .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+      const filtered = processedCvs.filter(
+        (cv) => cv.processingStatus === 'failed' && cv.retryCount < 3
+      )
+      return this.createMockQueryBuilder(filtered, 'processed_cvs') as any
     })
     this.stubs.push(canRetryStub)
 
-    const withValidDataStub = sinon.stub(ProcessedCv, 'withValidData').callsFake(async () => {
+    const withValidDataStub = sinon.stub(ProcessedCv, 'withValidData').callsFake(() => {
       const processedCvs = this.mockData.get('processed_cvs') || []
-      return processedCvs.filter(cv => cv.dataValidated === true)
-        .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+      const filtered = processedCvs.filter((cv) => cv.dataValidated === true)
+      return this.createMockQueryBuilder(filtered, 'processed_cvs') as any
     })
     this.stubs.push(withValidDataStub)
   }
@@ -350,13 +527,18 @@ export class DatabaseMockManager {
     let currentData = filteredData
 
     const queryBuilder = {
+      // Internal properties for tracking query state
+      _preloadedRelations: [] as string[],
+      _isGrouped: false,
+      _hasCount: false,
+      _groupColumn: null as string | null,
       where: sinon.stub().callsFake((column: string, operator: any, value?: any) => {
         if (arguments.length === 2) {
           value = operator
           operator = '='
         }
-        
-        currentData = currentData.filter(item => {
+
+        currentData = currentData.filter((item) => {
           const columnValue = this.getNestedProperty(item, column)
           switch (operator) {
             case '=':
@@ -378,9 +560,9 @@ export class DatabaseMockManager {
         })
         return queryBuilder
       }),
-      
+
       whereNotNull: sinon.stub().callsFake((column: string) => {
-        currentData = currentData.filter(item => {
+        currentData = currentData.filter((item) => {
           const columnValue = this.getNestedProperty(item, column)
           return columnValue !== null && columnValue !== undefined
         })
@@ -391,7 +573,7 @@ export class DatabaseMockManager {
         currentData.sort((a, b) => {
           const aVal = this.getNestedProperty(a, column)
           const bVal = this.getNestedProperty(b, column)
-          
+
           if (aVal < bVal) return direction === 'asc' ? -1 : 1
           if (aVal > bVal) return direction === 'asc' ? 1 : -1
           return 0
@@ -423,11 +605,17 @@ export class DatabaseMockManager {
         if (tableName === 'processed_cvs') {
           const instance = this.createProcessedCvInstance(result)
           // Add preloaded cvSubmission if requested
-          if (queryBuilder._preloadedRelations && queryBuilder._preloadedRelations.includes('cvSubmission')) {
+          if (
+            queryBuilder._preloadedRelations &&
+            queryBuilder._preloadedRelations.includes('cvSubmission')
+          ) {
             const submissions = this.mockData.get('cv_submissions') || []
-            const cvSubmission = submissions.find(s => s.id === result.cvSubmissionId)
+            const cvSubmission = submissions.find((s) => s.id === result.cvSubmissionId)
             if (cvSubmission) {
-              instance.cvSubmission = Object.assign(Object.create(CvSubmission.prototype), cvSubmission)
+              instance.cvSubmission = Object.assign(
+                Object.create(CvSubmission.prototype),
+                cvSubmission
+              )
             }
           }
           return instance
@@ -437,8 +625,8 @@ export class DatabaseMockManager {
       }),
 
       exec: sinon.stub().callsFake(async () => currentData),
-      
-      count: sinon.stub().callsFake((column: string = '* as count') => {
+
+      count: sinon.stub().callsFake((_column: string = '* as count') => {
         if (queryBuilder._isGrouped) {
           // For grouped queries, return the query builder to allow chaining
           queryBuilder._hasCount = true
@@ -452,20 +640,23 @@ export class DatabaseMockManager {
       // Add more query methods as needed
       groupBy: sinon.stub().callsFake((column: string) => {
         // For groupBy, we need to return aggregated results
-        const grouped = currentData.reduce((acc, item) => {
-          const key = this.getNestedProperty(item, column)
-          if (!acc[key]) {
-            acc[key] = []
-          }
-          acc[key].push(item)
-          return acc
-        }, {} as Record<string, any[]>)
+        const grouped = currentData.reduce(
+          (acc, item) => {
+            const key = this.getNestedProperty(item, column)
+            if (!acc[key]) {
+              acc[key] = []
+            }
+            acc[key].push(item)
+            return acc
+          },
+          {} as Record<string, any[]>
+        )
 
         // Transform to array format expected by count/select
         currentData = Object.entries(grouped).map(([key, items]) => ({
           [column]: key,
-          count: items.length,
-          items: items
+          count: (items as any[]).length,
+          items: items,
         }))
 
         // Mark as grouped for count/select handling
@@ -475,14 +666,17 @@ export class DatabaseMockManager {
         return queryBuilder
       }),
 
-      select: sinon.stub().callsFake((columns: string | string[]) => {
+      select: sinon.stub().callsFake((_columns: string | string[]) => {
         if (queryBuilder._isGrouped && queryBuilder._hasCount) {
           // This is the final step in groupBy().count().select() chain
           // Return the grouped results with count
-          const results = currentData.map(group => ({
-            [queryBuilder._groupColumn]: group[queryBuilder._groupColumn],
-            count: group.count
-          }))
+          const results = currentData.map((group) => {
+            const groupColumn = queryBuilder._groupColumn!
+            return {
+              [groupColumn]: group[groupColumn],
+              count: group.count,
+            }
+          })
           return Promise.resolve(results)
         } else {
           // For other select operations, just return the query builder
@@ -501,26 +695,30 @@ export class DatabaseMockManager {
       // Add static query scope methods for ProcessedCv
       completed: sinon.stub().callsFake(async () => {
         const processedCvs = this.mockData.get('processed_cvs') || []
-        return processedCvs.filter(cv => cv.processingStatus === 'completed')
-          .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+        return processedCvs
+          .filter((cv) => cv.processingStatus === 'completed')
+          .map((cv) => Object.assign(Object.create(ProcessedCv.prototype), cv))
       }),
 
       failed: sinon.stub().callsFake(async () => {
         const processedCvs = this.mockData.get('processed_cvs') || []
-        return processedCvs.filter(cv => cv.processingStatus === 'failed')
-          .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+        return processedCvs
+          .filter((cv) => cv.processingStatus === 'failed')
+          .map((cv) => Object.assign(Object.create(ProcessedCv.prototype), cv))
       }),
 
       canRetry: sinon.stub().callsFake(async () => {
         const processedCvs = this.mockData.get('processed_cvs') || []
-        return processedCvs.filter(cv => cv.processingStatus === 'failed' && cv.retryCount < 3)
-          .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+        return processedCvs
+          .filter((cv) => cv.processingStatus === 'failed' && cv.retryCount < 3)
+          .map((cv) => Object.assign(Object.create(ProcessedCv.prototype), cv))
       }),
 
       withValidData: sinon.stub().callsFake(async () => {
         const processedCvs = this.mockData.get('processed_cvs') || []
-        return processedCvs.filter(cv => cv.dataValidated === true)
-          .map(cv => Object.assign(Object.create(ProcessedCv.prototype), cv))
+        return processedCvs
+          .filter((cv) => cv.dataValidated === true)
+          .map((cv) => Object.assign(Object.create(ProcessedCv.prototype), cv))
       }),
     }
 
@@ -538,7 +736,10 @@ export class DatabaseMockManager {
     mockInstance.markAsCompleted = ProcessedCv.prototype.markAsCompleted.bind(mockInstance)
     mockInstance.markAsFailed = ProcessedCv.prototype.markAsFailed.bind(mockInstance)
     mockInstance.canRetry = ProcessedCv.prototype.canRetry.bind(mockInstance)
-    mockInstance.generateSearchableText = ProcessedCv.prototype.generateSearchableText.bind(mockInstance)
+    // Access private method using type assertion
+    mockInstance.generateSearchableText = (
+      ProcessedCv.prototype as any
+    ).generateSearchableText.bind(mockInstance)
 
     // Add cvSubmission preload mock
     mockInstance.cvSubmission = null
@@ -587,5 +788,11 @@ export class DatabaseMockManager {
     })
     this.stubs = []
     this.clearMockData()
+
+    // Restore original ProcessedCv constructor if it was mocked
+    if (this.originalProcessedCv) {
+      ;(global as any).ProcessedCv = this.originalProcessedCv
+      this.originalProcessedCv = null
+    }
   }
 }

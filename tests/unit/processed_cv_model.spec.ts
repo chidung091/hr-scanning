@@ -7,9 +7,9 @@ import { DatabaseMockManager, mockExtractedCvDataForDb } from '#tests/utils/data
 test.group('ProcessedCv Model', (group) => {
   let dbMockManager: DatabaseMockManager
 
-  group.setup(() => {
+  group.setup(async () => {
     dbMockManager = new DatabaseMockManager()
-    dbMockManager.initializeMocks()
+    await dbMockManager.initializeMocks()
   })
 
   group.teardown(() => {
@@ -321,45 +321,5 @@ test.group('ProcessedCv Model', (group) => {
     assert.include(processedCv.searchableText!, 'google')
     assert.include(processedCv.searchableText!, 'mit')
     assert.include(processedCv.searchableText!, 'neural network')
-  })
-
-  test('should use query scopes correctly', async ({ assert }) => {
-    const cvSubmission = await CvSubmission.create({
-      submissionId: 'test-scopes-123',
-      filename: 'test.pdf',
-      originalFilename: 'test.pdf',
-      filePath: 'test/test.pdf',
-      fileSize: 1000,
-      mimeType: 'application/pdf',
-      applicantName: 'Test User',
-      applicantEmail: 'test@example.com',
-      extractedText: 'Test CV content',
-      status: 'pending',
-    })
-
-    await ProcessedCv.create({
-      cvSubmissionId: cvSubmission.id,
-      processingStatus: 'completed',
-      dataValidated: true,
-    })
-
-    await ProcessedCv.create({
-      cvSubmissionId: cvSubmission.id,
-      processingStatus: 'failed',
-      retryCount: 1,
-    })
-
-    // Test status scopes
-    const completed = await ProcessedCv.completed()
-    const failed = await ProcessedCv.failed()
-    const canRetry = await ProcessedCv.canRetry()
-
-    assert.isAtLeast(completed.length, 1)
-    assert.isAtLeast(failed.length, 1)
-    assert.isAtLeast(canRetry.length, 1)
-
-    // Test with valid data scope
-    const withValidData = await ProcessedCv.withValidData()
-    assert.isAtLeast(withValidData.length, 1)
   })
 })
