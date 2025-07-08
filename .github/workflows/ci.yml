@@ -110,9 +110,6 @@ jobs:
           echo "SESSION_DRIVER=cookie" >> .env
           echo "LIMITER_STORE=database" >> .env
 
-      - name: Run database migrations
-        run: node ace migration:run --force
-
       - name: Build application
         run: npm run build
 
