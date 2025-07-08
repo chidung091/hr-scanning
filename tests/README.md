@@ -67,13 +67,13 @@ test.group('My Test Group', (group) => {
 
   test('should process CV successfully', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Mock successful response
     const mockStub = mockManager.mockSuccessfulResponse(mockExtractedCvData, 1500)
     ;(service as any).client.chat.completions.create = mockStub
 
     const result = await service.extractCvData('sample cv text')
-    
+
     assert.isTrue(result.success)
     assert.equal(result.tokensUsed, 1500)
   })
@@ -95,7 +95,7 @@ test('should handle OpenAI service failure', async ({ assert }) => {
   })
 
   // Your test logic here
-  
+
   // Clean up
   openaiStub.restore()
 })
@@ -163,21 +163,25 @@ Located in `tests/functional/`, these test complete workflows:
 ## Running Tests
 
 ### All Tests
+
 ```bash
 npm test
 ```
 
 ### Unit Tests Only
+
 ```bash
 npm test -- --grep "unit"
 ```
 
 ### Specific Test File
+
 ```bash
 npm test tests/unit/openai_service.spec.ts
 ```
 
 ### With Coverage
+
 ```bash
 npm test -- --coverage
 ```
@@ -185,26 +189,31 @@ npm test -- --coverage
 ## Best Practices
 
 ### 1. Always Mock External APIs
+
 - Never make real API calls in tests
 - Use the provided mock utilities for consistency
 - Test both success and failure scenarios
 
 ### 2. Test Isolation
+
 - Each test should be independent
 - Use database transactions that rollback after each test
 - Clean up mocks and stubs in teardown hooks
 
 ### 3. Comprehensive Coverage
+
 - Test happy paths and edge cases
 - Include error scenarios and retry logic
 - Validate data structures and business logic
 
 ### 4. Maintainable Tests
+
 - Use descriptive test names
 - Group related tests logically
 - Keep test data in reusable fixtures
 
 ### 5. Performance
+
 - Mock external dependencies to keep tests fast
 - Use appropriate timeouts for async operations
 - Avoid unnecessary database operations

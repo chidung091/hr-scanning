@@ -149,7 +149,9 @@ OPENAI_API_KEY=your-key        # OpenAI API key (optional)
 ## 🛠️ Common Commands
 
 ### Development
+
 c
+
 ```bash
 # Start PostgreSQL only
 docker-compose -f docker-compose.dev.yml up -d postgres
