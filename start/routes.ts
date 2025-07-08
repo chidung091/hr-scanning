@@ -24,6 +24,7 @@ const JobsController = () => import('#controllers/jobs_controller')
 const AssessmentController = () => import('#controllers/assessment_controller')
 const SwaggerController = () => import('#controllers/swagger_controller')
 const ManagementController = () => import('#controllers/management_controller')
+const AdminController = () => import('#controllers/admin_controller')
 
 router.get('/', [HomeController, 'index'])
 
@@ -82,6 +83,19 @@ router
 router
   .get('/api/management/analytics', [ManagementController, 'getAnalytics'])
   .use(managementAnalyticsThrottle)
+
+// Admin routes
+router.get('/admin', [AdminController, 'dashboard'])
+
+// Admin API routes
+router.get('/api/admin/jobs', [AdminController, 'getJobs'])
+router.get('/api/admin/applicants', [AdminController, 'getApplicants'])
+router.get('/api/admin/criteria', [AdminController, 'getCriteria'])
+router.post('/api/admin/criteria', [AdminController, 'createCriteria'])
+router.put('/api/admin/criteria/:id', [AdminController, 'updateCriteria'])
+router.delete('/api/admin/criteria/:id', [AdminController, 'deleteCriteria'])
+router.put('/api/admin/applicants/:id/status', [AdminController, 'updateApplicantStatus'])
+router.put('/api/admin/jobs/:id/status', [AdminController, 'updateJobStatus'])
 
 // API Documentation routes
 router.get('/api/docs', [SwaggerController, 'ui'])
