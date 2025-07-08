@@ -93,7 +93,14 @@ export default class ManagementController {
           jobQuery.select('id', 'job_title', 'work_location', 'salary_range')
         })
         .preload('questionnaireResponse', (responseQuery) => {
-          responseQuery.select('id', 'cv_submission_id', 'is_completed', 'total_score', 'assessment_result', 'completed_at')
+          responseQuery.select(
+            'id',
+            'cv_submission_id',
+            'is_completed',
+            'total_score',
+            'assessment_result',
+            'completed_at'
+          )
         })
         .orderBy('created_at', 'desc')
 
@@ -258,7 +265,10 @@ export default class ManagementController {
 
       // Update notes in questionnaire response if provided
       if (notes) {
-        const questionnaireResponse = await QuestionnaireResponse.findBy('cvSubmissionId', submission.id)
+        const questionnaireResponse = await QuestionnaireResponse.findBy(
+          'cvSubmissionId',
+          submission.id
+        )
         if (questionnaireResponse) {
           questionnaireResponse.notes = notes
           await questionnaireResponse.save()
@@ -304,7 +314,7 @@ export default class ManagementController {
   async getAnalytics({ request, response }: HttpContext) {
     try {
       const period = request.input('period', 'month')
-      
+
       // Calculate date range based on period
       let startDate: DateTime
       switch (period) {
@@ -327,7 +337,7 @@ export default class ManagementController {
         totalSubmissions,
         completedAssessments,
         scoreDistribution,
-        jobApplications
+        jobApplications,
       ] = await Promise.all([
         // Get submission counts by status
         CvSubmission.query()
@@ -337,9 +347,7 @@ export default class ManagementController {
           .select('status'),
 
         // Get total submissions count
-        CvSubmission.query()
-          .where('created_at', '>=', startDate.toSQL()!)
-          .count('* as total'),
+        CvSubmission.query().where('created_at', '>=', startDate.toSQL()!).count('* as total'),
 
         // Get completed assessments count
         QuestionnaireResponse.query()
@@ -362,12 +370,16 @@ export default class ManagementController {
           .join('jobs', 'cv_submissions.job_id', 'jobs.id')
           .groupBy('cv_submissions.job_id', 'jobs.job_title')
           .count('cv_submissions.id as count')
-          .select('cv_submissions.job_id as job_id', 'jobs.job_title')
+          .select('cv_submissions.job_id as job_id', 'jobs.job_title'),
       ])
 
-      const completionRate = totalSubmissions[0]?.$extras.total > 0 
-        ? Math.round((completedAssessments[0]?.$extras.completed / totalSubmissions[0]?.$extras.total) * 100)
-        : 0
+      const completionRate =
+        totalSubmissions[0]?.$extras.total > 0
+          ? Math.round(
+              (completedAssessments[0]?.$extras.completed / totalSubmissions[0]?.$extras.total) *
+                100
+            )
+          : 0
 
       return response.json({
         success: true,
@@ -375,21 +387,21 @@ export default class ManagementController {
           period,
           submissionCounts: submissionCounts.map((item: any) => ({
             status: item.status,
-            count: item.$extras.count
+            count: item.$extras.count,
           })),
           assessmentCompletion: {
             total: totalSubmissions[0]?.$extras.total || 0,
             completed: completedAssessments[0]?.$extras.completed || 0,
-            rate: completionRate
+            rate: completionRate,
           },
           scoreDistribution: scoreDistribution.map((item: any) => ({
             result: item.assessmentResult,
-            count: item.$extras.count
+            count: item.$extras.count,
           })),
           jobApplications: jobApplications.map((item: any) => ({
             jobId: item.jobId,
-            count: item.$extras.count
-          }))
+            count: item.$extras.count,
+          })),
         },
       })
     } catch (error) {

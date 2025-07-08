@@ -70,6 +70,9 @@ export default class Job extends BaseModel {
 
   // Scopes
   static activeJobs() {
-    return this.query().where('isActive', true).orderBy('sortOrder', 'asc').orderBy('createdAt', 'desc')
+    return this.query()
+      .where('isActive', true)
+      .orderBy('sortOrder', 'asc')
+      .orderBy('createdAt', 'desc')
   }
 }

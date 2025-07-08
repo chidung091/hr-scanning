@@ -94,7 +94,7 @@ export class OpenAIService {
 
   constructor() {
     const apiKey = env.get('OPENAI_API_KEY')
-    
+
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is required')
     }
@@ -116,8 +116,19 @@ export class OpenAIService {
    */
   async extractCvData(cvText: string): Promise<OpenAIProcessingResult> {
     const startTime = Date.now()
-    
+
     try {
+      // Validate input text
+      if (!cvText || cvText.trim().length === 0) {
+        const processingTime = Date.now() - startTime
+        return {
+          success: false,
+          error: 'CV text is empty or contains no meaningful content',
+          processingTime,
+          tokensUsed: 0,
+        }
+      }
+
       logger.info('Starting OpenAI CV data extraction', {
         textLength: cvText.length,
         model: this.config.model,
@@ -127,9 +138,9 @@ export class OpenAIService {
       const userPrompt = this.buildUserPrompt(cvText)
 
       const result = await this.callOpenAIWithRetry(systemPrompt, userPrompt)
-      
+
       const processingTime = Date.now() - startTime
-      
+
       logger.info('OpenAI CV data extraction completed', {
         success: result.success,
         processingTime,
@@ -142,7 +153,7 @@ export class OpenAIService {
       }
     } catch (error) {
       const processingTime = Date.now() - startTime
-      
+
       logger.error('OpenAI CV data extraction failed', {
         error: error.message,
         processingTime,
@@ -270,7 +281,10 @@ Required JSON Schema:
   /**
    * Call OpenAI API with retry logic
    */
-  private async callOpenAIWithRetry(systemPrompt: string, userPrompt: string): Promise<OpenAIProcessingResult> {
+  private async callOpenAIWithRetry(
+    systemPrompt: string,
+    userPrompt: string
+  ): Promise<OpenAIProcessingResult> {
     let lastError: Error | null = null
 
     for (let attempt = 1; attempt <= this.config.maxRetries; attempt++) {
@@ -310,7 +324,7 @@ Required JSON Schema:
         }
       } catch (error) {
         lastError = error as Error
-        
+
         logger.warn(`OpenAI API call attempt ${attempt} failed`, {
           error: error.message,
           attempt,
@@ -325,7 +339,7 @@ Required JSON Schema:
         // Wait before retrying (exponential backoff)
         if (attempt < this.config.maxRetries) {
           const delay = this.config.retryDelay * Math.pow(2, attempt - 1)
-          await new Promise(resolve => setTimeout(resolve, delay))
+          await new Promise((resolve) => setTimeout(resolve, delay))
         }
       }
     }
@@ -368,7 +382,16 @@ Required JSON Schema:
     }
 
     // Validate array properties
-    const arrayProperties = ['Education', 'WorkExperience', 'Certifications', 'Projects', 'Languages', 'ExtracurricularAwards', 'Interests', 'TechnologyExperience']
+    const arrayProperties = [
+      'Education',
+      'WorkExperience',
+      'Certifications',
+      'Projects',
+      'Languages',
+      'ExtracurricularAwards',
+      'Interests',
+      'TechnologyExperience',
+    ]
     for (const prop of arrayProperties) {
       if (!Array.isArray(data[prop])) {
         throw new Error(`Property ${prop} must be an array`)

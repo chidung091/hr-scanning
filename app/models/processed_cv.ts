@@ -62,9 +62,9 @@ export default class ProcessedCv extends BaseModel {
 
   @column({
     consume: (value: any) => Boolean(value),
-    prepare: (value: boolean) => value
+    prepare: (value: boolean) => value,
   })
-  declare dataValidated: boolean = false
+  declare dataValidated: boolean
 
   @column()
   declare validationNotes: string | null
@@ -87,7 +87,12 @@ export default class ProcessedCv extends BaseModel {
     this.processingStartedAt = DateTime.now()
   }
 
-  public markAsCompleted(data: ExtractedCvData, tokensUsed: number, processingTime: number, model: string): void {
+  public markAsCompleted(
+    data: ExtractedCvData,
+    tokensUsed: number,
+    processingTime: number,
+    model: string
+  ): void {
     this.processingStatus = 'completed'
     this.processingCompletedAt = DateTime.now()
     this.extractedData = data
@@ -129,14 +134,14 @@ export default class ProcessedCv extends BaseModel {
     if (data.JobObjective.CareerGoals) searchableFields.push(data.JobObjective.CareerGoals)
 
     // Education
-    data.Education.forEach(edu => {
+    data.Education.forEach((edu) => {
       if (edu.School) searchableFields.push(edu.School)
       if (edu.Major) searchableFields.push(edu.Major)
       if (edu.DegreeLevel) searchableFields.push(edu.DegreeLevel)
     })
 
     // Work experience
-    data.WorkExperience.forEach(work => {
+    data.WorkExperience.forEach((work) => {
       if (work.Company) searchableFields.push(work.Company)
       if (work.JobTitle) searchableFields.push(work.JobTitle)
       if (work.Description) searchableFields.push(work.Description)
@@ -150,19 +155,19 @@ export default class ProcessedCv extends BaseModel {
     searchableFields.push(...data.TechnologyExperience)
 
     // Projects
-    data.Projects.forEach(project => {
+    data.Projects.forEach((project) => {
       if (project.ProjectName) searchableFields.push(project.ProjectName)
       if (project.Description) searchableFields.push(project.Description)
       searchableFields.push(...project.Technologies)
     })
 
     // Languages
-    data.Languages.forEach(lang => {
+    data.Languages.forEach((lang) => {
       if (lang.Name) searchableFields.push(lang.Name)
     })
 
     // Certifications
-    data.Certifications.forEach(cert => {
+    data.Certifications.forEach((cert) => {
       if (cert.Name) searchableFields.push(cert.Name)
       if (cert.Issuer) searchableFields.push(cert.Issuer)
     })
@@ -170,7 +175,10 @@ export default class ProcessedCv extends BaseModel {
     // Interests
     searchableFields.push(...data.Interests)
 
-    this.searchableText = searchableFields.filter(field => field && field.trim()).join(' ').toLowerCase()
+    this.searchableText = searchableFields
+      .filter((field) => field && field.trim())
+      .join(' ')
+      .toLowerCase()
   }
 
   // Query scopes for common patterns
@@ -192,7 +200,13 @@ export default class ProcessedCv extends BaseModel {
 
   static withCvSubmission() {
     return this.query().preload('cvSubmission', (cvQuery) => {
-      cvQuery.select('id', 'submission_id', 'applicant_name', 'applicant_email', 'original_filename')
+      cvQuery.select(
+        'id',
+        'submission_id',
+        'applicant_name',
+        'applicant_email',
+        'original_filename'
+      )
     })
   }
 

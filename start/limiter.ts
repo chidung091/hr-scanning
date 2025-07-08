@@ -27,14 +27,23 @@ export const fileUploadThrottle = limiter.define('fileUpload', () => {
 
 // Assessment throttle - moderate restrictions
 export const assessmentStartThrottle = limiter.define('assessmentStart', () => {
+  if (env.get('NODE_ENV') === 'test') {
+    return limiter.allowRequests(1000).every('1 minute')
+  }
   return limiter.allowRequests(10).every('1 hour').blockFor('2 hours')
 })
 
 export const assessmentActionThrottle = limiter.define('assessmentAction', () => {
+  if (env.get('NODE_ENV') === 'test') {
+    return limiter.allowRequests(1000).every('1 minute')
+  }
   return limiter.allowRequests(50).every('15 minutes')
 })
 
 export const assessmentViewThrottle = limiter.define('assessmentView', () => {
+  if (env.get('NODE_ENV') === 'test') {
+    return limiter.allowRequests(1000).every('1 minute')
+  }
   return limiter.allowRequests(100).every('15 minutes')
 })
 

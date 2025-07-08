@@ -3,44 +3,45 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@yield('title', 'TechVision Solutions')</title>
+    <title>
+      @yield('title', 'TechVision Solutions')
+      </title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net" />
-    <link
-      href="https://fonts.bunny.net/css?family=inter:400,500,600,700"
-      rel="stylesheet"
-    />
+      <link rel="preconnect" href="https://fonts.bunny.net" />
+      <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdn.tailwindcss.com">
+        
+      </script>
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: [ "Inter", "sans-serif" ]
-            },
-            colors: {
-              primary: {
-                DEFAULT: "#2563eb",
-                50: "#eff6ff",
-                100: "#dbeafe",
-                500: "#3b82f6",
-                600: "#2563eb",
-                700: "#1d4ed8",
-                900: "#1e3a8a"
+      <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: [ "Inter", "sans-serif" ]
+              },
+              colors: {
+                primary: {
+                  DEFAULT: "#2563eb",
+                  50: "#eff6ff",
+                  100: "#dbeafe",
+                  500: "#3b82f6",
+                  600: "#2563eb",
+                  700: "#1d4ed8",
+                  900: "#1e3a8a"
+                }
               }
             }
           }
-        }
-      };
-    </script>
+        };
+      </script>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-  </head>
-  <body class="min-h-screen bg-gray-50 font-sans antialiased">
-    <div class="flex flex-col min-h-screen">
-      @yield('content')
-    </div>
-  </body>
-</html>
+      @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="min-h-screen bg-gray-50 font-sans antialiased">
+      <div class="flex flex-col min-h-screen">
+        @yield('content')
+        </div>
+      </body>
+    </html>

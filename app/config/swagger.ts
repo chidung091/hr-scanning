@@ -25,18 +25,19 @@ const swaggerDefinition = {
     contact: {
       name: 'TechVision Solutions',
       email: 'support@techvision.com',
-      url: 'https://techvision.com'
+      url: 'https://techvision.com',
     },
     license: {
       name: 'MIT',
-      url: 'https://opensource.org/licenses/MIT'
-    }
+      url: 'https://opensource.org/licenses/MIT',
+    },
   },
   servers: [
     {
       url: env.get('APP_URL', 'http://localhost:3333'),
-      description: env.get('NODE_ENV') === 'production' ? 'Production server' : 'Development server'
-    }
+      description:
+        env.get('NODE_ENV') === 'production' ? 'Production server' : 'Development server',
+    },
   ],
   components: {
     securitySchemes: {
@@ -44,8 +45,8 @@ const swaggerDefinition = {
         type: 'apiKey',
         in: 'header',
         name: 'X-CSRF-Token',
-        description: 'CSRF token for form submissions'
-      }
+        description: 'CSRF token for form submissions',
+      },
     },
     schemas: {
       Job: {
@@ -69,8 +70,8 @@ const swaggerDefinition = {
           isActive: { type: 'boolean', example: true },
           sortOrder: { type: 'integer', example: 0 },
           createdAt: { type: 'string', format: 'date-time' },
-          updatedAt: { type: 'string', format: 'date-time' }
-        }
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
       },
       CvSubmission: {
         type: 'object',
@@ -84,27 +85,43 @@ const swaggerDefinition = {
           mimeType: { type: 'string', example: 'application/pdf' },
           applicantName: { type: 'string', example: 'John Doe' },
           applicantEmail: { type: 'string', example: 'john.doe@email.com' },
-          status: { type: 'string', enum: ['pending', 'submitted', 'reviewed', 'accepted', 'rejected'], example: 'pending' },
+          status: {
+            type: 'string',
+            enum: ['pending', 'submitted', 'reviewed', 'accepted', 'rejected'],
+            example: 'pending',
+          },
           extractedText: { type: 'string' },
           jobId: { type: 'integer', example: 1 },
           createdAt: { type: 'string', format: 'date-time' },
-          updatedAt: { type: 'string', format: 'date-time' }
-        }
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
       },
       AssessmentQuestion: {
         type: 'object',
         properties: {
           id: { type: 'integer', example: 1 },
           key: { type: 'string', example: 'work_style_environment' },
-          type: { type: 'string', enum: ['multiple_choice', 'text', 'rating'], example: 'multiple_choice' },
+          type: {
+            type: 'string',
+            enum: ['multiple_choice', 'text', 'rating'],
+            example: 'multiple_choice',
+          },
           required: { type: 'boolean', example: true },
           title: { type: 'string', example: 'What is your preferred work style and environment?' },
-          description: { type: 'string', example: 'Select the work arrangement that best suits your productivity and lifestyle.' },
+          description: {
+            type: 'string',
+            example: 'Select the work arrangement that best suits your productivity and lifestyle.',
+          },
           placeholder: { type: 'string', example: 'Enter your answer here...' },
           options: {
             type: 'array',
             items: { type: 'string' },
-            example: ['Remote work from home', 'Traditional office environment', 'Hybrid (mix of remote and office)', 'Flexible arrangement based on project needs']
+            example: [
+              'Remote work from home',
+              'Traditional office environment',
+              'Hybrid (mix of remote and office)',
+              'Flexible arrangement based on project needs',
+            ],
           },
           validation: {
             type: 'object',
@@ -114,11 +131,11 @@ const swaggerDefinition = {
               options: {
                 type: 'array',
                 items: { type: 'string' },
-                example: ['remote', 'office', 'hybrid', 'flexible']
-              }
-            }
-          }
-        }
+                example: ['remote', 'office', 'hybrid', 'flexible'],
+              },
+            },
+          },
+        },
       },
       AssessmentProgress: {
         type: 'object',
@@ -132,8 +149,8 @@ const swaggerDefinition = {
           isExpired: { type: 'boolean', example: false },
           startedAt: { type: 'string', format: 'date-time' },
           lastActivityAt: { type: 'string', format: 'date-time' },
-          completedAt: { type: 'string', format: 'date-time', nullable: true }
-        }
+          completedAt: { type: 'string', format: 'date-time', nullable: true },
+        },
       },
       QuestionnaireResponse: {
         type: 'object',
@@ -147,38 +164,43 @@ const swaggerDefinition = {
             example: {
               work_style_environment: 'hybrid',
               overtime_commitment: 'reasonable_notice',
-              recognition_reward: 'career_advancement'
-            }
+              recognition_reward: 'career_advancement',
+            },
           },
           currentQuestion: { type: 'integer', example: 4 },
           questionsCompleted: { type: 'integer', example: 3 },
           isCompleted: { type: 'boolean', example: false },
           languagePreference: { type: 'string', enum: ['en', 'vi'], example: 'en' },
           totalScore: { type: 'integer', example: 85, nullable: true },
-          assessmentResult: { type: 'string', enum: ['excellent', 'good', 'fair', 'poor'], example: 'good', nullable: true },
+          assessmentResult: {
+            type: 'string',
+            enum: ['excellent', 'good', 'fair', 'poor'],
+            example: 'good',
+            nullable: true,
+          },
           notes: { type: 'string', nullable: true },
           startedAt: { type: 'string', format: 'date-time' },
           completedAt: { type: 'string', format: 'date-time', nullable: true },
           lastActivityAt: { type: 'string', format: 'date-time' },
           createdAt: { type: 'string', format: 'date-time' },
-          updatedAt: { type: 'string', format: 'date-time' }
-        }
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
       },
       ApiResponse: {
         type: 'object',
         properties: {
           success: { type: 'boolean', example: true },
           message: { type: 'string', example: 'Operation completed successfully' },
-          data: { type: 'object', additionalProperties: true }
-        }
+          data: { type: 'object', additionalProperties: true },
+        },
       },
       ErrorResponse: {
         type: 'object',
         properties: {
           success: { type: 'boolean', example: false },
           message: { type: 'string', example: 'An error occurred' },
-          error: { type: 'string', example: 'Detailed error message' }
-        }
+          error: { type: 'string', example: 'Detailed error message' },
+        },
       },
       ProcessedCv: {
         type: 'object',
@@ -188,7 +210,7 @@ const swaggerDefinition = {
           processingStatus: {
             type: 'string',
             enum: ['pending', 'processing', 'completed', 'failed'],
-            example: 'completed'
+            example: 'completed',
           },
           processingStartedAt: { type: 'string', format: 'date-time', nullable: true },
           processingCompletedAt: { type: 'string', format: 'date-time', nullable: true },
@@ -203,8 +225,8 @@ const swaggerDefinition = {
           validationNotes: { type: 'string', nullable: true },
           searchableText: { type: 'string', nullable: true },
           createdAt: { type: 'string', format: 'date-time' },
-          updatedAt: { type: 'string', format: 'date-time' }
-        }
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
       },
       ExtractedCvData: {
         type: 'object',
@@ -213,19 +235,41 @@ const swaggerDefinition = {
             type: 'object',
             properties: {
               Name: { type: 'string', example: 'John Doe', nullable: true },
-              DateOfBirth: { type: 'string', format: 'date', example: '1990-01-15', nullable: true },
+              DateOfBirth: {
+                type: 'string',
+                format: 'date',
+                example: '1990-01-15',
+                nullable: true,
+              },
               Gender: { type: 'string', example: 'male', nullable: true },
               PhoneNumber: { type: 'string', example: '+1-555-123-4567', nullable: true },
-              Email: { type: 'string', format: 'email', example: 'john.doe@email.com', nullable: true },
-              Address: { type: 'string', example: '123 Main St, City, State 12345', nullable: true }
-            }
+              Email: {
+                type: 'string',
+                format: 'email',
+                example: 'john.doe@email.com',
+                nullable: true,
+              },
+              Address: {
+                type: 'string',
+                example: '123 Main St, City, State 12345',
+                nullable: true,
+              },
+            },
           },
           JobObjective: {
             type: 'object',
             properties: {
-              DesiredPosition: { type: 'string', example: 'Senior Software Engineer', nullable: true },
-              CareerGoals: { type: 'string', example: 'To lead innovative software development projects', nullable: true }
-            }
+              DesiredPosition: {
+                type: 'string',
+                example: 'Senior Software Engineer',
+                nullable: true,
+              },
+              CareerGoals: {
+                type: 'string',
+                example: 'To lead innovative software development projects',
+                nullable: true,
+              },
+            },
           },
           Education: {
             type: 'array',
@@ -237,9 +281,9 @@ const swaggerDefinition = {
                 DegreeLevel: { type: 'string', example: 'Bachelor', nullable: true },
                 StartDate: { type: 'string', example: '2016-09', nullable: true },
                 EndDate: { type: 'string', example: '2020-06', nullable: true },
-                GPA: { type: 'string', example: '3.8', nullable: true }
-              }
-            }
+                GPA: { type: 'string', example: '3.8', nullable: true },
+              },
+            },
           },
           WorkExperience: {
             type: 'array',
@@ -249,10 +293,18 @@ const swaggerDefinition = {
                 Company: { type: 'string', example: 'TechCorp Inc.', nullable: true },
                 JobTitle: { type: 'string', example: 'Software Engineer', nullable: true },
                 Duration: { type: 'string', example: '2020-2023', nullable: true },
-                Description: { type: 'string', example: 'Developed web applications using React and Node.js', nullable: true },
-                KeyAchievements: { type: 'string', example: 'Led team of 5 developers, increased performance by 40%', nullable: true }
-              }
-            }
+                Description: {
+                  type: 'string',
+                  example: 'Developed web applications using React and Node.js',
+                  nullable: true,
+                },
+                KeyAchievements: {
+                  type: 'string',
+                  example: 'Led team of 5 developers, increased performance by 40%',
+                  nullable: true,
+                },
+              },
+            },
           },
           Skills: {
             type: 'object',
@@ -260,26 +312,44 @@ const swaggerDefinition = {
               Technical: {
                 type: 'array',
                 items: { type: 'string' },
-                example: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python']
+                example: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python'],
               },
               Soft: {
                 type: 'array',
                 items: { type: 'string' },
-                example: ['Leadership', 'Communication', 'Problem Solving']
-              }
-            }
+                example: ['Leadership', 'Communication', 'Problem Solving'],
+              },
+            },
           },
           Certifications: {
             type: 'array',
             items: {
               type: 'object',
               properties: {
-                Name: { type: 'string', example: 'AWS Certified Solutions Architect', nullable: true },
-                IssuingOrganization: { type: 'string', example: 'Amazon Web Services', nullable: true },
-                IssueDate: { type: 'string', format: 'date', example: '2023-01-15', nullable: true },
-                ExpirationDate: { type: 'string', format: 'date', example: '2026-01-15', nullable: true }
-              }
-            }
+                Name: {
+                  type: 'string',
+                  example: 'AWS Certified Solutions Architect',
+                  nullable: true,
+                },
+                IssuingOrganization: {
+                  type: 'string',
+                  example: 'Amazon Web Services',
+                  nullable: true,
+                },
+                IssueDate: {
+                  type: 'string',
+                  format: 'date',
+                  example: '2023-01-15',
+                  nullable: true,
+                },
+                ExpirationDate: {
+                  type: 'string',
+                  format: 'date',
+                  example: '2026-01-15',
+                  nullable: true,
+                },
+              },
+            },
           },
           Projects: {
             type: 'array',
@@ -288,14 +358,18 @@ const swaggerDefinition = {
               properties: {
                 ProjectName: { type: 'string', example: 'E-commerce Platform', nullable: true },
                 Role: { type: 'string', example: 'Lead Developer', nullable: true },
-                Description: { type: 'string', example: 'Built scalable e-commerce platform', nullable: true },
+                Description: {
+                  type: 'string',
+                  example: 'Built scalable e-commerce platform',
+                  nullable: true,
+                },
                 Technologies: {
                   type: 'array',
                   items: { type: 'string' },
-                  example: ['React', 'Express.js', 'MongoDB']
-                }
-              }
-            }
+                  example: ['React', 'Express.js', 'MongoDB'],
+                },
+              },
+            },
           },
           Languages: {
             type: 'array',
@@ -303,9 +377,9 @@ const swaggerDefinition = {
               type: 'object',
               properties: {
                 Name: { type: 'string', example: 'English', nullable: true },
-                Proficiency: { type: 'string', example: 'Native', nullable: true }
-              }
-            }
+                Proficiency: { type: 'string', example: 'Native', nullable: true },
+              },
+            },
           },
           ExtracurricularAwards: {
             type: 'array',
@@ -315,23 +389,27 @@ const swaggerDefinition = {
                 Title: { type: 'string', example: 'Best Innovation Award', nullable: true },
                 Organization: { type: 'string', example: 'Tech Conference 2023', nullable: true },
                 Date: { type: 'string', format: 'date', example: '2023-06-15', nullable: true },
-                Description: { type: 'string', example: 'Awarded for innovative AI solution', nullable: true }
-              }
-            }
+                Description: {
+                  type: 'string',
+                  example: 'Awarded for innovative AI solution',
+                  nullable: true,
+                },
+              },
+            },
           },
           Interests: {
             type: 'array',
             items: { type: 'string' },
-            example: ['Machine Learning', 'Open Source', 'Photography']
+            example: ['Machine Learning', 'Open Source', 'Photography'],
           },
           YearExperience: { type: 'integer', example: 5, nullable: true },
           TechnologyExperience: {
             type: 'array',
             items: { type: 'string' },
-            example: ['JavaScript', 'Python', 'React', 'Node.js', 'AWS']
+            example: ['JavaScript', 'Python', 'React', 'Node.js', 'AWS'],
           },
-          CareerPath: { type: 'string', example: 'Full Stack Development', nullable: true }
-        }
+          CareerPath: { type: 'string', example: 'Full Stack Development', nullable: true },
+        },
       },
       ProcessingStatus: {
         type: 'object',
@@ -340,11 +418,11 @@ const swaggerDefinition = {
           processingStatus: {
             type: 'string',
             enum: ['not_started', 'pending', 'processing', 'completed', 'failed'],
-            example: 'completed'
+            example: 'completed',
           },
           canRetry: { type: 'boolean', example: false },
-          processedCv: { $ref: '#/components/schemas/ProcessedCv' }
-        }
+          processedCv: { $ref: '#/components/schemas/ProcessedCv' },
+        },
       },
       ProcessingStats: {
         type: 'object',
@@ -354,33 +432,33 @@ const swaggerDefinition = {
           failed: { type: 'integer', example: 15 },
           pending: { type: 'integer', example: 10 },
           processing: { type: 'integer', example: 5 },
-          successRate: { type: 'number', format: 'float', example: 80.0 }
-        }
-      }
-    }
+          successRate: { type: 'number', format: 'float', example: 80.0 },
+        },
+      },
+    },
   },
   tags: [
     {
       name: 'Jobs',
-      description: 'Job listing and management endpoints'
+      description: 'Job listing and management endpoints',
     },
     {
       name: 'CV Submissions',
-      description: 'CV upload and submission management endpoints'
+      description: 'CV upload and submission management endpoints',
     },
     {
       name: 'Assessment',
-      description: 'Progressive assessment system endpoints'
+      description: 'Progressive assessment system endpoints',
     },
     {
       name: 'Management',
-      description: 'Administrative endpoints for managing applications'
+      description: 'Administrative endpoints for managing applications',
     },
     {
       name: 'OpenAI Processing',
-      description: 'AI-powered CV data extraction and processing endpoints'
-    }
-  ]
+      description: 'AI-powered CV data extraction and processing endpoints',
+    },
+  ],
 }
 
 const options: swaggerJSDoc.Options = {
@@ -389,15 +467,15 @@ const options: swaggerJSDoc.Options = {
     './app/controllers/*.ts',
     './start/routes.ts',
     './docs/swagger/*.yaml',
-    './app/models/*.ts' // Include models for better schema generation
+    './app/models/*.ts', // Include models for better schema generation
   ],
   swaggerDefinition: {
     ...swaggerDefinition,
     // Additional swagger-jsdoc specific options
     basePath: '/',
     produces: ['application/json'],
-    consumes: ['application/json', 'multipart/form-data']
-  }
+    consumes: ['application/json', 'multipart/form-data'],
+  },
 }
 
 // Generate the swagger specification with error handling
@@ -414,10 +492,10 @@ export const swaggerSpec = (() => {
       info: {
         title: 'TechVision HR Scanning API',
         version: '1.0.0',
-        description: 'API documentation generation failed. Please check server logs.'
+        description: 'API documentation generation failed. Please check server logs.',
       },
       paths: {},
-      components: {}
+      components: {},
     }
   }
 })()

@@ -7,7 +7,12 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('submission_id').notNullable()
-      table.integer('cv_submission_id').unsigned().references('id').inTable('cv_submissions').onDelete('CASCADE')
+      table
+        .integer('cv_submission_id')
+        .unsigned()
+        .references('id')
+        .inTable('cv_submissions')
+        .onDelete('CASCADE')
 
       // Store all questionnaire responses as JSON for flexibility
       table.json('responses').notNullable()

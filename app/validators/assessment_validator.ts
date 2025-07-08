@@ -6,7 +6,7 @@ import vine from '@vinejs/vine'
 export const createAssessmentValidator = vine.compile(
   vine.object({
     cvSubmissionId: vine.number().positive(),
-    language: vine.enum(['en', 'vi']).optional()
+    language: vine.enum(['en', 'vi']).optional(),
   })
 )
 
@@ -17,7 +17,7 @@ export const submitAnswerValidator = vine.compile(
   vine.object({
     questionId: vine.number().positive(),
     answer: vine.any().optional(), // Will be validated based on question type
-    action: vine.enum(['answer', 'skip', 'previous']).optional()
+    action: vine.enum(['answer', 'skip', 'previous']).optional(),
   })
 )
 
@@ -26,7 +26,7 @@ export const submitAnswerValidator = vine.compile(
  */
 export const multipleChoiceAnswerValidator = vine.compile(
   vine.object({
-    answer: vine.string().minLength(1)
+    answer: vine.string().minLength(1),
   })
 )
 
@@ -35,7 +35,7 @@ export const multipleChoiceAnswerValidator = vine.compile(
  */
 export const textAnswerValidator = vine.compile(
   vine.object({
-    answer: vine.string().minLength(1).maxLength(2000)
+    answer: vine.string().minLength(1).maxLength(2000),
   })
 )
 
@@ -44,7 +44,7 @@ export const textAnswerValidator = vine.compile(
  */
 export const ratingAnswerValidator = vine.compile(
   vine.object({
-    answer: vine.number().min(1).max(10)
+    answer: vine.number().min(1).max(10),
   })
 )
 
@@ -55,7 +55,7 @@ export const completeAssessmentValidator = vine.compile(
   vine.object({
     sessionId: vine.string().uuid(),
     finalScore: vine.number().min(0).max(100).optional(),
-    completedAt: vine.date().optional()
+    completedAt: vine.date().optional(),
   })
 )
 
@@ -70,7 +70,7 @@ export const assessmentQueryValidator = vine.compile(
     page: vine.number().positive().optional(),
     limit: vine.number().positive().max(100).optional(),
     sortBy: vine.enum(['createdAt', 'updatedAt', 'score']).optional(),
-    sortOrder: vine.enum(['asc', 'desc']).optional()
+    sortOrder: vine.enum(['asc', 'desc']).optional(),
   })
 )
 
@@ -82,38 +82,41 @@ export function createQuestionAnswerValidator(questionType: string, validation: 
     case 'multiple_choice':
       return vine.compile(
         vine.object({
-          answer: vine.string().in(validation.options || [])
+          answer: vine.string().in(validation.options || []),
         })
       )
-    
+
     case 'text':
       let textSchema = vine.string()
-      
+
       if (validation.minLength) {
         textSchema = textSchema.minLength(validation.minLength)
       }
-      
+
       if (validation.maxLength) {
         textSchema = textSchema.maxLength(validation.maxLength)
       }
-      
+
       return vine.compile(
         vine.object({
-          answer: textSchema
+          answer: textSchema,
         })
       )
-    
+
     case 'rating':
       return vine.compile(
         vine.object({
-          answer: vine.number().min(1).max(validation.maxRating || 10)
+          answer: vine
+            .number()
+            .min(1)
+            .max(validation.maxRating || 10),
         })
       )
-    
+
     default:
       return vine.compile(
         vine.object({
-          answer: vine.any()
+          answer: vine.any(),
         })
       )
   }

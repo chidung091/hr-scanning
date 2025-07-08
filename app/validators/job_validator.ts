@@ -17,7 +17,7 @@ export const createJobValidator = vine.compile(
     currency: vine.string().fixedLength(3).optional(), // ISO currency code
     isActive: vine.boolean().optional(),
     applicationDeadline: vine.date().afterOrEqual('today').optional(),
-    tags: vine.array(vine.string().minLength(1).maxLength(50)).maxLength(10).optional()
+    tags: vine.array(vine.string().minLength(1).maxLength(50)).maxLength(10).optional(),
   })
 )
 
@@ -38,7 +38,7 @@ export const updateJobValidator = vine.compile(
     currency: vine.string().fixedLength(3).optional(),
     isActive: vine.boolean().optional(),
     applicationDeadline: vine.date().afterOrEqual('today').optional(),
-    tags: vine.array(vine.string().minLength(1).maxLength(50)).maxLength(10).optional()
+    tags: vine.array(vine.string().minLength(1).maxLength(50)).maxLength(10).optional(),
   })
 )
 
@@ -58,8 +58,10 @@ export const jobQueryValidator = vine.compile(
     tags: vine.array(vine.string().minLength(1).maxLength(50)).optional(),
     page: vine.number().positive().optional(),
     limit: vine.number().positive().max(100).optional(),
-    sortBy: vine.enum(['createdAt', 'updatedAt', 'title', 'department', 'applicationDeadline']).optional(),
-    sortOrder: vine.enum(['asc', 'desc']).optional()
+    sortBy: vine
+      .enum(['createdAt', 'updatedAt', 'title', 'department', 'applicationDeadline'])
+      .optional(),
+    sortOrder: vine.enum(['asc', 'desc']).optional(),
   })
 )
 
@@ -68,7 +70,7 @@ export const jobQueryValidator = vine.compile(
  */
 export const jobIdValidator = vine.compile(
   vine.object({
-    id: vine.number().positive()
+    id: vine.number().positive(),
   })
 )
 
@@ -79,6 +81,6 @@ export const bulkJobOperationValidator = vine.compile(
   vine.object({
     jobIds: vine.array(vine.number().positive()).minLength(1).maxLength(50),
     operation: vine.enum(['activate', 'deactivate', 'delete']),
-    reason: vine.string().minLength(3).maxLength(500).optional()
+    reason: vine.string().minLength(3).maxLength(500).optional(),
   })
 )

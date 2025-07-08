@@ -137,7 +137,7 @@ export default class SwaggerController {
       console.error('Error serving Swagger JSON:', error)
       return response.status(500).json({
         error: 'Failed to generate API documentation',
-        message: 'Please check server logs for details'
+        message: 'Please check server logs for details',
       })
     }
   }
@@ -151,7 +151,7 @@ export default class SwaggerController {
       const yamlStr = yaml.dump(swaggerSpec, {
         indent: 2,
         lineWidth: 120,
-        noRefs: true
+        noRefs: true,
       })
 
       response.header('Content-Type', 'application/x-yaml; charset=utf-8')

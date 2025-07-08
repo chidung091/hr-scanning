@@ -33,6 +33,9 @@ test.group('ProcessedCv Model', (group) => {
       retryCount: 0,
     })
 
+    // Refresh from database to get default values
+    await processedCv.refresh()
+
     assert.isDefined(processedCv.id)
     assert.equal(processedCv.cvSubmissionId, cvSubmission.id)
     assert.equal(processedCv.processingStatus, 'pending')

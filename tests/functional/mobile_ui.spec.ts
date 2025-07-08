@@ -93,10 +93,10 @@ test.group('Mobile UI Responsiveness', (group) => {
 
   test('should have proper viewport meta tag for mobile', async ({ client, assert }) => {
     const response = await client.get('/')
-    
+
     response.assertStatus(200)
     const html = response.text()
-    
+
     // Check for mobile viewport meta tag
     assert.include(html, 'name="viewport"')
     assert.include(html, 'width=device-width')
@@ -105,10 +105,10 @@ test.group('Mobile UI Responsiveness', (group) => {
 
   test('should include Tailwind CSS responsive utilities', async ({ client, assert }) => {
     const response = await client.get('/')
-    
+
     response.assertStatus(200)
     const html = response.text()
-    
+
     // Check for various responsive breakpoints
     const responsiveClasses = [
       'sm:block',
@@ -120,16 +120,16 @@ test.group('Mobile UI Responsiveness', (group) => {
       'lg:p-',
       'sm:w-',
       'md:h-',
-      'lg:max-w'
+      'lg:max-w',
     ]
-    
+
     let foundResponsiveClasses = 0
-    responsiveClasses.forEach(className => {
+    responsiveClasses.forEach((className) => {
       if (html.includes(className)) {
         foundResponsiveClasses++
       }
     })
-    
+
     // Should have at least some responsive classes
     assert.isTrue(foundResponsiveClasses > 0)
   })

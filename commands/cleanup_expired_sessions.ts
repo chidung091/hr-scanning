@@ -41,7 +41,9 @@ export default class CleanupExpiredSessions extends BaseCommand {
     if (dryRun) {
       this.logger.info('DRY RUN - Would clean up the following sessions:')
       for (const session of expiredSessions) {
-        this.logger.info(`- Session ID: ${session.submissionId}, Last activity: ${session.lastActivityAt?.toFormat('yyyy-MM-dd HH:mm:ss')}`)
+        this.logger.info(
+          `- Session ID: ${session.submissionId}, Last activity: ${session.lastActivityAt?.toFormat('yyyy-MM-dd HH:mm:ss')}`
+        )
       }
       return
     }

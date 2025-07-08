@@ -16,7 +16,7 @@ import {
   managementThrottle,
   managementViewThrottle,
   managementUpdateThrottle,
-  managementAnalyticsThrottle
+  managementAnalyticsThrottle,
 } from '#start/limiter'
 const HomeController = () => import('#controllers/home_controller')
 const CvSubmissionsController = () => import('#controllers/cv_submissions_controller')
@@ -44,22 +44,44 @@ router.post('/api/cv/questionnaire', [CvSubmissionsController, 'submitQuestionna
 router.get('/success/:id', [CvSubmissionsController, 'success'])
 
 // OpenAI CV Processing routes
-router.get('/api/cv/:submissionId/processing-status', [CvSubmissionsController, 'getProcessingStatus'])
+router.get('/api/cv/:submissionId/processing-status', [
+  CvSubmissionsController,
+  'getProcessingStatus',
+])
 router.get('/api/cv/:submissionId/extracted-data', [CvSubmissionsController, 'getExtractedData'])
 router.post('/api/cv/:submissionId/retry-processing', [CvSubmissionsController, 'retryProcessing'])
 router.get('/api/cv/processing-stats', [CvSubmissionsController, 'getProcessingStats'])
 
 // Progressive Assessment API routes (with rate limiting for assessment actions)
-router.post('/api/assessment/start', [AssessmentController, 'startAssessment']).use(assessmentStartThrottle)
-router.get('/api/assessment/:assessmentId/question', [AssessmentController, 'getCurrentQuestion']).use(assessmentViewThrottle)
-router.post('/api/assessment/:assessmentId/answer', [AssessmentController, 'submitAnswer']).use(assessmentActionThrottle)
-router.get('/api/assessment/:assessmentId/progress', [AssessmentController, 'getProgress']).use(assessmentViewThrottle)
+router
+  .post('/api/assessment/start', [AssessmentController, 'startAssessment'])
+  .use(assessmentStartThrottle)
+router
+  .get('/api/assessment/:assessmentId/question', [AssessmentController, 'getCurrentQuestion'])
+  .use(assessmentViewThrottle)
+router
+  .post('/api/assessment/:assessmentId/answer', [AssessmentController, 'submitAnswer'])
+  .use(assessmentActionThrottle)
+router
+  .get('/api/assessment/:assessmentId/progress', [AssessmentController, 'getProgress'])
+  .use(assessmentViewThrottle)
 
 // Management API routes (with rate limiting for admin operations)
-router.get('/api/management/submissions', [ManagementController, 'getSubmissions']).use(managementThrottle)
-router.get('/api/management/submissions/:submissionId', [ManagementController, 'getSubmissionDetails']).use(managementViewThrottle)
-router.put('/api/management/submissions/:submissionId/status', [ManagementController, 'updateSubmissionStatus']).use(managementUpdateThrottle)
-router.get('/api/management/analytics', [ManagementController, 'getAnalytics']).use(managementAnalyticsThrottle)
+router
+  .get('/api/management/submissions', [ManagementController, 'getSubmissions'])
+  .use(managementThrottle)
+router
+  .get('/api/management/submissions/:submissionId', [ManagementController, 'getSubmissionDetails'])
+  .use(managementViewThrottle)
+router
+  .put('/api/management/submissions/:submissionId/status', [
+    ManagementController,
+    'updateSubmissionStatus',
+  ])
+  .use(managementUpdateThrottle)
+router
+  .get('/api/management/analytics', [ManagementController, 'getAnalytics'])
+  .use(managementAnalyticsThrottle)
 
 // API Documentation routes
 router.get('/api/docs', [SwaggerController, 'ui'])

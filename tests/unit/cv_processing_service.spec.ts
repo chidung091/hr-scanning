@@ -21,7 +21,7 @@ test.group('CV Processing Service', (group) => {
 
   test('should get processing status for non-existent CV', async ({ assert }) => {
     const status = await cvProcessingService.getProcessingStatus(99999)
-    
+
     assert.equal(status.status, 'not_started')
     assert.isUndefined(status.processedCv)
     assert.isUndefined(status.canRetry)
@@ -49,9 +49,7 @@ test.group('CV Processing Service', (group) => {
     assert.isDefined(result.processingTime)
 
     // Check if ProcessedCv record was created
-    const processedCv = await ProcessedCv.query()
-      .where('cv_submission_id', cvSubmission.id)
-      .first()
+    const processedCv = await ProcessedCv.query().where('cv_submission_id', cvSubmission.id).first()
 
     assert.isDefined(processedCv)
     assert.equal(processedCv!.cvSubmissionId, cvSubmission.id)
@@ -73,14 +71,14 @@ test.group('CV Processing Service', (group) => {
     })
 
     const result = await cvProcessingService.processCvSubmission(cvSubmission.id)
-    
+
     assert.isFalse(result.success)
     assert.include(result.error!, 'no extracted text')
   })
 
   test('should handle non-existent CV submission', async ({ assert }) => {
     const result = await cvProcessingService.processCvSubmission(99999)
-    
+
     assert.isFalse(result.success)
     assert.include(result.error!, 'CV submission not found')
   })
@@ -105,7 +103,14 @@ test.group('CV Processing Service', (group) => {
       cvSubmissionId: cvSubmission.id,
       processingStatus: 'completed',
       extractedData: {
-        PersonalInformation: { Name: 'Test User', DateOfBirth: null, Gender: null, PhoneNumber: null, Email: 'test@example.com', Address: null },
+        PersonalInformation: {
+          Name: 'Test User',
+          DateOfBirth: null,
+          Gender: null,
+          PhoneNumber: null,
+          Email: 'test@example.com',
+          Address: null,
+        },
         JobObjective: { DesiredPosition: null, CareerGoals: null },
         Education: [],
         WorkExperience: [],
@@ -123,7 +128,7 @@ test.group('CV Processing Service', (group) => {
     })
 
     const result = await cvProcessingService.processCvSubmission(cvSubmission.id)
-    
+
     assert.isTrue(result.success)
     assert.equal(result.processedCvId, processedCv.id)
   })
@@ -282,7 +287,7 @@ test.group('CV Processing Service', (group) => {
     })
 
     const result = await cvProcessingService.retryFailedProcessing(processedCv.id)
-    
+
     assert.isFalse(result.success)
     assert.include(result.error!, 'cannot be retried')
   })

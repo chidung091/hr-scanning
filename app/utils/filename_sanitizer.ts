@@ -5,24 +5,20 @@
 /**
  * Sanitize a filename by removing or replacing characters that are not allowed
  * by flydrive or other file storage systems
- * 
+ *
  * @param filename - The original filename to sanitize
  * @param options - Configuration options for sanitization
  * @returns A sanitized filename safe for storage
  */
 export function sanitizeFilename(
-  filename: string, 
+  filename: string,
   options: {
     replacement?: string
     maxLength?: number
     preserveExtension?: boolean
   } = {}
 ): string {
-  const {
-    replacement = '_',
-    maxLength = 255,
-    preserveExtension = true
-  } = options
+  const { replacement = '_', maxLength = 255, preserveExtension = true } = options
 
   if (!filename || typeof filename !== 'string' || filename.trim() === '') {
     return 'unnamed_file'
@@ -80,7 +76,7 @@ export function sanitizeFilename(
 /**
  * Generate a safe file key for storage systems by combining a unique identifier
  * with a sanitized filename
- * 
+ *
  * @param uniqueId - A unique identifier (like CUID)
  * @param originalFilename - The original filename
  * @param prefix - Optional prefix for the file key (e.g., 'cvs/')
@@ -93,13 +89,13 @@ export function generateSafeFileKey(
 ): string {
   const sanitizedFilename = sanitizeFilename(originalFilename)
   const fileName = `${uniqueId}_${sanitizedFilename}`
-  
+
   return prefix ? `${prefix}${fileName}` : fileName
 }
 
 /**
  * Validate if a filename contains only allowed characters
- * 
+ *
  * @param filename - The filename to validate
  * @returns True if filename is safe, false otherwise
  */
@@ -116,7 +112,7 @@ export function isFilenameSafe(filename: string): boolean {
 /**
  * Get a preview of what a filename will look like after sanitization
  * without actually sanitizing it
- * 
+ *
  * @param filename - The filename to preview
  * @param replacement - The replacement character to use
  * @returns Preview of the sanitized filename

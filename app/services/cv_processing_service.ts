@@ -1,7 +1,7 @@
 import logger from '@adonisjs/core/services/logger'
 import CvSubmission from '#models/cv_submission'
 import ProcessedCv from '#models/processed_cv'
-import openaiService, { type OpenAIProcessingResult } from '#services/openai_service'
+import openaiService from '#services/openai_service'
 import { DateTime } from 'luxon'
 
 /**
@@ -25,7 +25,7 @@ export class CvProcessingService {
    */
   async processCvSubmission(cvSubmissionId: number): Promise<CvProcessingResult> {
     const startTime = Date.now()
-    
+
     try {
       logger.info('Starting CV processing workflow', { cvSubmissionId })
 
@@ -46,7 +46,10 @@ export class CvProcessingService {
         .first()
 
       if (existingProcessed) {
-        logger.info('CV already processed successfully', { cvSubmissionId, processedCvId: existingProcessed.id })
+        logger.info('CV already processed successfully', {
+          cvSubmissionId,
+          processedCvId: existingProcessed.id,
+        })
         return {
           success: true,
           processedCvId: existingProcessed.id,
@@ -55,9 +58,7 @@ export class CvProcessingService {
       }
 
       // Create or update processing record
-      let processedCv = await ProcessedCv.query()
-        .where('cv_submission_id', cvSubmissionId)
-        .first()
+      let processedCv = await ProcessedCv.query().where('cv_submission_id', cvSubmissionId).first()
 
       if (!processedCv) {
         processedCv = new ProcessedCv()
@@ -125,7 +126,7 @@ export class CvProcessingService {
       }
     } catch (error) {
       const processingTime = Date.now() - startTime
-      
+
       logger.error('CV processing workflow failed', {
         cvSubmissionId,
         error: error.message,
@@ -151,7 +152,9 @@ export class CvProcessingService {
         .firstOrFail()
 
       if (!processedCv.canRetry()) {
-        throw new Error('Processing cannot be retried (max attempts reached or not in failed state)')
+        throw new Error(
+          'Processing cannot be retried (max attempts reached or not in failed state)'
+        )
       }
 
       logger.info('Retrying failed CV processing', {
@@ -182,9 +185,7 @@ export class CvProcessingService {
     processedCv?: ProcessedCv
     canRetry?: boolean
   }> {
-    const processedCv = await ProcessedCv.query()
-      .where('cv_submission_id', cvSubmissionId)
-      .first()
+    const processedCv = await ProcessedCv.query().where('cv_submission_id', cvSubmissionId).first()
 
     if (!processedCv) {
       return { status: 'not_started' }
@@ -227,7 +228,7 @@ export class CvProcessingService {
       }
 
       // Add a small delay between processing to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
 
     const totalProcessingTime = Date.now() - startTime
@@ -261,10 +262,13 @@ export class CvProcessingService {
       .count('* as count')
       .select('processing_status')
 
-    const statMap = stats.reduce((acc, stat) => {
-      acc[stat.processing_status] = Number(stat.count)
-      return acc
-    }, {} as Record<string, number>)
+    const statMap = stats.reduce(
+      (acc, stat: any) => {
+        acc[stat.processing_status] = Number(stat.count)
+        return acc
+      },
+      {} as Record<string, number>
+    )
 
     const total = Object.values(statMap).reduce((sum, count) => sum + count, 0)
     const completed = statMap.completed || 0
@@ -275,12 +279,12 @@ export class CvProcessingService {
     const successRate = total > 0 ? (completed / total) * 100 : 0
 
     return {
-      total,
-      completed,
-      failed,
-      pending,
-      processing,
-      successRate: Math.round(successRate * 100) / 100,
+      total: total || 0,
+      completed: completed || 0,
+      failed: failed || 0,
+      pending: pending || 0,
+      processing: processing || 0,
+      successRate: Number.isNaN(successRate) ? 0 : Math.round(successRate * 100) / 100,
     }
   }
 
@@ -289,12 +293,14 @@ export class CvProcessingService {
    */
   async cleanupFailedProcessing(olderThanDays: number = 7): Promise<number> {
     const cutoffDate = DateTime.now().minus({ days: olderThanDays })
-    
-    const deletedCount = await ProcessedCv.query()
+
+    const deletedRecords = await ProcessedCv.query()
       .where('processing_status', 'failed')
       .where('retry_count', '>=', 3)
       .where('created_at', '<', cutoffDate.toSQL()!)
       .delete()
+
+    const deletedCount = Array.isArray(deletedRecords) ? deletedRecords.length : 0
 
     logger.info('Cleaned up old failed processing records', {
       deletedCount,

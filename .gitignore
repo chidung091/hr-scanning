@@ -1,25 +1,226 @@
-# Dependencies and AdonisJS build
-node_modules
-build
-tmp
+# ===================================
+# HR Scanning Project - .gitignore
+# ===================================
 
-# Secrets
+# ===== Dependencies =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ===== Environment Configuration =====
 .env
 .env.local
-.env.production.local
+.env.development
 .env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+.env.staging.local
 
-# Frontend assets compiled code
-public/assets
+# ===== AdonisJS Specific =====
+build/
+tmp/
+ace.js
 
-# Build tools specific
-npm-debug.log
-yarn-error.log
+# ===== Storage & Upload Directories =====
+storage/
+uploads/
+temp/
+logs/
+*.log
 
-# Editors specific
-.fleet
-.idea
-.vscode
+# ===== Database Files & Backups =====
+*.sqlite
+*.sqlite3
+*.db
+database/backups/
+database/*.db
+database/*.sqlite
 
-# Platform specific
+# ===== Build & Distribution =====
+dist/
+.next/
+.nuxt/
+out/
+.output/
+.vercel/
+.netlify/
+
+# ===== Frontend Assets =====
+public/assets/
+public/build/
+public/hot
+public/storage
+
+# ===== Cache Directories =====
+.cache/
+.tmp/
+.temp/
+*.tmp
+*.temp
+.parcel-cache/
+.vite/
+
+# ===== IDE & Editor Files =====
+.vscode/
+.idea/
+.fleet/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.sublime-workspace
+.sublime-project
+
+# ===== OS Specific Files =====
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ===== Package Manager Lock Files =====
+# Keep only one type - npm is used in this project
+# yarn.lock
+# pnpm-lock.yaml
+
+# ===== TypeScript & JavaScript =====
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# ===== Testing =====
+coverage/
+.nyc_output/
+.coverage/
+*.lcov
+junit.xml
+test-results/
+
+# ===== Temporary Files =====
+*.pid
+*.seed
+*.pid.lock
+.grunt/
+lib-cov/
+
+# ===== Runtime Data =====
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===== Optional npm cache directory =====
+.npm/
+
+# ===== Optional eslint cache =====
+.eslintcache
+
+# ===== Microbundle cache =====
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ===== Optional REPL history =====
+.node_repl_history
+
+# ===== Output of 'npm pack' =====
+*.tgz
+
+# ===== Yarn Integrity file =====
+.yarn-integrity
+
+# ===== dotenv environment variables file =====
+.env.backup
+
+# ===== Serverless directories =====
+.serverless/
+
+# ===== FuseBox cache =====
+.fusebox/
+
+# ===== DynamoDB Local files =====
+.dynamodb/
+
+# ===== TernJS port file =====
+.tern-port
+
+# ===== Stores VSCode versions used for testing VSCode extensions =====
+.vscode-test/
+
+# ===== HR Scanning Specific =====
+# CV files and processed documents
+*.pdf
+*.doc
+*.docx
+# Exception: Keep test files in test/data directory
+!test/data/**/*.pdf
+!test/data/**/*.doc
+!test/data/**/*.docx
+
+# Extracted text files
+*.txt
+# Exception: Keep specific test files
+!test_cv.txt
+!test_cv_sample.txt
+
+# Image processing temporary files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+# Exception: Keep static assets
+!public/**/*.jpg
+!public/**/*.jpeg
+!public/**/*.png
+!public/**/*.gif
+!public/**/*.bmp
+!public/**/*.tiff
+
+# OpenAI API response cache
+.openai_cache/
+
+# Session files
+sessions/
+
+# Email templates compiled
+emails/compiled/
+
+# Backup files
+*.backup
+*.bak
+
+# ===== Docker =====
+.dockerignore
+docker-compose.override.yml
+
+# ===== Certificates =====
+*.pem
+*.key
+*.crt
+*.cert
+
+# ===== Monitoring & Analytics =====
+.sentry/
+newrelic_agent.log
+
+# ===== Miscellaneous =====
+.history/
+.vscode-upload.json
+.gitpod.yml

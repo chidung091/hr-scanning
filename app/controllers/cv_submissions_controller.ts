@@ -56,7 +56,6 @@ async function extractTextFromPdfWithPdfParse(fileKey: string): Promise<string> 
 
     console.log(`Successfully extracted ${extractedText.length} characters from PDF`)
     return extractedText
-
   } catch (error) {
     console.error('PDF text extraction failed:', error.message)
     throw error
@@ -82,7 +81,8 @@ async function extractTextFromDocx(fileKey: string): Promise<string> {
     console.log('Extracting text from DOCX file...')
     const result = await mammoth.extractRawText({ buffer: Buffer.from(dataBuffer) })
 
-    const extractedText = result.value || 'DOCX uploaded successfully but contains no extractable text.'
+    const extractedText =
+      result.value || 'DOCX uploaded successfully but contains no extractable text.'
     console.log(`DOCX text extraction successful: ${extractedText.length} characters`)
 
     if (result.messages && result.messages.length > 0) {
@@ -105,13 +105,18 @@ export default class CvSubmissionsController {
       // Validate request data using VineJS
       const payload = await request.validateUsing(cvUploadValidator)
 
-      const { cv_file: file, applicant_name: applicantName, applicant_email: applicantEmail, job_id: jobId } = payload
+      const {
+        cv_file: file,
+        applicant_name: applicantName,
+        applicant_email: applicantEmail,
+        job_id: jobId,
+      } = payload
 
       console.log('File details:', {
         clientName: file.clientName,
         extname: file.extname,
         type: file.type,
-        size: file.size
+        size: file.size,
       })
 
       // Generate unique submission ID
@@ -149,19 +154,31 @@ export default class CvSubmissionsController {
             console.error('PDF text extraction failed:', pdfError.message)
 
             // Provide specific error messages based on the type of failure
-            if (pdfError.message.includes('No text content found') || pdfError.message.includes('no extractable text')) {
-              extractedText = 'PDF uploaded successfully. This PDF appears to contain images or scanned content with no extractable text.'
-            } else if (pdfError.message.includes('password') || pdfError.message.includes('encrypted')) {
-              extractedText = 'PDF uploaded successfully. This PDF is password-protected or encrypted and cannot be processed.'
-            } else if (pdfError.message.includes('corrupted') || pdfError.message.includes('invalid')) {
-              extractedText = 'PDF uploaded successfully. This PDF file appears to be corrupted or invalid.'
+            if (
+              pdfError.message.includes('No text content found') ||
+              pdfError.message.includes('no extractable text')
+            ) {
+              extractedText =
+                'PDF uploaded successfully. This PDF appears to contain images or scanned content with no extractable text.'
+            } else if (
+              pdfError.message.includes('password') ||
+              pdfError.message.includes('encrypted')
+            ) {
+              extractedText =
+                'PDF uploaded successfully. This PDF is password-protected or encrypted and cannot be processed.'
+            } else if (
+              pdfError.message.includes('corrupted') ||
+              pdfError.message.includes('invalid')
+            ) {
+              extractedText =
+                'PDF uploaded successfully. This PDF file appears to be corrupted or invalid.'
             } else if (pdfError.message.includes('pdf-parse module not properly loaded')) {
-              extractedText = 'PDF uploaded successfully. Text extraction temporarily unavailable due to library loading issues.'
+              extractedText =
+                'PDF uploaded successfully. Text extraction temporarily unavailable due to library loading issues.'
             } else {
               extractedText = `PDF uploaded successfully. Text extraction failed: ${pdfError.message}`
             }
           }
-
         } else if (file.extname === 'docx') {
           console.log('Extracting text from DOCX file...')
           extractionStatus = 'docx_processing'
@@ -174,12 +191,11 @@ export default class CvSubmissionsController {
             console.error('DOCX text extraction failed:', docxError)
             extractedText = `DOCX uploaded successfully. Text extraction failed: ${docxError.message}`
           }
-
         } else if (file.extname === 'doc') {
           console.log('DOC files require special handling - using fallback message')
           extractionStatus = 'doc_unsupported'
-          extractedText = 'DOC file uploaded successfully. For better text extraction, please convert to DOCX or PDF format.'
-
+          extractedText =
+            'DOC file uploaded successfully. For better text extraction, please convert to DOCX or PDF format.'
         } else {
           extractionStatus = 'unsupported_format'
           extractedText = `File uploaded successfully. Text extraction not supported for ${file.extname} files.`
@@ -192,7 +208,6 @@ export default class CvSubmissionsController {
             .replace(/\n\s*\n/g, '\n') // Remove empty lines
             .trim()
         }
-
       } catch (textError) {
         extractionStatus = 'extraction_error'
         console.error('Text extraction failed with unexpected error:', textError)
@@ -224,7 +239,7 @@ export default class CvSubmissionsController {
       console.log('Preparing to save to database...')
       console.log('Data sizes:', {
         extractedTextLength: extractedText.length,
-        fileSize: file.size
+        fileSize: file.size,
       })
 
       let cvSubmission
@@ -256,7 +271,8 @@ export default class CvSubmissionsController {
           console.log('Starting OpenAI processing for CV...')
 
           // Process asynchronously to avoid blocking the response
-          cvProcessingService.processCvSubmission(cvSubmission.id)
+          cvProcessingService
+            .processCvSubmission(cvSubmission.id)
             .then((result) => {
               if (result.success) {
                 console.log('OpenAI processing completed successfully', {
@@ -285,7 +301,10 @@ export default class CvSubmissionsController {
         }
       } else {
         console.log('Skipping OpenAI processing - insufficient text content or extraction failed')
-        openaiProcessingResult = { status: 'skipped', reason: 'insufficient_text_or_extraction_failed' }
+        openaiProcessingResult = {
+          status: 'skipped',
+          reason: 'insufficient_text_or_extraction_failed',
+        }
       }
 
       return response.json({
@@ -298,7 +317,6 @@ export default class CvSubmissionsController {
           openaiProcessing: openaiProcessingResult,
         },
       })
-
     } catch (error) {
       console.error('CV upload error:', error)
       return response.status(500).json({
@@ -373,11 +391,11 @@ export default class CvSubmissionsController {
         data: {
           submissionId: cvSubmission.submissionId,
           applicationReference: `TV-${cvSubmission.submissionId.slice(-8).toUpperCase()}`,
-          questionsAnswered: (responses.question1.answered ? 1 : 0) + (responses.question2.answered ? 1 : 0),
+          questionsAnswered:
+            (responses.question1.answered ? 1 : 0) + (responses.question2.answered ? 1 : 0),
           totalScore,
         },
       })
-
     } catch (error) {
       console.error('Questionnaire submission error:', error)
       return response.status(500).json({
@@ -396,7 +414,14 @@ export default class CvSubmissionsController {
     const cvSubmission = await CvSubmission.query()
       .where('submission_id', submissionId)
       .preload('questionnaireResponse', (responseQuery) => {
-        responseQuery.select('id', 'cv_submission_id', 'is_completed', 'total_score', 'assessment_result', 'completed_at')
+        responseQuery.select(
+          'id',
+          'cv_submission_id',
+          'is_completed',
+          'total_score',
+          'assessment_result',
+          'completed_at'
+        )
       })
       .first()
 
@@ -412,8 +437,10 @@ export default class CvSubmissionsController {
       applicantName: cvSubmission.applicantName,
       applicationReference,
       submissionId: cvSubmission.submissionId,
-      questionsAnswered: cvSubmission.questionnaireResponse ?
-        Object.values(cvSubmission.questionnaireResponse.responses).filter((q: any) => q.answered).length : 0,
+      questionsAnswered: cvSubmission.questionnaireResponse
+        ? Object.values(cvSubmission.questionnaireResponse.responses).filter((q: any) => q.answered)
+            .length
+        : 0,
     })
   }
 
@@ -465,9 +492,7 @@ export default class CvSubmissionsController {
       const submissionId = params.submissionId
 
       // Find CV submission by submission ID
-      const cvSubmission = await CvSubmission.query()
-        .where('submission_id', submissionId)
-        .first()
+      const cvSubmission = await CvSubmission.query().where('submission_id', submissionId).first()
 
       if (!cvSubmission) {
         return response.status(404).json({
@@ -484,16 +509,18 @@ export default class CvSubmissionsController {
           submissionId,
           processingStatus: status.status,
           canRetry: status.canRetry || false,
-          processedCv: status.processedCv ? {
-            id: status.processedCv.id,
-            processingStartedAt: status.processedCv.processingStartedAt,
-            processingCompletedAt: status.processedCv.processingCompletedAt,
-            tokensUsed: status.processedCv.tokensUsed,
-            processingTimeMs: status.processedCv.processingTimeMs,
-            retryCount: status.processedCv.retryCount,
-            errorMessage: status.processedCv.errorMessage,
-            dataValidated: status.processedCv.dataValidated,
-          } : null,
+          processedCv: status.processedCv
+            ? {
+                id: status.processedCv.id,
+                processingStartedAt: status.processedCv.processingStartedAt,
+                processingCompletedAt: status.processedCv.processingCompletedAt,
+                tokensUsed: status.processedCv.tokensUsed,
+                processingTimeMs: status.processedCv.processingTimeMs,
+                retryCount: status.processedCv.retryCount,
+                errorMessage: status.processedCv.errorMessage,
+                dataValidated: status.processedCv.dataValidated,
+              }
+            : null,
         },
       })
     } catch (error) {

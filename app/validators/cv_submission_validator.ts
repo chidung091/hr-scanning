@@ -5,14 +5,13 @@ import vine from '@vinejs/vine'
  */
 export const cvUploadValidator = vine.compile(
   vine.object({
-    cv_file: vine
-      .file({
-        size: '10mb',
-        extnames: ['pdf', 'doc', 'docx']
-      }),
+    cv_file: vine.file({
+      size: '10mb',
+      extnames: ['pdf', 'doc', 'docx'],
+    }),
     applicant_name: vine.string().minLength(2).maxLength(100),
     applicant_email: vine.string().email().normalizeEmail(),
-    job_id: vine.number().positive().optional()
+    job_id: vine.number().positive().optional(),
   })
 )
 
@@ -26,7 +25,7 @@ export const createCvSubmissionValidator = vine.compile(
     fileUrl: vine.string().url().maxLength(500),
     extractedText: vine.string().optional(),
     fileSize: vine.number().positive().optional(),
-    mimeType: vine.string().maxLength(100).optional()
+    mimeType: vine.string().maxLength(100).optional(),
   })
 )
 
@@ -37,7 +36,7 @@ export const updateCvSubmissionValidator = vine.compile(
   vine.object({
     extractedText: vine.string().optional(),
     status: vine.enum(['pending', 'processed', 'failed']).optional(),
-    processingError: vine.string().maxLength(1000).optional()
+    processingError: vine.string().maxLength(1000).optional(),
   })
 )
 
@@ -51,6 +50,6 @@ export const cvSubmissionQueryValidator = vine.compile(
     page: vine.number().positive().optional(),
     limit: vine.number().positive().max(100).optional(),
     sortBy: vine.enum(['createdAt', 'fileName', 'status']).optional(),
-    sortOrder: vine.enum(['asc', 'desc']).optional()
+    sortOrder: vine.enum(['asc', 'desc']).optional(),
   })
 )

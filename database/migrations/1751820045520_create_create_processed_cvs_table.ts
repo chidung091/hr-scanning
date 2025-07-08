@@ -8,7 +8,13 @@ export default class extends BaseSchema {
       table.increments('id')
 
       // Reference to the original CV submission
-      table.integer('cv_submission_id').unsigned().notNullable().references('id').inTable('cv_submissions').onDelete('CASCADE')
+      table
+        .integer('cv_submission_id')
+        .unsigned()
+        .notNullable()
+        .references('id')
+        .inTable('cv_submissions')
+        .onDelete('CASCADE')
 
       // Processing metadata
       table.string('processing_status').notNullable().defaultTo('pending') // pending, processing, completed, failed

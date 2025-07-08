@@ -77,15 +77,19 @@ export default class CvSubmission extends BaseModel {
 
   static withQuestionnaireResponse() {
     return this.query().preload('questionnaireResponse', (responseQuery) => {
-      responseQuery.select('id', 'cv_submission_id', 'is_completed', 'total_score', 'assessment_result', 'completed_at')
+      responseQuery.select(
+        'id',
+        'cv_submission_id',
+        'is_completed',
+        'total_score',
+        'assessment_result',
+        'completed_at'
+      )
     })
   }
 
   static withCompleteDetails() {
-    return this.query()
-      .preload('job')
-      .preload('questionnaireResponse')
-      .preload('processedCv')
+    return this.query().preload('job').preload('questionnaireResponse').preload('processedCv')
   }
 
   static withProcessedCv() {

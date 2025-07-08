@@ -1,5 +1,4 @@
 import { test } from '@japa/runner'
-import { ApiClient } from '@japa/api-client'
 import CvSubmission from '#models/cv_submission'
 import QuestionnaireResponse from '#models/questionnaire_response'
 import Job from '#models/job'
@@ -35,10 +34,12 @@ test.group('Assessment API', (group) => {
 
   test('should start a new assessment session', async ({ client, assert }) => {
     // Add delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // First create a CV submission with a mock PDF file
-    const testFileContent = Buffer.from('%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000074 00000 n \n0000000120 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n179\n%%EOF')
+    const testFileContent = Buffer.from(
+      '%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000074 00000 n \n0000000120 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n179\n%%EOF'
+    )
 
     const uploadResponse = await client
       .post('/api/cv/upload')
@@ -54,16 +55,14 @@ test.group('Assessment API', (group) => {
     const submissionId = uploadData.data.submissionId
 
     // Start assessment
-    const response = await client
-      .post('/api/assessment/start')
-      .json({
-        submission_id: submissionId,
-        language: 'en'
-      })
+    const response = await client.post('/api/assessment/start').json({
+      submission_id: submissionId,
+      language: 'en',
+    })
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.exists(data.data.assessmentId)
     assert.equal(data.data.currentQuestion, 1)
@@ -107,7 +106,7 @@ test.group('Assessment API', (group) => {
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.equal(data.data.currentQuestion, 2)
     assert.equal(data.data.totalQuestions, 6)
@@ -136,12 +135,12 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 1,
         answer: 'hybrid',
-        action: 'next'
+        action: 'next',
       })
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.equal(data.data.currentQuestion, 2)
     assert.exists(data.data.question)
@@ -164,7 +163,7 @@ test.group('Assessment API', (group) => {
         overtime_commitment: 'reasonable_notice',
         recognition_reward: 'career_advancement',
         feedback_communication: 'embrace_learn',
-        learning_growth: 'This is a test answer for learning and growth opportunities.'
+        learning_growth: 'This is a test answer for learning and growth opportunities.',
       },
       currentQuestion: 6,
       questionsCompleted: 5,
@@ -179,12 +178,12 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 6,
         answer: 'growth_opportunities',
-        action: 'next'
+        action: 'next',
       })
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.isTrue(data.data.completed)
     assert.exists(data.data.totalScore)
@@ -211,12 +210,13 @@ test.group('Assessment API', (group) => {
       lastActivityAt: DateTime.now(),
     })
 
-    const response = await client
-      .get(`/api/assessment/${questionnaireResponse.submissionId}/progress`)
+    const response = await client.get(
+      `/api/assessment/${questionnaireResponse.submissionId}/progress`
+    )
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.equal(data.data.currentQuestion, 3)
     assert.equal(data.data.totalQuestions, 6)
@@ -244,12 +244,12 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 3,
         answer: null,
-        action: 'previous'
+        action: 'previous',
       })
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.equal(data.data.currentQuestion, 2)
     assert.exists(data.data.question)
@@ -274,15 +274,15 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 1,
         answer: null,
-        action: 'skip'
+        action: 'skip',
       })
 
     response.assertStatus(200)
     const data = response.body()
-    
+
     assert.isTrue(data.success)
     assert.equal(data.data.currentQuestion, 2)
-    
+
     // Verify no answer was saved for skipped question
     await questionnaireResponse.refresh()
     assert.isUndefined(questionnaireResponse.responses.work_style_environment)
@@ -306,23 +306,22 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 1,
         answer: '', // Empty answer for required question
-        action: 'next'
+        action: 'next',
       })
 
     response.assertStatus(400)
     const data = response.body()
-    
+
     assert.isFalse(data.success)
     assert.include(data.message.toLowerCase(), 'required')
   })
 
   test('should return 404 for non-existent assessment', async ({ client, assert }) => {
-    const response = await client
-      .get('/api/assessment/non-existent-id/question')
+    const response = await client.get('/api/assessment/non-existent-id/question')
 
     response.assertStatus(404)
     const data = response.body()
-    
+
     assert.isFalse(data.success)
     assert.include(data.message.toLowerCase(), 'not found')
   })
@@ -337,7 +336,7 @@ test.group('Assessment API', (group) => {
         recognition_reward: 'career_advancement',
         feedback_communication: 'embrace_learn',
         learning_growth: 'Test answer',
-        longterm_motivation: 'growth_opportunities'
+        longterm_motivation: 'growth_opportunities',
       },
       currentQuestion: 7,
       questionsCompleted: 6,
@@ -355,12 +354,12 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 1,
         answer: 'test',
-        action: 'next'
+        action: 'next',
       })
 
     response.assertStatus(400)
     const data = response.body()
-    
+
     assert.isFalse(data.success)
     assert.include(data.message.toLowerCase(), 'completed')
   })
@@ -372,7 +371,7 @@ test.group('Assessment API', (group) => {
       cvSubmissionId: testSubmission.id,
       responses: {
         work_style_environment: 'hybrid',
-        overtime_commitment: 'reasonable_notice'
+        overtime_commitment: 'reasonable_notice',
       },
       currentQuestion: 3,
       questionsCompleted: 2,
@@ -387,7 +386,7 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 3,
         answer: null,
-        action: 'skip_all'
+        action: 'skip_all',
       })
 
     response.assertStatus(200)
@@ -408,7 +407,10 @@ test.group('Assessment API', (group) => {
     assert.equal(questionnaireResponse.currentQuestion, 7) // Should be set to total + 1
   })
 
-  test('should properly calculate progress when skipping individual questions', async ({ client, assert }) => {
+  test('should properly calculate progress when skipping individual questions', async ({
+    client,
+    assert,
+  }) => {
     // Create assessment starting from question 1
     const questionnaireResponse = await QuestionnaireResponse.create({
       submissionId: 'test-skip-progress-123',
@@ -428,7 +430,7 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 1,
         answer: null,
-        action: 'skip'
+        action: 'skip',
       })
 
     response.assertStatus(200)
@@ -447,7 +449,7 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 2,
         answer: 'reasonable_notice',
-        action: 'next'
+        action: 'next',
       })
 
     response.assertStatus(200)
@@ -456,12 +458,15 @@ test.group('Assessment API', (group) => {
 
     // Skip questions 3, 4, 5 to get to the final question
     for (let questionId = 3; questionId <= 5; questionId++) {
+      // Add small delay to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
       response = await client
         .post(`/api/assessment/${questionnaireResponse.submissionId}/answer`)
         .json({
           question_id: questionId,
           answer: null,
-          action: 'skip'
+          action: 'skip',
         })
 
       response.assertStatus(200)
@@ -481,7 +486,7 @@ test.group('Assessment API', (group) => {
       .json({
         question_id: 6,
         answer: null,
-        action: 'skip'
+        action: 'skip',
       })
 
     response.assertStatus(200)

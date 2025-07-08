@@ -19,7 +19,10 @@ export default class extends BaseSchema {
       table.index(['is_completed'], 'questionnaire_responses_is_completed_index')
       table.index(['assessment_result'], 'questionnaire_responses_assessment_result_index')
       table.index(['created_at'], 'questionnaire_responses_created_at_index')
-      table.index(['is_completed', 'created_at'], 'questionnaire_responses_completed_created_at_index')
+      table.index(
+        ['is_completed', 'created_at'],
+        'questionnaire_responses_completed_created_at_index'
+      )
       table.index(['last_activity_at'], 'questionnaire_responses_last_activity_at_index')
     })
 
@@ -49,7 +52,10 @@ export default class extends BaseSchema {
       table.dropIndex(['is_completed'], 'questionnaire_responses_is_completed_index')
       table.dropIndex(['assessment_result'], 'questionnaire_responses_assessment_result_index')
       table.dropIndex(['created_at'], 'questionnaire_responses_created_at_index')
-      table.dropIndex(['is_completed', 'created_at'], 'questionnaire_responses_completed_created_at_index')
+      table.dropIndex(
+        ['is_completed', 'created_at'],
+        'questionnaire_responses_completed_created_at_index'
+      )
       table.dropIndex(['last_activity_at'], 'questionnaire_responses_last_activity_at_index')
     })
 

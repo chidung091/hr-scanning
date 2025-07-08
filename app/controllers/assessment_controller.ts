@@ -4,9 +4,7 @@ import CvSubmission from '#models/cv_submission'
 import QuestionnaireResponse from '#models/questionnaire_response'
 import { ASSESSMENT_CONFIG, getQuestionById } from '../config/assessment_questions.js'
 import { DateTime } from 'luxon'
-import {
-  createQuestionAnswerValidator
-} from '#validators/assessment_validator'
+import { createQuestionAnswerValidator } from '#validators/assessment_validator'
 
 export default class AssessmentController {
   /**
@@ -110,8 +108,11 @@ export default class AssessmentController {
       }
 
       // Check if assessment already exists
-      let questionnaireResponse = await QuestionnaireResponse.findBy('cvSubmissionId', cvSubmission.id)
-      
+      let questionnaireResponse = await QuestionnaireResponse.findBy(
+        'cvSubmissionId',
+        cvSubmission.id
+      )
+
       if (questionnaireResponse) {
         // If assessment is already completed, return error
         if (questionnaireResponse.isCompleted) {
@@ -120,7 +121,7 @@ export default class AssessmentController {
             message: 'Assessment has already been completed',
           })
         }
-        
+
         // If assessment is expired, reset it
         if (questionnaireResponse.isExpired()) {
           questionnaireResponse.currentQuestion = 1
@@ -302,7 +303,11 @@ export default class AssessmentController {
       }
 
       // Validate required questions
-      if (action === 'next' && currentQuestion.required && (answer === null || answer === undefined || answer === '')) {
+      if (
+        action === 'next' &&
+        currentQuestion.required &&
+        (answer === null || answer === undefined || answer === '')
+      ) {
         return response.status(400).json({
           success: false,
           message: 'This question is required and cannot be empty',
@@ -312,13 +317,16 @@ export default class AssessmentController {
       // Validate answer if provided and not skipping
       if (action !== 'skip' && answer !== null && answer !== undefined) {
         try {
-          const answerValidator = createQuestionAnswerValidator(currentQuestion.type, currentQuestion.validation)
+          const answerValidator = createQuestionAnswerValidator(
+            currentQuestion.type,
+            currentQuestion.validation
+          )
           await answerValidator.validate({ answer })
         } catch (validationError: any) {
           return response.status(400).json({
             success: false,
             message: validationError.messages?.[0]?.message || 'Invalid answer provided',
-            errors: validationError.messages || []
+            errors: validationError.messages || [],
           })
         }
       }
@@ -356,7 +364,10 @@ export default class AssessmentController {
           questionnaireResponse.currentQuestion = nextQuestionId
           // IMPORTANT: Also increment questionsCompleted for skipped questions
           // This ensures progress calculation reaches 100% when all questions are processed
-          questionnaireResponse.questionsCompleted = Math.max(questionnaireResponse.questionsCompleted, questionId)
+          questionnaireResponse.questionsCompleted = Math.max(
+            questionnaireResponse.questionsCompleted,
+            questionId
+          )
 
           // Check if completed after skipping
           if (questionnaireResponse.questionsCompleted >= ASSESSMENT_CONFIG.totalQuestions) {
@@ -376,7 +387,9 @@ export default class AssessmentController {
       // Check if assessment is completed
       if (questionnaireResponse.isCompleted) {
         // Update CV submission status
-        const cvSubmission = await questionnaireResponse.related('cvSubmission').query()
+        const cvSubmission = await questionnaireResponse
+          .related('cvSubmission')
+          .query()
           .select('id', 'submission_id', 'status')
           .first()
         if (cvSubmission) {
@@ -439,8 +452,6 @@ export default class AssessmentController {
       })
     }
   }
-
-
 
   /**
    * Get assessment progress

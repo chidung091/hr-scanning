@@ -8,7 +8,7 @@ export const paginationValidator = vine.compile(
     page: vine.number().positive().optional(),
     limit: vine.number().positive().max(100).optional(),
     sortBy: vine.string().minLength(1).maxLength(50).optional(),
-    sortOrder: vine.enum(['asc', 'desc']).optional()
+    sortOrder: vine.enum(['asc', 'desc']).optional(),
   })
 )
 
@@ -19,7 +19,7 @@ export const searchValidator = vine.compile(
   vine.object({
     q: vine.string().minLength(1).maxLength(200).optional(),
     search: vine.string().minLength(1).maxLength(200).optional(),
-    query: vine.string().minLength(1).maxLength(200).optional()
+    query: vine.string().minLength(1).maxLength(200).optional(),
   })
 )
 
@@ -28,7 +28,7 @@ export const searchValidator = vine.compile(
  */
 export const idValidator = vine.compile(
   vine.object({
-    id: vine.number().positive()
+    id: vine.number().positive(),
   })
 )
 
@@ -37,7 +37,7 @@ export const idValidator = vine.compile(
  */
 export const uuidValidator = vine.compile(
   vine.object({
-    id: vine.string().uuid()
+    id: vine.string().uuid(),
   })
 )
 
@@ -49,7 +49,7 @@ export const dateRangeValidator = vine.compile(
     startDate: vine.date().optional(),
     endDate: vine.date().afterField('startDate').optional(),
     dateFrom: vine.date().optional(),
-    dateTo: vine.date().afterField('dateFrom').optional()
+    dateTo: vine.date().afterField('dateFrom').optional(),
   })
 )
 
@@ -58,7 +58,7 @@ export const dateRangeValidator = vine.compile(
  */
 export const statusValidator = vine.compile(
   vine.object({
-    status: vine.enum(['active', 'inactive', 'pending', 'completed', 'failed']).optional()
+    status: vine.enum(['active', 'inactive', 'pending', 'completed', 'failed']).optional(),
   })
 )
 
@@ -70,9 +70,9 @@ export const fileUploadValidator = vine.compile(
     file: vine
       .file({
         size: '10mb',
-        extnames: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png']
+        extnames: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png'],
       })
-      .optional()
+      .optional(),
   })
 )
 
@@ -81,7 +81,7 @@ export const fileUploadValidator = vine.compile(
  */
 export const emailValidator = vine.compile(
   vine.object({
-    email: vine.string().email().normalizeEmail()
+    email: vine.string().email().normalizeEmail(),
   })
 )
 
@@ -90,7 +90,7 @@ export const emailValidator = vine.compile(
  */
 export const phoneValidator = vine.compile(
   vine.object({
-    phone: vine.string().mobile().optional()
+    phone: vine.string().mobile().optional(),
   })
 )
 
@@ -101,7 +101,7 @@ export const languageValidator = vine.compile(
   vine.object({
     language: vine.enum(['en', 'vi']).optional(),
     lang: vine.enum(['en', 'vi']).optional(),
-    locale: vine.enum(['en', 'vi']).optional()
+    locale: vine.enum(['en', 'vi']).optional(),
   })
 )
 
@@ -113,7 +113,7 @@ export const bulkOperationValidator = vine.compile(
     ids: vine.array(vine.number().positive()).minLength(1).maxLength(100),
     operation: vine.string().minLength(1).maxLength(50),
     reason: vine.string().minLength(3).maxLength(500).optional(),
-    confirm: vine.boolean().optional()
+    confirm: vine.boolean().optional(),
   })
 )
 
@@ -131,24 +131,30 @@ export const alphanumericWithSymbolsRule = vine.createRule((value, _options, fie
 
   const pattern = /^[a-zA-Z0-9\s\-_.,!?()]+$/
   if (!pattern.test(value)) {
-    field.report('The {{ field }} field must contain only letters, numbers, and common symbols', 'alphanumericWithSymbols', field)
+    field.report(
+      'The {{ field }} field must contain only letters, numbers, and common symbols',
+      'alphanumericWithSymbols',
+      field
+    )
   }
 })
 
 /**
  * Validate file size in a more flexible way
  */
-export const fileSizeRule = vine.createRule((value: any, options: { maxSize?: number } = {}, field) => {
-  if (!value || typeof value.size !== 'number') {
-    return
-  }
+export const fileSizeRule = vine.createRule(
+  (value: any, options: { maxSize?: number } = {}, field) => {
+    if (!value || typeof value.size !== 'number') {
+      return
+    }
 
-  const maxSize = options.maxSize || 10 * 1024 * 1024 // 10MB default
-  if (value.size > maxSize) {
-    const maxSizeMB = Math.round(maxSize / (1024 * 1024))
-    field.report(`The {{ field }} field must be smaller than ${maxSizeMB}MB`, 'fileSize', field)
+    const maxSize = options.maxSize || 10 * 1024 * 1024 // 10MB default
+    if (value.size > maxSize) {
+      const maxSizeMB = Math.round(maxSize / (1024 * 1024))
+      field.report(`The {{ field }} field must be smaller than ${maxSizeMB}MB`, 'fileSize', field)
+    }
   }
-})
+)
 
 /**
  * Validate that a date is not in the past

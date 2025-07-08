@@ -7,15 +7,17 @@ This document provides comprehensive instructions for running the HR Scanning ap
 ### Development Environment
 
 1. **Start PostgreSQL database only:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml up -d postgres
    ```
 
 2. **Configure environment for PostgreSQL:**
+
    ```bash
    # Copy environment template
    cp .env.example .env
-   
+
    # Edit .env and set:
    DB_CONNECTION=postgres
    DB_HOST=localhost
@@ -26,6 +28,7 @@ This document provides comprehensive instructions for running the HR Scanning ap
    ```
 
 3. **Run database migrations:**
+
    ```bash
    npm run migration:run
    ```
@@ -38,10 +41,11 @@ This document provides comprehensive instructions for running the HR Scanning ap
 ### Production Environment
 
 1. **Configure production environment:**
+
    ```bash
    # Copy production template
    cp .env.production .env
-   
+
    # Edit .env with your production values:
    # - Set secure APP_KEY
    # - Set secure DB_PASSWORD
@@ -49,6 +53,7 @@ This document provides comprehensive instructions for running the HR Scanning ap
    ```
 
 2. **Start all services:**
+
    ```bash
    docker-compose -f docker-compose.prod.yml up -d
    ```
@@ -83,10 +88,12 @@ This document provides comprehensive instructions for running the HR Scanning ap
 ### Development Environment (`docker-compose.dev.yml`)
 
 **Services:**
+
 - **PostgreSQL 15**: Database server on port 5433
 - **Redis 7**: Caching server on port 6379 (optional)
 
 **Features:**
+
 - Persistent data volumes
 - Health checks
 - Development-optimized PostgreSQL settings
@@ -95,12 +102,14 @@ This document provides comprehensive instructions for running the HR Scanning ap
 ### Production Environment (`docker-compose.prod.yml`)
 
 **Services:**
+
 - **PostgreSQL 15**: Production database with optimized settings
 - **AdonisJS App**: Application server on port 3333
 - **Redis 7**: Caching and session storage
 - **Nginx**: Reverse proxy and static file serving (optional)
 
 **Features:**
+
 - Resource limits and reservations
 - Health checks and restart policies
 - Production-optimized configurations
@@ -110,6 +119,7 @@ This document provides comprehensive instructions for running the HR Scanning ap
 ## 🔐 Environment Variables
 
 ### Database Configuration
+
 ```bash
 DB_CONNECTION=postgres          # Database type (PostgreSQL only)
 DB_HOST=localhost              # Database host
@@ -124,6 +134,7 @@ DB_DEBUG=false                 # Enable query debugging
 ```
 
 ### Application Configuration
+
 ```bash
 NODE_ENV=development           # Environment (development/production)
 PORT=3333                      # Application port
@@ -138,6 +149,7 @@ OPENAI_API_KEY=your-key        # OpenAI API key (optional)
 ## 🛠️ Common Commands
 
 ### Development
+
 ```bash
 # Start PostgreSQL only
 docker-compose -f docker-compose.dev.yml up -d postgres
@@ -156,6 +168,7 @@ docker-compose -f docker-compose.dev.yml down -v
 ```
 
 ### Production
+
 ```bash
 # Start all services
 docker-compose -f docker-compose.prod.yml up -d
@@ -178,6 +191,7 @@ docker-compose -f docker-compose.prod.yml down
 ```
 
 ### Database Management
+
 ```bash
 # Run migrations
 node ace migration:run
@@ -198,17 +212,20 @@ node ace make:migration create_new_table
 ## 🔍 Troubleshooting
 
 ### Port Conflicts
+
 If you get "port already allocated" errors:
 
 1. **Check what's using the port:**
+
    ```bash
    lsof -i :5432  # or :5433
    ```
 
 2. **Change the port in docker-compose.dev.yml:**
+
    ```yaml
    ports:
-     - "5434:5432"  # Use different external port
+     - '5434:5432' # Use different external port
    ```
 
 3. **Update .env accordingly:**
@@ -217,12 +234,15 @@ If you get "port already allocated" errors:
    ```
 
 ### Database Connection Issues
+
 1. **Verify PostgreSQL is running:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml ps
    ```
 
 2. **Check PostgreSQL logs:**
+
    ```bash
    docker-compose -f docker-compose.dev.yml logs postgres
    ```
@@ -233,12 +253,15 @@ If you get "port already allocated" errors:
    ```
 
 ### Application Issues
+
 1. **Check application logs:**
+
    ```bash
    docker-compose -f docker-compose.prod.yml logs app
    ```
 
 2. **Verify environment variables:**
+
    ```bash
    docker-compose -f docker-compose.prod.yml exec app env | grep DB_
    ```
@@ -251,13 +274,16 @@ If you get "port already allocated" errors:
 ## 📊 Monitoring
 
 ### Health Checks
+
 All services include health checks:
+
 - **PostgreSQL**: `pg_isready` command
 - **Redis**: `redis-cli ping`
 - **Application**: HTTP health endpoint
 - **Nginx**: HTTP status check
 
 ### Resource Usage
+
 ```bash
 # View resource usage
 docker stats
@@ -269,6 +295,7 @@ docker-compose -f docker-compose.prod.yml exec app top
 ## 🔒 Security Considerations
 
 ### Production Security
+
 1. **Change default passwords** in `.env.production`
 2. **Use strong APP_KEY** (generate with `node ace generate:key`)
 3. **Enable SSL** for database connections if needed
@@ -277,6 +304,7 @@ docker-compose -f docker-compose.prod.yml exec app top
 6. **Backup strategy** for persistent data
 
 ### Network Security
+
 - Services communicate through isolated Docker networks
 - Database is not exposed externally in production
 - Nginx handles SSL termination and security headers
@@ -284,13 +312,16 @@ docker-compose -f docker-compose.prod.yml exec app top
 ## 📈 Performance Tuning
 
 ### PostgreSQL Optimization
+
 The production configuration includes optimized settings:
+
 - Shared buffers: 512MB
 - Effective cache size: 2GB
 - Work memory: 8MB
 - Connection pooling: 5-20 connections
 
 ### Application Optimization
+
 - Multi-stage Docker builds for smaller images
 - Non-root user for security
 - Resource limits to prevent resource exhaustion
@@ -303,6 +334,7 @@ This application uses PostgreSQL as the primary and only supported database. All
 ## 📞 Support
 
 For issues or questions:
+
 1. Check the troubleshooting section above
 2. Review Docker and application logs
 3. Verify environment configuration

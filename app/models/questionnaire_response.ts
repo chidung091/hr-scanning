@@ -43,7 +43,7 @@ export default class QuestionnaireResponse extends BaseModel {
   declare questionsCompleted: number
 
   @column({
-    consume: (value: any) => Boolean(value)
+    consume: (value: any) => Boolean(value),
   })
   declare isCompleted: boolean
 
@@ -90,7 +90,11 @@ export default class QuestionnaireResponse extends BaseModel {
     return DateTime.now().diff(this.lastActivityAt).milliseconds > timeoutMs
   }
 
-  public calculateScore(): { totalScore: number; questionScores: Record<string, number>; assessmentResult: string } {
+  public calculateScore(): {
+    totalScore: number
+    questionScores: Record<string, number>
+    assessmentResult: string
+  } {
     return calculateAssessmentScore(this.responses)
   }
 

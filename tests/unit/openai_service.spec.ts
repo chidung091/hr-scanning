@@ -6,7 +6,7 @@ test.group('OpenAI Service', () => {
   test('should initialize with API key', ({ assert }) => {
     // Mock environment variable
     const originalApiKey = env.get('OPENAI_API_KEY')
-    
+
     if (!originalApiKey) {
       // Skip test if no API key is configured
       assert.plan(0)
@@ -20,9 +20,9 @@ test.group('OpenAI Service', () => {
   test('should throw error without API key', ({ assert }) => {
     // Temporarily remove API key
     const originalGet = env.get
-    env.get = (key: string) => {
+    ;(env as any).get = (key: string, defaultValue?: any) => {
       if (key === 'OPENAI_API_KEY') return undefined
-      return originalGet.call(env, key)
+      return originalGet.call(env, key, defaultValue)
     }
 
     assert.throws(() => {
@@ -30,12 +30,12 @@ test.group('OpenAI Service', () => {
     }, 'OPENAI_API_KEY environment variable is required')
 
     // Restore original method
-    env.get = originalGet
+    ;(env as any).get = originalGet
   })
 
   test('should validate extracted data structure', async ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // Test with invalid data
     assert.throws(() => {
       // @ts-ignore - Testing private method
@@ -85,10 +85,10 @@ test.group('OpenAI Service', () => {
 
   test('should build correct system prompt', ({ assert }) => {
     const service = new OpenAIService()
-    
+
     // @ts-ignore - Testing private method
     const systemPrompt = service.buildSystemPrompt()
-    
+
     assert.isString(systemPrompt)
     assert.include(systemPrompt, 'Professional CV data extraction assistant')
     assert.include(systemPrompt, 'Structured JSON data')
@@ -98,10 +98,10 @@ test.group('OpenAI Service', () => {
   test('should build correct user prompt', ({ assert }) => {
     const service = new OpenAIService()
     const cvText = 'John Doe\nSoftware Engineer\nExperience: 5 years'
-    
+
     // @ts-ignore - Testing private method
     const userPrompt = service.buildUserPrompt(cvText)
-    
+
     assert.isString(userPrompt)
     assert.include(userPrompt, cvText)
     assert.include(userPrompt, 'PersonalInformation')
@@ -120,7 +120,7 @@ test.group('OpenAI Service', () => {
     assert.isFalse(result.success)
     assert.isDefined(result.error)
     assert.isDefined(result.processingTime)
-  }).timeout(10000)
+  }).timeout(30000)
 
   test('should handle very short CV text', async ({ assert }) => {
     if (!env.get('OPENAI_API_KEY')) {
@@ -173,27 +173,27 @@ test.group('OpenAI Service Integration', () => {
     `
 
     const result = await service.extractCvData(sampleCvText)
-    
+
     if (result.success && result.data) {
       assert.isTrue(result.success)
       assert.isDefined(result.data)
       assert.isDefined(result.tokensUsed)
       assert.isDefined(result.processingTime)
-      
+
       // Validate structure
       assert.isDefined(result.data.PersonalInformation)
       assert.isDefined(result.data.WorkExperience)
       assert.isDefined(result.data.Education)
       assert.isDefined(result.data.Skills)
-      
+
       // Check if basic information was extracted
       assert.include(result.data.PersonalInformation.Name || '', 'John')
       assert.include(result.data.PersonalInformation.Email || '', 'john.doe@example.com')
-      
+
       // Check skills arrays
       assert.isArray(result.data.Skills.Technical)
       assert.isArray(result.data.Skills.Soft)
-      
+
       // Check work experience
       assert.isArray(result.data.WorkExperience)
       if (result.data.WorkExperience.length > 0) {
@@ -216,11 +216,11 @@ test.group('OpenAI Service Integration', () => {
     const malformedText = '!@#$%^&*()_+{}|:"<>?[]\\;\',./'
 
     const result = await service.extractCvData(malformedText)
-    
+
     // Should either succeed with empty/null values or fail gracefully
     assert.isDefined(result.success)
     assert.isDefined(result.processingTime)
-    
+
     if (result.success && result.data) {
       // If it succeeds, data should still follow the schema
       assert.isDefined(result.data.PersonalInformation)

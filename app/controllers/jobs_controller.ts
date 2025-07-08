@@ -19,9 +19,7 @@ export default class JobsController {
   async show({ params, view, response }: HttpContext) {
     const jobId = params.id
 
-    const job = await Job.activeJobs()
-      .where('id', jobId)
-      .first()
+    const job = await Job.activeJobs().where('id', jobId).first()
 
     if (!job) {
       return response.status(404).redirect('/careers')
@@ -50,9 +48,7 @@ export default class JobsController {
   async apiShow({ params, response }: HttpContext) {
     const jobId = params.id
 
-    const job = await Job.activeJobs()
-      .where('id', jobId)
-      .first()
+    const job = await Job.activeJobs().where('id', jobId).first()
 
     if (!job) {
       return response.status(404).json({
