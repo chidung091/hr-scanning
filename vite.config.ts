@@ -1,37 +1,28 @@
 import { defineConfig } from 'vite'
 import adonisjs from '@adonisjs/vite/client'
 
+const isDocker = process.env.IS_DOCKER === 'true' // bạn set IS_DOCKER=true trong Docker ENV
+
 export default defineConfig({
   plugins: [
     adonisjs({
-      /**
-       * Entrypoints of your application. Each entrypoint will
-       * result in a separate bundle.
-       */
       entrypoints: ['resources/css/app.css', 'resources/js/app.js'],
-
-      /**
-       * Paths to watch and reload the browser on file change
-       */
       reload: ['resources/views/**/*.edge'],
     }),
   ],
 
-  // Configure cache directory and permissions
-  cacheDir: '/tmp/.vite',
+  cacheDir: isDocker ? '/tmp/vite_cache' : 'node_modules/.vite',
 
-  // Server configuration for Docker
   server: {
     host: '0.0.0.0',
     port: 3333,
     watch: {
-      usePolling: true,
+      usePolling: isDocker, // chỉ enable polling trong Docker
       interval: 1000,
     },
   },
 
-  // Optimize dependencies
   optimizeDeps: {
-    force: true,
+    force: false, // không ép unless cần
   },
 })
