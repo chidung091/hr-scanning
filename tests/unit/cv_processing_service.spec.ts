@@ -1,32 +1,102 @@
 import { test } from '@japa/runner'
 import sinon from 'sinon'
+import { DateTime } from 'luxon'
 import { CvProcessingService } from '#services/cv_processing_service'
 import CvSubmission from '#models/cv_submission'
 import ProcessedCv from '#models/processed_cv'
-import Database from '@adonisjs/lucid/services/db'
 import openaiService from '#services/openai_service'
 import { OpenAIMockManager, mockExtractedCvData } from '#tests/utils/openai_mocks'
+import { DatabaseMockManager, mockProcessedCvData } from '#tests/utils/database_mocks'
 
 test.group('CV Processing Service', (group) => {
   let cvProcessingService: CvProcessingService
   let mockManager: OpenAIMockManager
+  let dbMockManager: DatabaseMockManager
   let openaiStub: sinon.SinonStub
 
   group.setup(async () => {
     cvProcessingService = new CvProcessingService()
     mockManager = new OpenAIMockManager()
+    dbMockManager = new DatabaseMockManager()
+    dbMockManager.initializeMocks()
   })
 
   group.teardown(() => {
     mockManager.restore()
+    dbMockManager.restore()
   })
 
   group.each.setup(async () => {
-    await Database.beginGlobalTransaction()
+    // Clear mock data for each test but keep the stubs
+    dbMockManager.clearMockData()
+
+    // Mock ProcessedCv constructor by stubbing the service's usage
+    if (!ProcessedCv._isConstructorMocked) {
+      const originalProcessedCv = ProcessedCv
+
+      // Create a factory function that the service will use
+      const createProcessedCvInstance = () => {
+        const newProcessedCv = {
+          ...mockProcessedCvData,
+          id: null,
+          createdAt: null,
+          updatedAt: null,
+        }
+
+        const instance = Object.assign(Object.create(ProcessedCv.prototype), newProcessedCv)
+
+        instance.save = sinon.stub().callsFake(async () => {
+          if (!instance.id) {
+            const processedCvs = dbMockManager.getMockData('processed_cvs')
+            instance.id = processedCvs.length + 1
+            instance.createdAt = DateTime.now()
+            instance.updatedAt = DateTime.now()
+            processedCvs.push({ ...instance })
+          } else {
+            instance.updatedAt = DateTime.now()
+            const processedCvs = dbMockManager.getMockData('processed_cvs')
+            const index = processedCvs.findIndex(cv => cv.id === instance.id)
+            if (index >= 0) {
+              processedCvs[index] = { ...instance }
+            }
+          }
+          return instance
+        })
+
+        instance.markAsProcessing = ProcessedCv.prototype.markAsProcessing.bind(instance)
+        instance.markAsCompleted = ProcessedCv.prototype.markAsCompleted.bind(instance)
+        instance.markAsFailed = ProcessedCv.prototype.markAsFailed.bind(instance)
+        instance.canRetry = ProcessedCv.prototype.canRetry.bind(instance)
+        instance.generateSearchableText = ProcessedCv.prototype.generateSearchableText.bind(instance)
+
+        return instance
+      }
+
+      // Mock the constructor by replacing it temporarily
+      const MockProcessedCv = function(this: any, data?: any) {
+        const instance = createProcessedCvInstance()
+        if (data) {
+          Object.assign(instance, data)
+        }
+        return instance
+      } as any
+
+      // Copy all static methods and properties
+      Object.setPrototypeOf(MockProcessedCv, originalProcessedCv)
+      Object.assign(MockProcessedCv, originalProcessedCv)
+      MockProcessedCv.prototype = originalProcessedCv.prototype
+      MockProcessedCv._isConstructorMocked = true
+
+      // Replace the constructor
+      Object.defineProperty(global, 'ProcessedCv', {
+        value: MockProcessedCv,
+        writable: true,
+        configurable: true
+      })
+    }
   })
 
   group.each.teardown(async () => {
-    await Database.rollbackGlobalTransaction()
     // Restore any OpenAI stubs
     if (openaiStub) {
       openaiStub.restore()
@@ -67,6 +137,13 @@ test.group('CV Processing Service', (group) => {
 
     const result = await cvProcessingService.processCvSubmission(cvSubmission.id)
 
+    // Debug output
+    if (!result.success) {
+      console.log('Processing failed:', result.error)
+      console.log('Full result:', JSON.stringify(result, null, 2))
+    }
+
+    // The test should pass with our mocking setup
     assert.isTrue(result.success)
     assert.isDefined(result.processedCvId)
     assert.isDefined(result.processingTime)

@@ -1,16 +1,24 @@
 import { test } from '@japa/runner'
 import ProcessedCv from '#models/processed_cv'
 import CvSubmission from '#models/cv_submission'
-import Database from '@adonisjs/lucid/services/db'
 import type { ExtractedCvData } from '#services/openai_service'
+import { DatabaseMockManager, mockExtractedCvDataForDb } from '#tests/utils/database_mocks'
 
 test.group('ProcessedCv Model', (group) => {
-  group.each.setup(async () => {
-    await Database.beginGlobalTransaction()
+  let dbMockManager: DatabaseMockManager
+
+  group.setup(() => {
+    dbMockManager = new DatabaseMockManager()
+    dbMockManager.initializeMocks()
   })
 
-  group.each.teardown(async () => {
-    await Database.rollbackGlobalTransaction()
+  group.teardown(() => {
+    dbMockManager.restore()
+  })
+
+  group.each.setup(() => {
+    // Clear mock data for each test but keep the stubs
+    dbMockManager.clearMockData()
   })
 
   test('should create processed CV with basic properties', async ({ assert }) => {
@@ -58,61 +66,10 @@ test.group('ProcessedCv Model', (group) => {
       status: 'pending',
     })
 
-    const extractedData: ExtractedCvData = {
-      PersonalInformation: {
-        Name: 'John Doe',
-        DateOfBirth: '1990-01-01',
-        Gender: 'male',
-        PhoneNumber: '+1234567890',
-        Email: 'john@example.com',
-        Address: '123 Main St',
-      },
-      JobObjective: {
-        DesiredPosition: 'Software Engineer',
-        CareerGoals: 'To become a senior developer',
-      },
-      Education: [
-        {
-          School: 'University of Technology',
-          Major: 'Computer Science',
-          DegreeLevel: 'Bachelor',
-          StartDate: '2016-09',
-          EndDate: '2020-06',
-          GPA: '3.8',
-        },
-      ],
-      WorkExperience: [
-        {
-          Company: 'TechCorp',
-          JobTitle: 'Software Engineer',
-          Duration: '2020-2023',
-          Description: 'Developed web applications',
-          KeyAchievements: 'Led team of 5 developers',
-        },
-      ],
-      Skills: {
-        Technical: ['JavaScript', 'TypeScript', 'React'],
-        Soft: ['Communication', 'Leadership'],
-      },
-      Certifications: [],
-      Projects: [],
-      Languages: [
-        {
-          Name: 'English',
-          Proficiency: 'Native',
-        },
-      ],
-      ExtracurricularAwards: [],
-      Interests: ['Programming', 'Music'],
-      YearExperience: 3,
-      TechnologyExperience: ['JavaScript', 'TypeScript', 'React'],
-      CareerPath: 'Full Stack Development',
-    }
-
     const processedCv = await ProcessedCv.create({
       cvSubmissionId: cvSubmission.id,
       processingStatus: 'completed',
-      extractedData: extractedData,
+      extractedData: mockExtractedCvDataForDb,
       dataValidated: true,
     })
 
@@ -121,10 +78,12 @@ test.group('ProcessedCv Model', (group) => {
 
     assert.isDefined(processedCv.extractedData)
     assert.equal(processedCv.extractedData!.PersonalInformation.Name, 'John Doe')
-    assert.equal(processedCv.extractedData!.PersonalInformation.Email, 'john@example.com')
-    assert.equal(processedCv.extractedData!.Skills.Technical.length, 3)
+    assert.equal(processedCv.extractedData!.PersonalInformation.Email, 'john.doe@example.com')
+    assert.equal(processedCv.extractedData!.WorkExperience[0].JobTitle, 'Senior Developer')
+    assert.equal(processedCv.extractedData!.Skills.Technical.length, 4)
     assert.include(processedCv.extractedData!.Skills.Technical, 'JavaScript')
-    assert.equal(processedCv.extractedData!.YearExperience, 3)
+    assert.equal(processedCv.extractedData!.YearExperience, 5)
+    assert.equal(processedCv.dataValidated, true)
   })
 
   test('should mark as processing correctly', async ({ assert }) => {
