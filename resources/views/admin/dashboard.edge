@@ -319,6 +319,9 @@
                       Assessment Score
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      AI Evaluation
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Applied Date
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -640,7 +643,7 @@
         if (applicants.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                 No applicants found
               </td>
             </tr>
@@ -656,6 +659,27 @@
             : 'Not assessed';
           const appliedDate = new Date(applicant.createdAt).toLocaleDateString();
           const statusClass = getStatusClass(applicant.status);
+
+          // AI Evaluation display
+          let aiEvaluationDisplay = '';
+          if (applicant.evaluation) {
+            const evalScore = applicant.evaluation.score;
+            const evalRecommendation = applicant.evaluation.recommendation;
+            const evalClass = getEvaluationClass(evalRecommendation);
+            aiEvaluationDisplay = `
+              <div class="text-sm font-medium text-gray-900">Score: ${evalScore}/10</div>
+              <div class="text-xs ${evalClass}">${evalRecommendation}</div>
+            `;
+          } else {
+            aiEvaluationDisplay = `
+              <button
+                onclick="evaluateCandidate('${applicant.submissionId}')"
+                class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200"
+              >
+                Run AI Evaluation
+              </button>
+            `;
+          }
 
           return `
             <tr class="hover:bg-gray-50">
@@ -674,6 +698,9 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900">${assessmentScore}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                ${aiEvaluationDisplay}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900">${appliedDate}</div>
@@ -734,6 +761,15 @@
           case 'accepted': return 'bg-green-100 text-green-800';
           case 'rejected': return 'bg-red-100 text-red-800';
           default: return 'bg-gray-100 text-gray-800';
+        }
+      }
+
+      function getEvaluationClass(recommendation) {
+        switch (recommendation) {
+          case 'Proceed to next round': return 'text-green-600';
+          case 'Consider with caution': return 'text-yellow-600';
+          case 'Do not proceed': return 'text-red-600';
+          default: return 'text-gray-600';
         }
       }
 
@@ -968,6 +1004,47 @@
       function viewApplicant(submissionId) {
         // Open applicant details in a new tab or modal
         window.open(`/management/submissions/${submissionId}`, '_blank');
+      }
+
+      async function evaluateCandidate(submissionId) {
+        try {
+          // Show loading state on the button
+          const button = event.target;
+          const originalText = button.textContent;
+          button.textContent = 'Evaluating...';
+          button.disabled = true;
+          button.classList.add('opacity-50');
+
+          const response = await fetch(`/api/admin/applicants/${submissionId}/evaluate`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showSuccess('Candidate evaluated successfully!');
+            // Reload the applicants table to show the new evaluation
+            loadApplicants();
+          } else {
+            showError(result.message || 'Failed to evaluate candidate');
+            // Restore button state
+            button.textContent = originalText;
+            button.disabled = false;
+            button.classList.remove('opacity-50');
+          }
+        } catch (error) {
+          console.error('Error evaluating candidate:', error);
+          showError('Error evaluating candidate: ' + error.message);
+          // Restore button state
+          const button = event.target;
+          button.textContent = 'Run AI Evaluation';
+          button.disabled = false;
+          button.classList.remove('opacity-50');
+        }
       }
 
       // Utility functions

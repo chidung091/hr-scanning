@@ -151,6 +151,10 @@ router
     router.post('/criteria', [AdminController, 'createCriteria'])
     router.put('/criteria/:id', [AdminController, 'updateCriteria'])
     router.delete('/criteria/:id', [AdminController, 'deleteCriteria'])
+
+    router.post('/applicants/:submissionId/evaluate', [AdminController, 'evaluateCandidate'])
+    router.get('/applicants/:submissionId/evaluation', [AdminController, 'getCandidateEvaluation'])
+    router.post('/applicants/auto-evaluate', [AdminController, 'autoEvaluatePendingCandidates'])
   })
   .prefix('/api/admin')
   .use(middleware.adminAuth)

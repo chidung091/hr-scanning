@@ -4,6 +4,7 @@ import type { HasOne, BelongsTo } from '@adonisjs/lucid/types/relations'
 import QuestionnaireResponse from './questionnaire_response.js'
 import Job from './job.js'
 import ProcessedCv from './processed_cv.js'
+import CandidateEvaluation from './candidate_evaluation.js'
 
 export default class CvSubmission extends BaseModel {
   @column({ isPrimary: true })
@@ -50,6 +51,9 @@ export default class CvSubmission extends BaseModel {
 
   @hasOne(() => ProcessedCv)
   declare processedCv: HasOne<typeof ProcessedCv>
+
+  @hasOne(() => CandidateEvaluation)
+  declare evaluation: HasOne<typeof CandidateEvaluation>
 
   @belongsTo(() => Job)
   declare job: BelongsTo<typeof Job>

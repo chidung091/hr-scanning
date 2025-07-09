@@ -176,6 +176,8 @@ export default class ManagementController {
         .where('submission_id', submissionId)
         .preload('job')
         .preload('questionnaireResponse')
+        .preload('processedCv')
+        .preload('evaluation')
         .first()
 
       if (!submission) {

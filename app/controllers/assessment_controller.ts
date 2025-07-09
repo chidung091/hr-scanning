@@ -2,11 +2,64 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { cuid } from '@adonisjs/core/helpers'
 import CvSubmission from '#models/cv_submission'
 import QuestionnaireResponse from '#models/questionnaire_response'
+import CandidateEvaluation from '#models/candidate_evaluation'
 import { ASSESSMENT_CONFIG, getQuestionById } from '../config/assessment_questions.js'
 import { DateTime } from 'luxon'
 import { createQuestionAnswerValidator } from '#validators/assessment_validator'
+import aiEvaluationService from '#services/ai_evaluation_service'
+import logger from '@adonisjs/core/services/logger'
 
 export default class AssessmentController {
+  /**
+   * Trigger AI evaluation for a candidate (background process)
+   */
+  private async triggerAiEvaluation(cvSubmissionId: number): Promise<void> {
+    try {
+      // Check if evaluation already exists
+      const existingEvaluation = await CandidateEvaluation.query()
+        .where('cv_submission_id', cvSubmissionId)
+        .first()
+
+      if (existingEvaluation) {
+        logger.info('AI evaluation already exists for submission', { cvSubmissionId })
+        return
+      }
+
+      logger.info('Starting automatic AI evaluation', { cvSubmissionId })
+
+      // Run AI evaluation in background
+      const evaluationResult = await aiEvaluationService.evaluateCandidate(cvSubmissionId)
+
+      if (evaluationResult.success) {
+        // Save evaluation to database
+        const savedEvaluation = await aiEvaluationService.saveEvaluation(
+          evaluationResult.data!,
+          {
+            tokensUsed: evaluationResult.tokensUsed,
+            processingTime: evaluationResult.processingTime,
+            evaluationModel: 'gpt-4o-mini',
+          }
+        )
+
+        logger.info('AI evaluation completed successfully', {
+          cvSubmissionId,
+          evaluationId: savedEvaluation.id,
+          score: savedEvaluation.score,
+          recommendation: savedEvaluation.recommendation,
+        })
+      } else {
+        logger.error('AI evaluation failed', {
+          cvSubmissionId,
+          error: evaluationResult.error,
+        })
+      }
+    } catch (error) {
+      logger.error('Error in automatic AI evaluation', {
+        cvSubmissionId,
+        error: error.message,
+      })
+    }
+  }
   /**
    * @swagger
    * /api/assessment/start:
@@ -394,6 +447,15 @@ export default class AssessmentController {
         if (cvSubmission) {
           cvSubmission.status = 'submitted'
           await cvSubmission.save()
+
+          // Trigger AI evaluation automatically after assessment completion
+          // Run in background without blocking the response
+          this.triggerAiEvaluation(cvSubmission.id).catch((error) => {
+            logger.error('Background AI evaluation failed', {
+              cvSubmissionId: cvSubmission.id,
+              error: error.message,
+            })
+          })
         }
 
         return response.json({

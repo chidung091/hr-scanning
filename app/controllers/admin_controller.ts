@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Job from '#models/job'
 import CvSubmission from '#models/cv_submission'
 import AiCriteria from '#models/ai_criteria'
+import CandidateEvaluation from '#models/candidate_evaluation'
+import aiEvaluationService from '#services/ai_evaluation_service'
 import vine from '@vinejs/vine'
 
 export default class AdminController {
@@ -111,10 +113,25 @@ export default class AdminController {
 
     const applicants = await query.paginate(page, limit)
 
+    // Get evaluation data for each applicant
+    const applicantsWithEvaluation = await Promise.all(
+      applicants.all().map(async (applicant) => {
+        const evaluation = await CandidateEvaluation.query()
+          .where('cv_submission_id', applicant.id)
+          .select('id', 'score', 'recommendation', 'status', 'created_at')
+          .first()
+
+        return {
+          ...applicant.serialize(),
+          evaluation: evaluation ? evaluation.serialize() : null,
+        }
+      })
+    )
+
     return response.json({
       success: true,
       data: {
-        applicants: applicants.all(),
+        applicants: applicantsWithEvaluation,
         pagination: {
           currentPage: applicants.currentPage,
           perPage: applicants.perPage,
@@ -297,5 +314,187 @@ export default class AdminController {
       success: true,
       message: 'Criteria deleted successfully',
     })
+  }
+
+  /**
+   * Evaluate a candidate using AI
+   */
+  async evaluateCandidate({ params, response }: HttpContext) {
+    const submissionId = params.submissionId
+
+    try {
+      // Check if submission exists
+      const submission = await CvSubmission.findBy('submissionId', submissionId)
+      if (!submission) {
+        return response.status(404).json({
+          success: false,
+          message: 'Applicant not found',
+        })
+      }
+
+      // Check if already evaluated
+      const existingEvaluation = await CandidateEvaluation.query()
+        .where('cv_submission_id', submission.id)
+        .first()
+
+      if (existingEvaluation) {
+        return response.status(400).json({
+          success: false,
+          message: 'Candidate has already been evaluated',
+          data: existingEvaluation,
+        })
+      }
+
+      // Run AI evaluation
+      const evaluationResult = await aiEvaluationService.evaluateCandidate(submission.id)
+
+      if (!evaluationResult.success) {
+        return response.status(500).json({
+          success: false,
+          message: 'Evaluation failed',
+          error: evaluationResult.error,
+        })
+      }
+
+      // Save evaluation to database
+      const savedEvaluation = await aiEvaluationService.saveEvaluation(
+        evaluationResult.data!,
+        {
+          tokensUsed: evaluationResult.tokensUsed,
+          processingTime: evaluationResult.processingTime,
+          evaluationModel: 'gpt-4o-mini',
+        }
+      )
+
+      // Load related data for response
+      await savedEvaluation.load('cvSubmission')
+      await savedEvaluation.load('job')
+
+      return response.json({
+        success: true,
+        message: 'Candidate evaluated successfully',
+        data: savedEvaluation,
+      })
+    } catch (error) {
+      return response.status(500).json({
+        success: false,
+        message: 'An error occurred during evaluation',
+        error: error.message,
+      })
+    }
+  }
+
+  /**
+   * Auto-evaluate candidates who have CV processed but no evaluation yet
+   */
+  async autoEvaluatePendingCandidates({ response }: HttpContext) {
+    try {
+      // Find candidates with completed CV processing but no evaluation
+      const pendingCandidates = await CvSubmission.query()
+        .whereHas('processedCv', (cvQuery) => {
+          cvQuery.where('processing_status', 'completed')
+        })
+        .whereDoesntHave('evaluation', (evalQuery) => {
+          evalQuery.where('status', 'completed')
+        })
+        .limit(10) // Process in batches to avoid overwhelming the system
+
+      let evaluatedCount = 0
+      const results = []
+
+      for (const candidate of pendingCandidates) {
+        try {
+          const evaluationResult = await aiEvaluationService.evaluateCandidate(candidate.id)
+          
+          if (evaluationResult.success) {
+            await aiEvaluationService.saveEvaluation(evaluationResult.data!, {
+              tokensUsed: evaluationResult.tokensUsed,
+              processingTime: evaluationResult.processingTime,
+              evaluationModel: 'gpt-4o-mini',
+            })
+            
+            evaluatedCount++
+            results.push({
+              submissionId: candidate.submissionId,
+              status: 'success',
+              score: evaluationResult.data!.score,
+              recommendation: evaluationResult.data!.recommendation,
+            })
+          } else {
+            results.push({
+              submissionId: candidate.submissionId,
+              status: 'failed',
+              error: evaluationResult.error,
+            })
+          }
+        } catch (error) {
+          results.push({
+            submissionId: candidate.submissionId,
+            status: 'failed',
+            error: error.message,
+          })
+        }
+      }
+
+      return response.json({
+        success: true,
+        message: `Auto-evaluation completed for ${evaluatedCount} candidates`,
+        data: {
+          totalProcessed: pendingCandidates.length,
+          successCount: evaluatedCount,
+          failedCount: pendingCandidates.length - evaluatedCount,
+          results,
+        },
+      })
+    } catch (error) {
+      return response.status(500).json({
+        success: false,
+        message: 'Failed to auto-evaluate candidates',
+        error: error.message,
+      })
+    }
+  }
+
+  /**
+   * Get candidate evaluation
+   */
+  async getCandidateEvaluation({ params, response }: HttpContext) {
+    const submissionId = params.submissionId
+
+    try {
+      // Find the submission
+      const submission = await CvSubmission.findBy('submissionId', submissionId)
+      if (!submission) {
+        return response.status(404).json({
+          success: false,
+          message: 'Applicant not found',
+        })
+      }
+
+      // Get evaluation
+      const evaluation = await CandidateEvaluation.query()
+        .where('cv_submission_id', submission.id)
+        .preload('cvSubmission')
+        .preload('job')
+        .first()
+
+      if (!evaluation) {
+        return response.status(404).json({
+          success: false,
+          message: 'No evaluation found for this candidate',
+        })
+      }
+
+      return response.json({
+        success: true,
+        data: evaluation,
+      })
+    } catch (error) {
+      return response.status(500).json({
+        success: false,
+        message: 'An error occurred while fetching evaluation',
+        error: error.message,
+      })
+    }
   }
 }
