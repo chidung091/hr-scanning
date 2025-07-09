@@ -18,7 +18,7 @@ const shieldConfig = defineConfig({
    */
   csrf: {
     enabled: env.get('NODE_ENV') !== 'test',
-    exceptRoutes: [],
+    exceptRoutes: ['/api/admin/*'],
     enableXsrfCookie: false,
     methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
   },
