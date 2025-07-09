@@ -526,7 +526,7 @@
               </button>
             </td>
           </tr>
-        `).join('');
+        `;
       }
 
       function updateJobsPagination(pagination) {
@@ -835,7 +835,7 @@
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">${weightPercentage}%</div>
               <div class="text-xs text-gray-500">${weightDecimal}</div>
-            </td>`;
+            </td>
             <td class="px-6 py-4">
               <div class="text-sm text-gray-900 max-w-xs truncate" title="${escapeHtml(criterion.description || '')}">
                 ${escapeHtml(criterion.description || 'No description')}
@@ -870,7 +870,8 @@
               </button>
             </td>
           </tr>
-        `).join('');
+        `;
+        }).join('');
       }
 
       function updateWeightSummary(totalWeight) {

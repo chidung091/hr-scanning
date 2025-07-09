@@ -10,17 +10,15 @@ export default class AdminController {
   /**
    * Show admin dashboard with tabs
    */
-  async dashboard({ view, request, session, admin }: HttpContext) {
+  async dashboard({ view, request }: HttpContext) {
     console.log('AdminController.dashboard called')
-    console.log('Admin user:', admin)
-    console.log('Session admin_username:', session.get('admin_username'))
 
     const activeTab = request.input('tab', 'jobs')
 
     const data = {
       activeTab,
-      adminUser: admin,
-      adminUsername: session.get('admin_username') || admin?.username || 'Admin',
+      adminUser: null,
+      adminUsername: 'Admin',
     }
 
     console.log('Rendering dashboard with data:', data)

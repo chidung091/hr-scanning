@@ -18,6 +18,7 @@ import {
   managementUpdateThrottle,
   managementAnalyticsThrottle,
 } from '#start/limiter'
+const HomeController = () => import('#controllers/home_controller')
 const CvSubmissionsController = () => import('#controllers/cv_submissions_controller')
 const JobsController = () => import('#controllers/jobs_controller')
 const AssessmentController = () => import('#controllers/assessment_controller')
@@ -25,7 +26,7 @@ const SwaggerController = () => import('#controllers/swagger_controller')
 const ManagementController = () => import('#controllers/management_controller')
 const AdminController = () => import('#controllers/admin_controller')
 
-router.get('/', ({ response }) => response.redirect('/admin'))
+router.get('/', [HomeController, 'index'])
 
 // Job routes
 router.get('/careers', [JobsController, 'careers'])
