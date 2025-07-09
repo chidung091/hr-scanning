@@ -55,7 +55,7 @@
 
           <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-600">
-              Welcome, {{ session.get('admin_username', 'Admin') }}
+              Welcome, {{ adminUsername }}
             </span>
             <a
               href="/admin/logout"
@@ -434,6 +434,7 @@
           setupJobsSearch();
         } else if (activeTab === 'applicants') {
           loadApplicants();
+          setupApplicantsSearch();
         } else if (activeTab === 'criteria') {
           loadCriteria();
         }
@@ -599,9 +600,141 @@
         window.open(`/jobs/${jobId}`, '_blank');
       }
 
-      function loadApplicants() {
+      async function loadApplicants() {
         console.log('Loading applicants...');
-        // TODO: Implement applicants loading
+        showLoading();
+
+        try {
+          const response = await fetch('/api/admin/applicants', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          if (result.success) {
+            populateApplicantsTable(result.data.applicants);
+            updateApplicantsPagination(result.data.pagination);
+          } else {
+            showError('Failed to load applicants data');
+          }
+        } catch (error) {
+          console.error('Error loading applicants:', error);
+          showError('Error loading applicants: ' + error.message);
+        } finally {
+          hideLoading();
+        }
+      }
+
+      function populateApplicantsTable(applicants) {
+        const tableBody = document.getElementById('applicants-table-body');
+        if (!tableBody) return;
+
+        if (applicants.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                No applicants found
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = applicants.map(applicant => {
+          const jobTitle = applicant.job ? applicant.job.jobTitle : 'N/A';
+          const workLocation = applicant.job ? applicant.job.workLocation : 'N/A';
+          const assessmentScore = applicant.questionnaireResponse && applicant.questionnaireResponse.totalScore
+            ? applicant.questionnaireResponse.totalScore.toFixed(1)
+            : 'Not assessed';
+          const appliedDate = new Date(applicant.createdAt).toLocaleDateString();
+          const statusClass = getStatusClass(applicant.status);
+
+          return `
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">${escapeHtml(applicant.applicantName || 'N/A')}</div>
+                <div class="text-sm text-gray-500">${escapeHtml(applicant.applicantEmail || 'N/A')}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${escapeHtml(jobTitle)}</div>
+                <div class="text-sm text-gray-500">${escapeHtml(workLocation)}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                  ${applicant.status}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${assessmentScore}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${appliedDate}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button
+                  onclick="viewApplicant('${applicant.submissionId}')"
+                  class="text-primary-600 hover:text-primary-900 mr-3"
+                >
+                  View
+                </button>
+                <select
+                  onchange="updateApplicantStatus('${applicant.submissionId}', this.value)"
+                  class="text-sm border border-gray-300 rounded px-2 py-1"
+                >
+                  <option value="pending" ${applicant.status === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="reviewed" ${applicant.status === 'reviewed' ? 'selected' : ''}>Reviewed</option>
+                  <option value="accepted" ${applicant.status === 'accepted' ? 'selected' : ''}>Accepted</option>
+                  <option value="rejected" ${applicant.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                </select>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function updateApplicantsPagination(pagination) {
+        const paginationContainer = document.getElementById('applicants-pagination');
+        if (!paginationContainer || !pagination) return;
+
+        if (pagination.lastPage <= 1) {
+          paginationContainer.innerHTML = '';
+          return;
+        }
+
+        let paginationHtml = '<div class="flex items-center justify-between">';
+        paginationHtml += `<div class="text-sm text-gray-700">Showing ${pagination.currentPage} of ${pagination.lastPage} pages (${pagination.total} total applicants)</div>`;
+        paginationHtml += '<div class="flex space-x-2">';
+
+        // Previous button
+        if (pagination.currentPage > 1) {
+          paginationHtml += `<button onclick="loadApplicantsPage(${pagination.currentPage - 1})" class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</button>`;
+        }
+
+        // Next button
+        if (pagination.currentPage < pagination.lastPage) {
+          paginationHtml += `<button onclick="loadApplicantsPage(${pagination.currentPage + 1})" class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</button>`;
+        }
+
+        paginationHtml += '</div></div>';
+        paginationContainer.innerHTML = paginationHtml;
+      }
+
+      function getStatusClass(status) {
+        switch (status) {
+          case 'pending': return 'bg-yellow-100 text-yellow-800';
+          case 'reviewed': return 'bg-blue-100 text-blue-800';
+          case 'accepted': return 'bg-green-100 text-green-800';
+          case 'rejected': return 'bg-red-100 text-red-800';
+          default: return 'bg-gray-100 text-gray-800';
+        }
       }
 
       async function loadCriteria() {
@@ -788,6 +921,55 @@
         }
       }
 
+      // Applicant management functions
+      async function loadApplicantsPage(page) {
+        const url = new URL('/api/admin/applicants', window.location.origin);
+        url.searchParams.set('page', page);
+
+        try {
+          const response = await fetch(url);
+          const result = await response.json();
+
+          if (result.success) {
+            populateApplicantsTable(result.data.applicants);
+            updateApplicantsPagination(result.data.pagination);
+          }
+        } catch (error) {
+          console.error('Error loading applicants page:', error);
+          showError('Error loading applicants page');
+        }
+      }
+
+      async function updateApplicantStatus(submissionId, newStatus) {
+        try {
+          const response = await fetch(`/api/admin/applicants/${submissionId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            loadApplicants(); // Reload the applicants table
+            showSuccess(result.message || 'Applicant status updated successfully');
+          } else {
+            showError(result.message || 'Failed to update applicant status');
+          }
+        } catch (error) {
+          console.error('Error updating applicant status:', error);
+          showError('Error updating applicant status');
+        }
+      }
+
+      function viewApplicant(submissionId) {
+        // Open applicant details in a new tab or modal
+        window.open(`/management/submissions/${submissionId}`, '_blank');
+      }
+
       // Utility functions
       function escapeHtml(text) {
         const div = document.createElement('div');
@@ -819,6 +1001,109 @@
         // Simple success display - could be enhanced with a proper notification system
         console.log(message);
         alert('Success: ' + message);
+      }
+
+      // Search functionality for applicants
+      function setupApplicantsSearch() {
+        const searchInput = document.getElementById('applicants-search');
+        const statusFilter = document.getElementById('applicants-status-filter');
+        const jobFilter = document.getElementById('applicants-job-filter');
+
+        if (searchInput) {
+          let searchTimeout;
+          searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+              loadApplicantsWithFilters();
+            }, 300); // Debounce search
+          });
+        }
+
+        if (statusFilter) {
+          statusFilter.addEventListener('change', function() {
+            loadApplicantsWithFilters();
+          });
+        }
+
+        if (jobFilter) {
+          jobFilter.addEventListener('change', function() {
+            loadApplicantsWithFilters();
+          });
+        }
+
+        // Load job options for the filter
+        loadJobsForFilter();
+      }
+
+      async function loadJobsForFilter() {
+        try {
+          const response = await fetch('/api/admin/jobs?limit=100', {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            const jobFilter = document.getElementById('applicants-job-filter');
+            if (jobFilter) {
+              const jobOptions = result.data.jobs.map(job =>
+                `<option value="${job.id}">${escapeHtml(job.jobTitle)}</option>`
+              ).join('');
+              jobFilter.innerHTML = '<option value="">All Jobs</option>' + jobOptions;
+            }
+          }
+        } catch (error) {
+          console.error('Error loading jobs for filter:', error);
+        }
+      }
+
+      async function loadApplicantsWithFilters() {
+        const searchInput = document.getElementById('applicants-search');
+        const statusFilter = document.getElementById('applicants-status-filter');
+        const jobFilter = document.getElementById('applicants-job-filter');
+
+        const params = new URLSearchParams();
+
+        if (searchInput && searchInput.value.trim()) {
+          params.set('search', searchInput.value.trim());
+        }
+
+        if (statusFilter && statusFilter.value) {
+          params.set('status', statusFilter.value);
+        }
+
+        if (jobFilter && jobFilter.value) {
+          params.set('job_id', jobFilter.value);
+        }
+
+        const url = `/api/admin/applicants?${params.toString()}`;
+
+        try {
+          showLoading();
+          const response = await fetch(url, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            populateApplicantsTable(result.data.applicants);
+            updateApplicantsPagination(result.data.pagination);
+          } else {
+            showError('Failed to load applicants data');
+          }
+        } catch (error) {
+          console.error('Error loading applicants with filters:', error);
+          showError('Error loading applicants');
+        } finally {
+          hideLoading();
+        }
       }
 
       // Search functionality for jobs

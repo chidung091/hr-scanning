@@ -8,11 +8,13 @@ export default class AdminController {
   /**
    * Show admin dashboard with tabs
    */
-  async dashboard({ view, request }: HttpContext) {
+  async dashboard({ view, request, session, admin }: HttpContext) {
     const activeTab = request.input('tab', 'jobs')
 
     return view.render('admin/dashboard', {
       activeTab,
+      adminUser: admin,
+      adminUsername: session.get('admin_username') || admin?.username || 'Admin',
     })
   }
 

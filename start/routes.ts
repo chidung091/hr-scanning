@@ -129,15 +129,16 @@ router
   })
   .use(middleware.adminAuth)
 
-// Admin Routes (temporarily without middleware for testing)
+// Admin Routes (protected by authentication middleware)
 router
   .group(() => {
     // Admin Dashboard
     router.get('/', [AdminController, 'dashboard'])
   })
   .prefix('/admin')
+  .use(middleware.adminAuth)
 
-// Admin API Routes (temporarily without middleware for testing)
+// Admin API Routes (protected by authentication middleware)
 router
   .group(() => {
     router.get('/jobs', [AdminController, 'getJobs'])
@@ -152,3 +153,4 @@ router
     router.delete('/criteria/:id', [AdminController, 'deleteCriteria'])
   })
   .prefix('/api/admin')
+  .use(middleware.adminAuth)
