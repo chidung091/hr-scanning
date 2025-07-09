@@ -652,15 +652,21 @@
           return;
         }
 
-        tableBody.innerHTML = criteria.map(criterion => `
+        tableBody.innerHTML = criteria.map(criterion => {
+          // Ensure weight is a valid number
+          const weight = Number.parseFloat(criterion.weight) || 0;
+          const weightPercentage = (weight * 100).toFixed(1);
+          const weightDecimal = weight.toFixed(3);
+
+          return `
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm font-medium text-gray-900">${escapeHtml(criterion.name)}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">${(criterion.weight * 100).toFixed(1)}%</div>
-              <div class="text-xs text-gray-500">${criterion.weight.toFixed(3)}</div>
-            </td>
+              <div class="text-sm text-gray-900">${weightPercentage}%</div>
+              <div class="text-xs text-gray-500">${weightDecimal}</div>
+            </td>`;
             <td class="px-6 py-4">
               <div class="text-sm text-gray-900 max-w-xs truncate" title="${escapeHtml(criterion.description || '')}">
                 ${escapeHtml(criterion.description || 'No description')}
@@ -702,18 +708,21 @@
         const totalWeightElement = document.getElementById('total-weight');
         const weightProgressElement = document.getElementById('weight-progress');
 
+        // Ensure totalWeight is a valid number
+        const weight = Number.parseFloat(totalWeight) || 0;
+
         if (totalWeightElement) {
-          totalWeightElement.textContent = totalWeight.toFixed(2);
+          totalWeightElement.textContent = weight.toFixed(2);
         }
 
         if (weightProgressElement) {
-          const percentage = Math.min(totalWeight * 100, 100);
+          const percentage = Math.min(weight * 100, 100);
           weightProgressElement.style.width = `${percentage}%`;
 
           // Change color based on weight total
-          if (totalWeight < 0.95) {
+          if (weight < 0.95) {
             weightProgressElement.className = 'bg-yellow-600 h-2 rounded-full transition-all duration-300';
-          } else if (totalWeight > 1.05) {
+          } else if (weight > 1.05) {
             weightProgressElement.className = 'bg-red-600 h-2 rounded-full transition-all duration-300';
           } else {
             weightProgressElement.className = 'bg-blue-600 h-2 rounded-full transition-all duration-300';

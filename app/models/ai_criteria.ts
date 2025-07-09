@@ -43,11 +43,21 @@ export default class AiCriteria extends BaseModel {
   static async getTotalWeight(): Promise<number> {
     const result = await this.query().where('is_active', true).sum('weight as total')
 
-    return result[0]?.$extras.total || 0
+    const total = result[0]?.$extras.total || 0
+    return Number.parseFloat(total) || 0
   }
 
   // Get criteria for AI evaluation
   static async getForEvaluation(): Promise<AiCriteria[]> {
     return await this.activeCriteria()
+  }
+
+  // Serialize method to ensure weight is always a number
+  serialize() {
+    const serialized = super.serialize()
+    return {
+      ...serialized,
+      weight: Number.parseFloat(serialized.weight) || 0,
+    }
   }
 }
