@@ -118,11 +118,7 @@ class ProgressiveAssessment {
                 <p class="text-gray-600">Thank you for completing the questionnaire. Your application has been submitted successfully.</p>
               </div>
               
-              <div id="scoreDisplay" class="bg-gray-50 rounded-lg p-4 mb-6">
-                <div class="text-sm text-gray-600 mb-1">Assessment Score</div>
-                <div id="finalScore" class="text-2xl font-bold text-primary-600">--</div>
-                <div id="assessmentResult" class="text-sm text-gray-600 capitalize">--</div>
-              </div>
+              <!-- Score display removed as per requirements -->
 
               <div id="autoRedirectMessage" class="text-sm text-gray-600 mb-4 text-center">
                 Redirecting to success page in <span id="countdown">3</span> seconds...
@@ -481,11 +477,7 @@ class ProgressiveAssessment {
     document.getElementById('questionContent').classList.add('hidden')
     document.getElementById('completionScreen').classList.remove('hidden')
 
-    if (data.totalScore !== undefined) {
-      document.getElementById('finalScore').textContent = data.totalScore
-      document.getElementById('assessmentResult').textContent = data.assessmentResult || 'Completed'
-    }
-
+    // Score display removed as per requirements
     this.completionData = data
 
     // Auto-redirect to success page after 3 seconds with countdown

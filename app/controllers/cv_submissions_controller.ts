@@ -411,37 +411,53 @@ export default class CvSubmissionsController {
   async success({ params, view }: HttpContext) {
     const submissionId = params.id
 
-    const cvSubmission = await CvSubmission.query()
-      .where('submission_id', submissionId)
-      .preload('questionnaireResponse', (responseQuery) => {
-        responseQuery.select(
-          'id',
-          'cv_submission_id',
-          'is_completed',
-          'total_score',
-          'assessment_result',
-          'completed_at'
-        )
-      })
-      .first()
+    try {
+      const cvSubmission = await CvSubmission.query()
+        .where('submission_id', submissionId)
+        .preload('questionnaireResponse', (responseQuery) => {
+          responseQuery.select(
+            'id',
+            'cv_submission_id',
+            'is_completed',
+            'total_score',
+            'assessment_result',
+            'completed_at',
+            'responses',
+            'questions_completed'
+          )
+        })
+        .first()
 
-    if (!cvSubmission) {
+      if (!cvSubmission) {
+        return view.render('pages/error', {
+          message: 'Application not found',
+        })
+      }
+
+      const applicationReference = `TV-${cvSubmission.submissionId.slice(-8).toUpperCase()}`
+
+      // Calculate questions answered from the responses object
+      let questionsAnswered = 0
+      if (cvSubmission.questionnaireResponse && cvSubmission.questionnaireResponse.responses) {
+        // Count non-null, non-undefined responses
+        questionsAnswered = Object.values(cvSubmission.questionnaireResponse.responses).filter(
+          (answer) => answer !== null && answer !== undefined && answer !== ''
+        ).length
+      }
+
+      return view.render('pages/success', {
+        applicantName: cvSubmission.applicantName || 'Applicant',
+        applicationReference,
+        submissionId: cvSubmission.submissionId,
+        questionsAnswered,
+        isAssessmentCompleted: cvSubmission.questionnaireResponse?.isCompleted || false,
+      })
+    } catch (error) {
+      console.error('Success page error:', error)
       return view.render('pages/error', {
-        message: 'Application not found',
+        message: 'An error occurred while loading your application details',
       })
     }
-
-    const applicationReference = `TV-${cvSubmission.submissionId.slice(-8).toUpperCase()}`
-
-    return view.render('pages/success', {
-      applicantName: cvSubmission.applicantName,
-      applicationReference,
-      submissionId: cvSubmission.submissionId,
-      questionsAnswered: cvSubmission.questionnaireResponse
-        ? Object.values(cvSubmission.questionnaireResponse.responses).filter((q: any) => q.answered)
-            .length
-        : 0,
-    })
   }
 
   /**

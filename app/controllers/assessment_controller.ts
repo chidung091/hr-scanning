@@ -207,9 +207,8 @@ export default class AssessmentController {
           success: true,
           data: {
             completed: true,
-            totalScore: questionnaireResponse.totalScore,
-            assessmentResult: questionnaireResponse.assessmentResult,
             progress: 100,
+            // Score and assessment result removed from user-facing API
           },
         })
       }
@@ -401,10 +400,9 @@ export default class AssessmentController {
           success: true,
           data: {
             completed: true,
-            totalScore: questionnaireResponse.totalScore,
-            assessmentResult: questionnaireResponse.assessmentResult,
             progress: 100,
             submissionId: cvSubmission?.submissionId,
+            // Score and assessment result removed from user-facing API
           },
         })
       }

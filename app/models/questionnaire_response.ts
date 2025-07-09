@@ -81,7 +81,10 @@ export default class QuestionnaireResponse extends BaseModel {
 
   // Helper methods
   public getProgressPercentage(): number {
-    return Math.round((this.questionsCompleted / ASSESSMENT_CONFIG.totalQuestions) * 100)
+    // Fix: questionsCompleted represents the highest question number completed (1-based)
+    // For 6 questions, when questionsCompleted = 6, progress should be 100%
+    const completedCount = Math.min(this.questionsCompleted, ASSESSMENT_CONFIG.totalQuestions)
+    return Math.round((completedCount / ASSESSMENT_CONFIG.totalQuestions) * 100)
   }
 
   public isExpired(): boolean {
@@ -107,7 +110,7 @@ export default class QuestionnaireResponse extends BaseModel {
     this.questionsCompleted = Math.max(this.questionsCompleted, questionNumber)
     this.lastActivityAt = DateTime.now()
 
-    // Check if completed
+    // Check if completed - when we've processed all questions
     if (this.questionsCompleted >= ASSESSMENT_CONFIG.totalQuestions) {
       this.isCompleted = true
       this.completedAt = DateTime.now()
