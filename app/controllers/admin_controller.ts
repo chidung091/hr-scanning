@@ -11,13 +11,28 @@ export default class AdminController {
    * Show admin dashboard with tabs
    */
   async dashboard({ view, request, session, admin }: HttpContext) {
+    console.log('AdminController.dashboard called')
+    console.log('Admin user:', admin)
+    console.log('Session admin_username:', session.get('admin_username'))
+    
     const activeTab = request.input('tab', 'jobs')
 
-    return view.render('admin/dashboard', {
+    const data = {
       activeTab,
       adminUser: admin,
       adminUsername: session.get('admin_username') || admin?.username || 'Admin',
-    })
+    }
+
+    console.log('Rendering dashboard with data:', data)
+    
+    try {
+      const result = await view.render('admin/dashboard', data)
+      console.log('Dashboard rendered successfully, length:', result.length)
+      return result
+    } catch (error) {
+      console.error('Error rendering dashboard:', error)
+      throw error
+    }
   }
 
   /**
@@ -357,14 +372,11 @@ export default class AdminController {
       }
 
       // Save evaluation to database
-      const savedEvaluation = await aiEvaluationService.saveEvaluation(
-        evaluationResult.data!,
-        {
-          tokensUsed: evaluationResult.tokensUsed,
-          processingTime: evaluationResult.processingTime,
-          evaluationModel: 'gpt-4o-mini',
-        }
-      )
+      const savedEvaluation = await aiEvaluationService.saveEvaluation(evaluationResult.data!, {
+        tokensUsed: evaluationResult.tokensUsed,
+        processingTime: evaluationResult.processingTime,
+        evaluationModel: 'gpt-4o-mini',
+      })
 
       // Load related data for response
       await savedEvaluation.load('cvSubmission')
@@ -405,14 +417,14 @@ export default class AdminController {
       for (const candidate of pendingCandidates) {
         try {
           const evaluationResult = await aiEvaluationService.evaluateCandidate(candidate.id)
-          
+
           if (evaluationResult.success) {
             await aiEvaluationService.saveEvaluation(evaluationResult.data!, {
               tokensUsed: evaluationResult.tokensUsed,
               processingTime: evaluationResult.processingTime,
               evaluationModel: 'gpt-4o-mini',
             })
-            
+
             evaluatedCount++
             results.push({
               submissionId: candidate.submissionId,

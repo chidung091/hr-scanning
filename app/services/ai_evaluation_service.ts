@@ -83,9 +83,9 @@ export class AiEvaluationService {
     const startTime = Date.now()
 
     try {
-      // Gather all required data
-      const inputData = await this.gatherEvaluationData(cvSubmissionId)
-      
+      // Gather all required data with retry mechanism
+      const inputData = await this.gatherEvaluationDataWithRetry(cvSubmissionId)
+
       if (!inputData) {
         return {
           success: false,
@@ -138,6 +138,31 @@ export class AiEvaluationService {
   }
 
   /**
+   * Gather all required data for evaluation with retry mechanism
+   */
+  private async gatherEvaluationDataWithRetry(cvSubmissionId: number): Promise<EvaluationInput | null> {
+    const maxRetries = 3
+    const retryDelay = 2000 // 2 seconds
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const data = await this.gatherEvaluationData(cvSubmissionId)
+      
+      if (data) {
+        return data
+      }
+
+      if (attempt < maxRetries) {
+        logger.info(`Retrying evaluation data gathering (attempt ${attempt + 1}/${maxRetries}) in ${retryDelay}ms`, {
+          cvSubmissionId,
+        })
+        await new Promise(resolve => setTimeout(resolve, retryDelay))
+      }
+    }
+
+    return null
+  }
+
+  /**
    * Gather all required data for evaluation
    */
   private async gatherEvaluationData(cvSubmissionId: number): Promise<EvaluationInput | null> {
@@ -145,10 +170,20 @@ export class AiEvaluationService {
       // Get CV submission with related data
       const cvSubmission = await CvSubmission.query()
         .where('id', cvSubmissionId)
-        .preload('processedCv')
+        .preload('processedCv', (processedQuery) => {
+          processedQuery.where('processing_status', 'completed')
+        })
         .preload('questionnaireResponse')
         .preload('job')
         .first()
+
+      logger.info('CV submission found', {
+        cvSubmissionId,
+        hasProcessedCv: !!cvSubmission?.processedCv,
+        processingStatus: cvSubmission?.processedCv?.processingStatus,
+        hasJob: !!cvSubmission?.job,
+        hasQuestionnaire: !!cvSubmission?.questionnaireResponse,
+      })
 
       if (!cvSubmission) {
         logger.error('CV submission not found', { cvSubmissionId })
@@ -157,7 +192,11 @@ export class AiEvaluationService {
 
       // Check if CV is processed
       if (!cvSubmission.processedCv || cvSubmission.processedCv.processingStatus !== 'completed') {
-        logger.error('CV not processed yet', { cvSubmissionId })
+        logger.error('CV not processed yet', {
+          cvSubmissionId,
+          hasProcessedCv: !!cvSubmission.processedCv,
+          processingStatus: cvSubmission.processedCv?.processingStatus || 'no processed CV found',
+        })
         return null
       }
 
@@ -194,7 +233,10 @@ export class AiEvaluationService {
    */
   private buildSystemPrompt(inputData: EvaluationInput): string {
     const criteriaList = inputData.aiCriteria
-      .map(criteria => `- ${criteria.name} (Weight: ${(criteria.weight * 100).toFixed(1)}%): ${criteria.description}`)
+      .map(
+        (criteria) =>
+          `- ${criteria.name} (Weight: ${(criteria.weight * 100).toFixed(1)}%): ${criteria.description}`
+      )
       .join('\n')
 
     return `Role: Expert HR AI Assistant for candidate evaluation
@@ -253,7 +295,7 @@ QUESTIONNAIRE RESPONSES:
 ${JSON.stringify(inputData.questionnaireResponses, null, 2)}
 
 EVALUATION CRITERIA IDS (for linking):
-${inputData.aiCriteria.map(c => `${c.id}: ${c.name}`).join(', ')}
+${inputData.aiCriteria.map((c) => `${c.id}: ${c.name}`).join(', ')}
 
 QUESTIONNAIRE RESPONSE IDS (for linking):
 Available response IDs: [1, 2, 3, 4, 5, 6] (standard questionnaire responses)
@@ -376,16 +418,27 @@ Required JSON Schema:
       throw new Error('Strengths must be an array with 2-5 items')
     }
 
-    if (!Array.isArray(data.weaknesses) || data.weaknesses.length < 1 || data.weaknesses.length > 3) {
+    if (
+      !Array.isArray(data.weaknesses) ||
+      data.weaknesses.length < 1 ||
+      data.weaknesses.length > 3
+    ) {
       throw new Error('Weaknesses must be an array with 1-3 items')
     }
 
-    const validRecommendations = ['Proceed to next round', 'Consider with caution', 'Do not proceed']
+    const validRecommendations = [
+      'Proceed to next round',
+      'Consider with caution',
+      'Do not proceed',
+    ]
     if (!validRecommendations.includes(data.recommendation)) {
       throw new Error('Invalid recommendation value')
     }
 
-    if (!Array.isArray(data.linkedCriteriaIds) || !Array.isArray(data.linkedQuestionnaireResponseIds)) {
+    if (
+      !Array.isArray(data.linkedCriteriaIds) ||
+      !Array.isArray(data.linkedQuestionnaireResponseIds)
+    ) {
       throw new Error('Linked IDs must be arrays')
     }
   }

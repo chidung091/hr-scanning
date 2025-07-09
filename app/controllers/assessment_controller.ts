@@ -32,14 +32,11 @@ export default class AssessmentController {
 
       if (evaluationResult.success) {
         // Save evaluation to database
-        const savedEvaluation = await aiEvaluationService.saveEvaluation(
-          evaluationResult.data!,
-          {
-            tokensUsed: evaluationResult.tokensUsed,
-            processingTime: evaluationResult.processingTime,
-            evaluationModel: 'gpt-4o-mini',
-          }
-        )
+        const savedEvaluation = await aiEvaluationService.saveEvaluation(evaluationResult.data!, {
+          tokensUsed: evaluationResult.tokensUsed,
+          processingTime: evaluationResult.processingTime,
+          evaluationModel: 'gpt-4o-mini',
+        })
 
         logger.info('AI evaluation completed successfully', {
           cvSubmissionId,

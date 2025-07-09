@@ -22,13 +22,13 @@ export default class CandidateEvaluation extends BaseModel {
 
   @column({
     serialize: (value: string) => JSON.parse(value),
-    prepare: (value: string[]) => JSON.stringify(value)
+    prepare: (value: string[]) => JSON.stringify(value),
   })
   declare strengths: string[]
 
   @column({
     serialize: (value: string) => JSON.parse(value),
-    prepare: (value: string[]) => JSON.stringify(value)
+    prepare: (value: string[]) => JSON.stringify(value),
   })
   declare weaknesses: string[]
 
@@ -40,13 +40,13 @@ export default class CandidateEvaluation extends BaseModel {
 
   @column({
     serialize: (value: string) => JSON.parse(value),
-    prepare: (value: number[]) => JSON.stringify(value)
+    prepare: (value: number[]) => JSON.stringify(value),
   })
   declare linkedCriteriaIds: number[]
 
   @column({
     serialize: (value: string) => JSON.parse(value),
-    prepare: (value: number[]) => JSON.stringify(value)
+    prepare: (value: number[]) => JSON.stringify(value),
   })
   declare linkedQuestionnaireResponseIds: number[]
 
