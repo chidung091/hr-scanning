@@ -104,5 +104,11 @@ router.put('/api/admin/criteria/:id', [AdminController, 'updateCriteria'])
 router.delete('/api/admin/criteria/:id', [AdminController, 'deleteCriteria'])
 
 router.post('/api/admin/applicants/:submissionId/evaluate', [AdminController, 'evaluateCandidate'])
-router.get('/api/admin/applicants/:submissionId/evaluation', [AdminController, 'getCandidateEvaluation'])
-router.post('/api/admin/applicants/auto-evaluate', [AdminController, 'autoEvaluatePendingCandidates'])
+router.get('/api/admin/applicants/:submissionId/evaluation', [
+  AdminController,
+  'getCandidateEvaluation',
+])
+router.post('/api/admin/applicants/auto-evaluate', [
+  AdminController,
+  'autoEvaluatePendingCandidates',
+])

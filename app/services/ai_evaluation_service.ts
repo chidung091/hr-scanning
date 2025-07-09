@@ -140,22 +140,27 @@ export class AiEvaluationService {
   /**
    * Gather all required data for evaluation with retry mechanism
    */
-  private async gatherEvaluationDataWithRetry(cvSubmissionId: number): Promise<EvaluationInput | null> {
+  private async gatherEvaluationDataWithRetry(
+    cvSubmissionId: number
+  ): Promise<EvaluationInput | null> {
     const maxRetries = 3
     const retryDelay = 2000 // 2 seconds
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const data = await this.gatherEvaluationData(cvSubmissionId)
-      
+
       if (data) {
         return data
       }
 
       if (attempt < maxRetries) {
-        logger.info(`Retrying evaluation data gathering (attempt ${attempt + 1}/${maxRetries}) in ${retryDelay}ms`, {
-          cvSubmissionId,
-        })
-        await new Promise(resolve => setTimeout(resolve, retryDelay))
+        logger.info(
+          `Retrying evaluation data gathering (attempt ${attempt + 1}/${maxRetries}) in ${retryDelay}ms`,
+          {
+            cvSubmissionId,
+          }
+        )
+        await new Promise((resolve) => setTimeout(resolve, retryDelay))
       }
     }
 

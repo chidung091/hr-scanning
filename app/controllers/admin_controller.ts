@@ -14,7 +14,7 @@ export default class AdminController {
     console.log('AdminController.dashboard called')
     console.log('Admin user:', admin)
     console.log('Session admin_username:', session.get('admin_username'))
-    
+
     const activeTab = request.input('tab', 'jobs')
 
     const data = {
@@ -24,7 +24,7 @@ export default class AdminController {
     }
 
     console.log('Rendering dashboard with data:', data)
-    
+
     try {
       const result = await view.render('admin/dashboard', data)
       console.log('Dashboard rendered successfully, length:', result.length)
