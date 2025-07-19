@@ -12,8 +12,8 @@ const loggerConfig = defineConfig({
   loggers: {
     app: {
       enabled: true,
-      name: env.get('APP_NAME'),
-      level: env.get('LOG_LEVEL'),
+      name: env.get('APP_NAME', 'japanese-learning-quiz'),
+      level: env.get('LOG_LEVEL', 'info'),
       transport: {
         targets: targets()
           .pushIf(!app.inProduction, targets.pretty())
@@ -31,5 +31,7 @@ export default loggerConfig
  * in your application.
  */
 declare module '@adonisjs/core/types' {
-  export interface LoggersList extends InferLoggers<typeof loggerConfig> {}
+  export interface LoggersList {
+    app: typeof loggerConfig.loggers.app
+  }
 }

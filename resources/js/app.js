@@ -1,8 +1,5 @@
 // Main application JavaScript
-console.log('TechVision Solutions - Application Loaded')
-
-// Import components
-import './components/ProgressiveAssessment.js'
+console.log('Japanese Learning Quiz - Application Loaded')
 
 // DOM Content Loaded handler
 document.addEventListener('DOMContentLoaded', function () {
@@ -31,19 +28,7 @@ function initializeComponents() {
     })
   })
 
-  // Add loading states for forms
-  const forms = document.querySelectorAll('form')
-  forms.forEach((form) => {
-    form.addEventListener('submit', function () {
-      const submitButton = form.querySelector('button[type="submit"], input[type="submit"]')
-      if (submitButton) {
-        submitButton.disabled = true
-        submitButton.textContent = 'Processing...'
-      }
-    })
-  })
-
-  // Add fade-in animation for elements
+  // Add fade-in animation for quiz elements
   const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px',
@@ -60,4 +45,44 @@ function initializeComponents() {
   // Observe elements with fade-in class
   const fadeElements = document.querySelectorAll('.fade-on-scroll')
   fadeElements.forEach((el) => observer.observe(el))
+
+  // Initialize Japanese character display enhancements
+  initializeJapaneseCharacterDisplay()
+}
+
+// Initialize Japanese character display enhancements
+function initializeJapaneseCharacterDisplay() {
+  // Add hover effects for character displays
+  const characterDisplays = document.querySelectorAll('#character-display')
+  characterDisplays.forEach((display) => {
+    display.addEventListener('mouseenter', function () {
+      this.style.transform = 'scale(1.05)'
+      this.style.transition = 'transform 0.2s ease'
+    })
+
+    display.addEventListener('mouseleave', function () {
+      this.style.transform = 'scale(1)'
+    })
+  })
+
+  // Add keyboard navigation for quiz
+  document.addEventListener('keydown', function (e) {
+    // Allow 1-4 keys to select answers
+    if (['1', '2', '3', '4'].includes(e.key)) {
+      const answerButtons = document.querySelectorAll('.answer-option')
+      const buttonIndex = parseInt(e.key) - 1
+      if (answerButtons[buttonIndex] && !answerButtons[buttonIndex].disabled) {
+        answerButtons[buttonIndex].click()
+      }
+    }
+
+    // Allow Enter or Space to proceed to next question
+    if ((e.key === 'Enter' || e.key === ' ') && !e.target.matches('button')) {
+      const nextButton = document.getElementById('next-question')
+      if (nextButton && !nextButton.classList.contains('hidden')) {
+        e.preventDefault()
+        nextButton.click()
+      }
+    }
+  })
 }

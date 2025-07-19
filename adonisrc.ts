@@ -50,9 +50,6 @@ export default defineConfig({
     () => import('@adonisjs/shield/shield_provider'),
     () => import('@adonisjs/static/static_provider'),
     () => import('@adonisjs/lucid/database_provider'),
-    () => import('@adonisjs/drive/drive_provider'),
-    () => import('@adonisjs/limiter/limiter_provider'),
-    () => import('#providers/database_migration_provider'),
   ],
 
   /*
@@ -63,11 +60,7 @@ export default defineConfig({
   | List of modules to import before starting the application.
   |
   */
-  preloads: [
-    () => import('#start/routes'),
-    () => import('#start/kernel'),
-    () => import('#start/limiter'),
-  ],
+  preloads: [() => import('#start/routes'), () => import('#start/kernel')],
 
   /*
   |--------------------------------------------------------------------------

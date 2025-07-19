@@ -6,16 +6,15 @@ import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import testUtils from '@adonisjs/core/services/test_utils'
 import sinon from 'sinon'
 import env from '#start/env'
-import { DatabaseMockManager } from '#tests/utils/database_mocks'
+// Database mocks removed - not needed for Japanese learning quiz
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
  */
 
 /**
- * Global database mock manager instance
+ * Global test configuration for Japanese learning quiz
  */
-const databaseMockManager = new DatabaseMockManager()
 
 /**
  * Configure Japa plugins in the plugins array.
@@ -39,15 +38,8 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
       process.env.NODE_ENV = 'test'
       console.log('✅ NODE_ENV set to test')
 
-      try {
-        // Initialize database mocks for all tests
-        console.log('🗄️ Initializing database mocks...')
-        await databaseMockManager.initializeMocks()
-        console.log('✅ Database mocks initialized successfully')
-      } catch (error) {
-        console.error('❌ Failed to initialize database mocks:', error)
-        throw error
-      }
+      // No database setup needed for Japanese learning quiz
+      console.log('✅ Japanese quiz app ready for testing')
 
       // Set up global environment variable stub for OpenAI API key
       if (!env.get('OPENAI_API_KEY')) {
@@ -68,13 +60,8 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
     () => {
       console.log('🧹 Starting test teardown...')
 
-      try {
-        // Restore database mocks
-        databaseMockManager.restore()
-        console.log('✅ Database mocks restored')
-      } catch (error) {
-        console.error('⚠️ Error restoring database mocks:', error)
-      }
+      // No database cleanup needed for Japanese learning quiz
+      console.log('✅ Japanese quiz app test cleanup complete')
 
       try {
         // Restore all sinon stubs
