@@ -170,10 +170,19 @@
             <h2 id="quiz-title" class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Hiragana Quiz
             </h2>
-            <div class="flex justify-center items-center space-x-4 text-sm text-gray-600">
+            <div class="flex justify-center items-center space-x-4 text-sm text-gray-600 mb-4">
               <span id="question-counter">Question 1 of 20</span>
               <span>•</span>
               <span id="score-display">Score: 0</span>
+            </div>
+            <!-- Hearts Display -->
+            <div class="flex justify-center items-center space-x-1 mb-2">
+              <span class="text-sm text-gray-600 mr-2">Lives:</span>
+              <div id="hearts-display" class="flex space-x-1">
+                <span class="heart text-red-500 text-xl">❤️</span>
+                <span class="heart text-red-500 text-xl">❤️</span>
+                <span class="heart text-red-500 text-xl">❤️</span>
+              </div>
             </div>
           </div>
 
@@ -280,6 +289,51 @@
         </div>
       </div>
     </section>
+
+    <!-- Game Over Modal -->
+    <div
+      id="game-over-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4 text-center">
+        <div class="mb-6">
+          <div class="text-6xl mb-4">
+            💔
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            Game Over!
+          </h2>
+          <p class="text-gray-600 mb-4">
+            You've run out of hearts. Don't worry, you can try again!
+          </p>
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <div class="text-sm text-gray-600 mb-2">
+              Final Results:
+            </div>
+            <div id="game-over-score" class="text-lg font-semibold text-gray-900 mb-1">
+              Score: 0/20
+            </div>
+            <div id="game-over-percentage" class="text-sm text-gray-600">
+              0% Correct
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            id="game-over-restart"
+            class="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all duration-200"
+          >
+            Try Again
+          </button>
+          <button
+            id="game-over-home"
+            class="bg-white text-primary-600 border-2 border-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-all duration-200"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- About Section -->
     <section id="about" class="py-12 sm:py-16 lg:py-20 bg-white">
@@ -571,6 +625,9 @@
           this.score = 0;
           this.questionNumber = 0;
           this.totalQuestions = 20;
+          this.hearts = 3;
+          this.maxHearts = 3;
+          this.isGameOver = false;
           this.isAnswered = false;
           this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
           this.initializeElements();
@@ -588,6 +645,7 @@
           this.quizTitle = document.getElementById("quiz-title");
           this.questionCounter = document.getElementById("question-counter");
           this.scoreDisplay = document.getElementById("score-display");
+          this.heartsDisplay = document.getElementById("hearts-display");
           this.progressBar = document.getElementById("progress-bar");
           this.characterDisplay = document.getElementById("character-display");
           this.answerOptions = document.getElementById("answer-options");
@@ -598,6 +656,12 @@
           // Results elements
           this.finalScore = document.getElementById("final-score");
           this.finalPercentage = document.getElementById("final-percentage");
+          // Game Over Modal elements
+          this.gameOverModal = document.getElementById("game-over-modal");
+          this.gameOverScore = document.getElementById("game-over-score");
+          this.gameOverPercentage = document.getElementById("game-over-percentage");
+          this.gameOverRestartBtn = document.getElementById("game-over-restart");
+          this.gameOverHomeBtn = document.getElementById("game-over-home");
           // Buttons
           this.startHiraganaBtn = document.getElementById("start-hiragana-quiz");
           this.startKatakanaBtn = document.getElementById("start-katakana-quiz");
@@ -610,6 +674,9 @@
           this.nextButton.addEventListener("click", () => this.nextQuestion());
           this.restartBtn.addEventListener("click", () => this.restartQuiz());
           this.switchModeBtn.addEventListener("click", () => this.switchMode());
+          // Game Over Modal events
+          this.gameOverRestartBtn.addEventListener("click", () => this.restartFromGameOver());
+          this.gameOverHomeBtn.addEventListener("click", () => this.goHome());
           // Mobile menu functionality
           this.setupMobileMenu();
         }
@@ -674,6 +741,9 @@
             this.totalQuestions = data.totalQuestions;
             this.currentQuestion = data.currentQuestion;
             this.score = 0;
+            this.hearts = data.hearts || 3;
+            this.maxHearts = data.maxHearts || 3;
+            this.isGameOver = data.isGameOver || false;
             this.questionNumber = 1;
             this.isAnswered = false;
             this.showQuizInterface();
@@ -695,6 +765,7 @@
           if (!this.currentQuestion) return;
           this.questionCounter.textContent = `Question ${this.questionNumber} of ${this.totalQuestions}`;
           this.scoreDisplay.textContent = `Score: ${this.score}`;
+          this.updateHeartsDisplay();
           this.progressBar.style.width = `${this.questionNumber / this.totalQuestions * 100}%`;
           this.characterDisplay.textContent = this.currentQuestion.character;
           // Clear previous options
@@ -711,6 +782,46 @@
           this.feedbackDisplay.classList.add("hidden");
           this.nextButton.classList.add("hidden");
           this.isAnswered = false;
+        }
+        updateHeartsDisplay() {
+          if (!this.heartsDisplay) return;
+          this.heartsDisplay.innerHTML = "";
+          for (let i = 0; i < this.maxHearts; i++) {
+            const heart = document.createElement("span");
+            heart.className = "heart text-xl";
+            if (i < this.hearts) {
+              heart.textContent = "❤️";
+              heart.classList.add("text-red-500");
+            } else {
+              heart.textContent = "🤍";
+              heart.classList.add("text-gray-300");
+            }
+            this.heartsDisplay.appendChild(heart);
+          }
+        }
+        showGameOverModal() {
+          const percentage = Math.round(this.score / this.questionNumber * 100);
+          this.gameOverScore.textContent = `Score: ${this.score}/${this.questionNumber}`;
+          this.gameOverPercentage.textContent = `${percentage}% Correct`;
+          this.gameOverModal.classList.remove("hidden");
+        }
+        hideGameOverModal() {
+          this.gameOverModal.classList.add("hidden");
+        }
+        restartFromGameOver() {
+          this.hideGameOverModal();
+          this.restartQuiz();
+        }
+        goHome() {
+          this.hideGameOverModal();
+          this.showHome();
+        }
+        showHome() {
+          this.quizInterface.classList.add("hidden");
+          this.quizResults.classList.add("hidden");
+          this.heroSection.classList.remove("hidden");
+          this.aboutSection.classList.remove("hidden");
+          this.progressSection.classList.remove("hidden");
         }
         async selectAnswer(selectedAnswer, buttonElement) {
           if (this.isAnswered) return;
@@ -732,9 +843,16 @@
             const data = await response.json();
             this.score = data.score;
             this.questionNumber = data.questionNumber;
+            this.hearts = data.hearts;
+            this.isGameOver = data.isGameOver;
             // Show feedback
             this.showFeedback(data.isCorrect, data.correctAnswer, buttonElement);
-            if (data.completed) {
+            // Check for game over due to no hearts
+            if (data.isGameOver && data.gameOverReason === "no_hearts") {
+              setTimeout(() => {
+                this.showGameOverModal();
+              }, 2e3); // Show modal after feedback is displayed
+            } else if (data.completed) {
               this.showResults(data);
             } else {
               this.nextButton.classList.remove("hidden");
@@ -779,9 +897,15 @@
             }
             const data = await response.json();
             if (data.completed) {
-              this.showResults(data);
+              if (data.isGameOver && data.gameOverReason === "no_hearts") {
+                this.showGameOverModal();
+              } else {
+                this.showResults(data);
+              }
             } else {
               this.currentQuestion = data.question;
+              this.hearts = data.hearts;
+              this.isGameOver = data.isGameOver;
               this.displayQuestion();
             }
           } catch (error) {
@@ -793,8 +917,9 @@
           this.quizInterface.classList.add("hidden");
           this.quizResults.classList.remove("hidden");
           const percentage = Math.round(data.finalScore / this.totalQuestions * 100);
+          const heartsRemaining = data.heartsRemaining || this.hearts;
           this.finalScore.textContent = `Score: ${data.finalScore}/${this.totalQuestions}`;
-          this.finalPercentage.textContent = `${percentage}% Correct`;
+          this.finalPercentage.textContent = `${percentage}% Correct • ${heartsRemaining} ❤️ remaining`;
           // Update progress tracking
           this.updateProgress(this.quizType, data.finalScore, this.totalQuestions);
         }

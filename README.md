@@ -5,10 +5,15 @@ An interactive web application for learning Japanese Hiragana and Katakana chara
 ## ✨ Features
 
 - **Interactive Quizzes**: 20-question sessions for both Hiragana and Katakana
+- **Health/Lives System**: 3 hearts per quiz - lose hearts for wrong answers, game over when all hearts are lost
+- **Game Over Recovery**: Restart functionality when hearts are depleted
 - **Immediate Feedback**: Get instant feedback on your answers
 - **Progress Tracking**: Track your learning progress with detailed statistics
+- **Comprehensive Character Set**: 220+ Hiragana and 240+ Katakana characters including dakuten, handakuten, small tsu, and combinations
 - **Responsive Design**: Works perfectly on desktop and mobile devices
+- **Keyboard Navigation**: Use 1-4 keys for answers, Enter/Space for next question
 - **Local Storage**: Your progress is saved locally in your browser
+- **API Documentation**: Complete Swagger/OpenAPI documentation at `/docs`
 - **AI-Ready**: OpenAI integration ready for future AI-powered learning features
 
 ## 🚀 Getting Started
@@ -47,6 +52,7 @@ node ace generate:key
 ```
 
 5. (Optional) Set up PostgreSQL database for future features:
+
 ```bash
 # Create database
 createdb japanese_learning_quiz
@@ -62,6 +68,15 @@ npm run dev
 ```
 
 7. Open your browser and visit `http://localhost:3333`
+
+### API Documentation
+
+The application includes comprehensive API documentation:
+
+- **Swagger UI**: Visit `http://localhost:3333/docs` for interactive API documentation
+- **OpenAPI Spec**: Raw specification available at `http://localhost:3333/swagger`
+
+The API documentation includes all quiz endpoints with detailed request/response schemas, including the health system parameters.
 
 ## 🎮 How to Use
 
@@ -100,13 +115,24 @@ npm run dev
 
 ### Hiragana (ひらがな)
 
-- 46 basic characters covering all Japanese syllables
-- Used for native Japanese words and grammatical elements
+- **Basic Characters**: 46 fundamental syllables (a-n)
+- **Dakuten (濁点)**: Voiced sounds (ga, za, da, ba rows)
+- **Handakuten (半濁点)**: Semi-voiced sounds (pa row)
+- **Combination Sounds**: Complex syllables (kya, sha, cha, etc.)
+- **Long Vowels**: Extended vowel sounds (aa, ii, uu, etc.)
+- **Small Tsu (っ)**: Gemination/doubled consonants (kka, tta, ppa, etc.)
+- **Total**: 220+ characters for comprehensive learning
 
 ### Katakana (カタカナ)
 
-- 46 basic characters (same sounds as Hiragana)
-- Used for foreign words, onomatopoeia, and emphasis
+- **Basic Characters**: 46 fundamental syllables (a-n)
+- **Dakuten (濁点)**: Voiced sounds (ga, za, da, ba rows)
+- **Handakuten (半濁点)**: Semi-voiced sounds (pa row)
+- **Combination Sounds**: Complex syllables (kya, sha, cha, etc.)
+- **Long Vowels**: Extended vowel sounds with ー (chōon)
+- **Foreign Sounds**: Special combinations (fa, va, ti, di, etc.)
+- **Small Tsu (ッ)**: Gemination/doubled consonants (kka, tta, ppa, etc.)
+- **Total**: 240+ characters including modern foreign adaptations
 
 ## 🛠️ Development
 

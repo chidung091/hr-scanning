@@ -75,11 +75,14 @@
     "@adonisjs/static": "^1.1.1",
     "@adonisjs/vite": "^4.0.0",
     "@types/pg": "^8.15.4",
+    "adonis-autoswagger": "^3.73.0",
     "edge.js": "^6.2.1",
     "luxon": "^3.6.1",
     "openai": "^5.8.2",
     "pg": "^8.16.3",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "hotHook": {
     "boundaries": [
