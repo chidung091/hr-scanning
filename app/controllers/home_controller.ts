@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import JapaneseCharactersService, { type QuizQuestion } from '#services/japanese_characters_service'
+import OpenAIService from '#services/openai_service'
 
 interface QuizSession {
   id: string
@@ -210,6 +211,75 @@ export default class HomeController {
       isGameOver: session.isGameOver,
       gameOverReason: session.isGameOver && session.hearts === 0 ? 'no_hearts' : null,
     })
+  }
+
+  /**
+   * @japaneseTeacher
+   * @summary Japanese Teacher - Explain Japanese words/grammar for Vietnamese learners
+   * @description Takes a Japanese word or grammar pattern and returns detailed explanation in Vietnamese with romaji, furigana, examples, and usage notes
+   * @tag Japanese Teacher
+   */
+  async japaneseTeacher({ request, response }: HttpContext) {
+    try {
+      const { input } = request.only(['input'])
+
+      if (!input || typeof input !== 'string' || input.trim().length === 0) {
+        return response.badRequest({
+          error: 'Input is required. Please provide a Japanese word or grammar pattern.',
+        })
+      }
+
+      const openaiService = new OpenAIService()
+
+      if (!openaiService.isConfigured()) {
+        return response.internalServerError({
+          error: 'OpenAI service is not properly configured. Please check API key.',
+        })
+      }
+
+      const aiResponse = await openaiService.explainJapaneseForVietnamese(input.trim())
+
+      // Try to parse the JSON response
+      let parsedResponse
+      try {
+        parsedResponse = JSON.parse(aiResponse)
+      } catch (parseError) {
+        console.error('Failed to parse OpenAI response as JSON:', parseError)
+        return response.internalServerError({
+          error: 'Failed to parse AI response. Please try again.',
+        })
+      }
+
+      // Validate the response structure
+      const requiredFields = [
+        'input',
+        'romaji',
+        'furigana',
+        'meaning_vietnamese',
+        'pronunciation_guide',
+        'example_japanese',
+        'example_vietnamese',
+        'note',
+      ]
+      const missingFields = requiredFields.filter((field) => !parsedResponse[field])
+
+      if (missingFields.length > 0) {
+        console.error('Missing fields in AI response:', missingFields)
+        return response.internalServerError({
+          error: 'Incomplete response from AI. Please try again.',
+        })
+      }
+
+      return response.ok({
+        success: true,
+        data: parsedResponse,
+      })
+    } catch (error) {
+      console.error('Japanese Teacher API Error:', error)
+      return response.internalServerError({
+        error: 'An error occurred while processing your request. Please try again.',
+      })
+    }
   }
 
   private generateSessionId(): string {

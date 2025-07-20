@@ -62,6 +62,10 @@
                 class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >Start Quiz</a>
               <a
+                href="#japanese-teacher"
+                class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >Japanese Teacher</a>
+              <a
                 href="#about"
                 class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >About</a>
@@ -114,6 +118,10 @@
               href="#quiz-selection"
               class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
             >Start Quiz</a>
+            <a
+              href="#japanese-teacher"
+              class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+            >Japanese Teacher</a>
             <a
               href="#about"
               class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
@@ -334,6 +342,115 @@
         </div>
       </div>
     </div>
+
+    <!-- Japanese Teacher Section -->
+    <section id="japanese-teacher" class="py-12 sm:py-16 lg:py-20 bg-gray-50">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 sm:mb-16">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 px-4 sm:px-0">
+            🎌 Japanese Teacher
+          </h2>
+          <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0 leading-relaxed">
+            Get detailed explanations of Japanese words and grammar patterns in Vietnamese.
+            Enter any Japanese text and receive romaji, furigana, meanings, examples, and usage notes.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+          <!-- Input Form -->
+          <div class="mb-8">
+            <label for="japanese-input" class="block text-sm font-medium text-gray-700 mb-2">
+              Enter Japanese word or grammar pattern:
+            </label>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <input
+                type="text"
+                id="japanese-input"
+                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg"
+                placeholder="例: 頑張ります"
+                autocomplete="off"
+              />
+              <button
+                id="japanese-submit"
+                class="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span id="submit-text">Explain</span>
+                <span id="submit-loading" class="hidden">
+                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Error Display -->
+          <div id="japanese-error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 hidden">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+              </svg>
+              <span id="error-message">An error occurred. Please try again.</span>
+            </div>
+          </div>
+
+          <!-- Results Display -->
+          <div id="japanese-results" class="hidden">
+            <div class="border-t pt-6">
+              <h3 class="text-xl font-semibold text-gray-900 mb-6 text-center">Explanation</h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div class="space-y-4">
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-700 mb-2">Input</h4>
+                    <p id="result-input" class="text-lg font-medium text-gray-900"></p>
+                  </div>
+
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-700 mb-2">Romaji</h4>
+                    <p id="result-romaji" class="text-lg text-gray-900"></p>
+                  </div>
+
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-700 mb-2">Furigana</h4>
+                    <p id="result-furigana" class="text-lg text-gray-900"></p>
+                  </div>
+
+                  <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-blue-700 mb-2">Pronunciation Guide</h4>
+                    <p id="result-pronunciation" class="text-lg text-gray-900"></p>
+                  </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-4">
+                  <div class="bg-primary-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-primary-700 mb-2">Vietnamese Meaning</h4>
+                    <p id="result-meaning" class="text-lg text-gray-900"></p>
+                  </div>
+
+                  <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-700 mb-2">Example (Japanese)</h4>
+                    <p id="result-example-jp" class="text-lg text-gray-900 mb-2"></p>
+                    <h4 class="font-semibold text-green-700 mb-2">Example (Vietnamese)</h4>
+                    <p id="result-example-vn" class="text-gray-700"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notes Section -->
+              <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-yellow-700 mb-2">Usage Notes</h4>
+                <p id="result-note" class="text-gray-700"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- About Section -->
     <section id="about" class="py-12 sm:py-16 lg:py-20 bg-white">
@@ -578,6 +695,9 @@
                 <a href="#quiz-selection" class="hover:text-white transition-colors text-sm sm:text-base">Start Quiz</a>
               </li>
               <li>
+                <a href="#japanese-teacher" class="hover:text-white transition-colors text-sm sm:text-base">Japanese Teacher</a>
+              </li>
+              <li>
                 <a href="#progress" class="hover:text-white transition-colors text-sm sm:text-base">Progress</a>
               </li>
               <li>
@@ -641,6 +761,7 @@
           this.quizResults = document.getElementById("quiz-results");
           this.aboutSection = document.getElementById("about");
           this.progressSection = document.getElementById("progress");
+          this.japaneseTeacherSection = document.getElementById("japanese-teacher");
           // Quiz elements
           this.quizTitle = document.getElementById("quiz-title");
           this.questionCounter = document.getElementById("question-counter");
@@ -667,6 +788,14 @@
           this.startKatakanaBtn = document.getElementById("start-katakana-quiz");
           this.restartBtn = document.getElementById("restart-quiz");
           this.switchModeBtn = document.getElementById("switch-mode");
+          // Japanese Teacher elements
+          this.japaneseInput = document.getElementById("japanese-input");
+          this.japaneseSubmit = document.getElementById("japanese-submit");
+          this.japaneseError = document.getElementById("japanese-error");
+          this.japaneseResults = document.getElementById("japanese-results");
+          this.submitText = document.getElementById("submit-text");
+          this.submitLoading = document.getElementById("submit-loading");
+          this.errorMessage = document.getElementById("error-message");
         }
         bindEvents() {
           this.startHiraganaBtn.addEventListener("click", () => this.startQuiz("hiragana"));
@@ -677,6 +806,13 @@
           // Game Over Modal events
           this.gameOverRestartBtn.addEventListener("click", () => this.restartFromGameOver());
           this.gameOverHomeBtn.addEventListener("click", () => this.goHome());
+          // Japanese Teacher events
+          this.japaneseSubmit.addEventListener("click", () => this.submitJapaneseTeacher());
+          this.japaneseInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              this.submitJapaneseTeacher();
+            }
+          });
           // Mobile menu functionality
           this.setupMobileMenu();
         }
@@ -757,6 +893,7 @@
           this.heroSection.classList.add("hidden");
           this.aboutSection.classList.add("hidden");
           this.progressSection.classList.add("hidden");
+          this.japaneseTeacherSection.classList.add("hidden");
           this.quizResults.classList.add("hidden");
           this.quizInterface.classList.remove("hidden");
           this.quizTitle.textContent = this.quizType === "hiragana" ? "Hiragana Quiz" : "Katakana Quiz";
@@ -822,6 +959,7 @@
           this.heroSection.classList.remove("hidden");
           this.aboutSection.classList.remove("hidden");
           this.progressSection.classList.remove("hidden");
+          this.japaneseTeacherSection.classList.remove("hidden");
         }
         async selectAnswer(selectedAnswer, buttonElement) {
           if (this.isAnswered) return;
@@ -932,6 +1070,7 @@
           this.heroSection.classList.remove("hidden");
           this.aboutSection.classList.remove("hidden");
           this.progressSection.classList.remove("hidden");
+          this.japaneseTeacherSection.classList.remove("hidden");
         }
         updateProgress(type, score, total) {
           const stats = this.getStoredStats();
@@ -985,6 +1124,91 @@
           document.getElementById("total-questions").textContent = totalQuestions;
           document.getElementById("total-correct").textContent = totalCorrect;
           document.getElementById("overall-accuracy").textContent = `${overallAccuracy}%`;
+        }
+
+        // Japanese Teacher Methods
+        async submitJapaneseTeacher() {
+          const input = this.japaneseInput.value.trim();
+
+          if (!input) {
+            this.showJapaneseError("Please enter a Japanese word or grammar pattern.");
+            return;
+          }
+
+          this.setJapaneseLoading(true);
+          this.hideJapaneseError();
+          this.hideJapaneseResults();
+
+          try {
+            const response = await fetch('/api/japanese-teacher', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': this.csrfToken
+              },
+              body: JSON.stringify({ input })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.error || 'Failed to get explanation');
+            }
+
+            if (data.success && data.data) {
+              this.displayJapaneseResults(data.data);
+            } else {
+              throw new Error('Invalid response format');
+            }
+          } catch (error) {
+            console.error('Japanese Teacher Error:', error);
+            this.showJapaneseError(error.message || 'An error occurred. Please try again.');
+          } finally {
+            this.setJapaneseLoading(false);
+          }
+        }
+
+        displayJapaneseResults(data) {
+          // Populate result fields
+          document.getElementById("result-input").textContent = data.input || '';
+          document.getElementById("result-romaji").textContent = data.romaji || '';
+          document.getElementById("result-furigana").textContent = data.furigana || '';
+          document.getElementById("result-pronunciation").textContent = data.pronunciation_guide || '';
+          document.getElementById("result-meaning").textContent = data.meaning_vietnamese || '';
+          document.getElementById("result-example-jp").textContent = data.example_japanese || '';
+          document.getElementById("result-example-vn").textContent = data.example_vietnamese || '';
+          document.getElementById("result-note").textContent = data.note || '';
+
+          // Show results
+          this.showJapaneseResults();
+        }
+
+        setJapaneseLoading(loading) {
+          this.japaneseSubmit.disabled = loading;
+          if (loading) {
+            this.submitText.classList.add("hidden");
+            this.submitLoading.classList.remove("hidden");
+          } else {
+            this.submitText.classList.remove("hidden");
+            this.submitLoading.classList.add("hidden");
+          }
+        }
+
+        showJapaneseError(message) {
+          this.errorMessage.textContent = message;
+          this.japaneseError.classList.remove("hidden");
+        }
+
+        hideJapaneseError() {
+          this.japaneseError.classList.add("hidden");
+        }
+
+        showJapaneseResults() {
+          this.japaneseResults.classList.remove("hidden");
+        }
+
+        hideJapaneseResults() {
+          this.japaneseResults.classList.add("hidden");
         }
       }
       // Initialize the quiz when the page loads

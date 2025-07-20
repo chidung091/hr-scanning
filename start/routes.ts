@@ -21,6 +21,9 @@ router.get('/api/quiz/:sessionId/question', [HomeController, 'getQuestion'])
 router.post('/api/quiz/:sessionId/answer', [HomeController, 'submitAnswer'])
 router.get('/api/quiz/:sessionId/progress', [HomeController, 'getProgress'])
 
+// Japanese Teacher API route
+router.post('/api/japanese-teacher', [HomeController, 'japaneseTeacher'])
+
 // Swagger API Documentation routes
 router.get('/swagger', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swagger)

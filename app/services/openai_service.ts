@@ -139,10 +139,43 @@ export default class OpenAIService {
    * Generate study tips for Japanese learning
    */
   async generateStudyTips(topic: string): Promise<string> {
-    const prompt = `Provide helpful study tips for learning ${topic} in Japanese. 
+    const prompt = `Provide helpful study tips for learning ${topic} in Japanese.
     Include practical advice, memory techniques, and encouragement for beginners.`
 
     return await this.generateJapaneseLearningContent(prompt)
+  }
+
+  /**
+   * Japanese Teacher - Explain Japanese words/grammar for Vietnamese learners
+   */
+  async explainJapaneseForVietnamese(input: string): Promise<string> {
+    const messages: ChatMessage[] = [
+      {
+        role: 'system',
+        content: `You are a Japanese language teacher helping Vietnamese learners understand Japanese vocabulary and grammar. When given a Japanese word or grammar pattern, respond in the following JSON format. All explanations should be in simple Vietnamese. Use romaji and furigana for Japanese words.
+
+Return your answer in valid JSON with this exact structure:
+{
+  "input": "[Japanese word or grammar]",
+  "romaji": "[romaji reading]",
+  "furigana": "[furigana reading]",
+  "meaning_vietnamese": "[Vietnamese explanation]",
+  "pronunciation_guide": "[Vietnamese pronunciation tips and phonetic guidance to help Vietnamese learners pronounce the Japanese word correctly]",
+  "example_japanese": "[example sentence in Japanese]",
+  "example_vietnamese": "[meaning of the example sentence in Vietnamese]",
+  "note": "[any extra notes about nuance, politeness, usage, or alternatives]"
+}
+
+Do not explain outside the JSON, just return the JSON only.`,
+      },
+      {
+        role: 'user',
+        content: input,
+      },
+    ]
+
+    const response = await this.generateChatCompletion(messages)
+    return response.content
   }
 
   /**
