@@ -149,10 +149,94 @@ export default class OpenAIService {
    * Japanese Teacher - Explain Japanese words/grammar for Vietnamese learners
    */
   async explainJapaneseForVietnamese(input: string): Promise<string> {
+    // Detect if input is a single word/phrase or a complete sentence
+    const isCompleteSentence = this.isCompleteSentence(input.trim())
+
     const messages: ChatMessage[] = [
       {
         role: 'system',
-        content: `You are a Japanese language teacher helping Vietnamese learners understand Japanese vocabulary and grammar. When given a Japanese word or grammar pattern, respond in the following JSON format. All explanations should be in simple Vietnamese. Use romaji and furigana for Japanese words.
+        content: this.getSystemPromptForJapaneseTeacher(isCompleteSentence),
+      },
+      {
+        role: 'user',
+        content: input,
+      },
+    ]
+
+    const response = await this.generateChatCompletion(messages)
+    return response.content
+  }
+
+  /**
+   * Detect if the input is a complete sentence or just a word/phrase
+   */
+  private isCompleteSentence(input: string): boolean {
+    // Check for sentence-ending particles and punctuation
+    const sentenceEnders = ['。', '！', '？', '.', '!', '?']
+    const hasEnding = sentenceEnders.some((ender) => input.endsWith(ender))
+
+    // Check for common sentence patterns (verb forms, particles, etc.)
+    const sentencePatterns = [
+      /です$/,
+      /である$/,
+      /だ$/,
+      /である。$/,
+      /です。$/,
+      /ます$/,
+      /ました$/,
+      /ません$/,
+      /ませんでした$/,
+      /た$/,
+      /だった$/,
+      /ない$/,
+      /なかった$/,
+      /よ$/,
+      /ね$/,
+      /か$/,
+      /の$/,
+      /わ$/,
+      /ている$/,
+      /ていた$/,
+      /ていない$/,
+      /ていなかった$/,
+    ]
+
+    const hasVerbForm = sentencePatterns.some((pattern) => pattern.test(input))
+
+    // Check length - longer inputs are more likely to be sentences
+    const isLongEnough = input.length > 8
+
+    // Check for multiple words (spaces or multiple kanji/hiragana groups)
+    const hasMultipleComponents =
+      input.includes(' ') ||
+      (input.match(/[\u4e00-\u9faf]+/g) || []).length > 1 ||
+      (input.match(/[\u3040-\u309f]+/g) || []).length > 2
+
+    return hasEnding || (hasVerbForm && (isLongEnough || hasMultipleComponents))
+  }
+
+  /**
+   * Get appropriate system prompt based on input type
+   */
+  private getSystemPromptForJapaneseTeacher(isCompleteSentence: boolean): string {
+    if (isCompleteSentence) {
+      return `You are a Japanese language teacher helping Vietnamese learners understand complete Japanese sentences. When given a Japanese sentence, provide a comprehensive explanation in the following JSON format. All explanations should be in simple Vietnamese.
+
+Return your answer in valid JSON with this exact structure:
+{
+  "input": "[Complete Japanese sentence]",
+  "romaji": "[Complete romaji reading of the entire sentence]",
+  "furigana": "[Furigana reading for the entire sentence, showing readings above kanji]",
+  "meaning_vietnamese": "[Complete Vietnamese translation and detailed explanation of the sentence meaning, including context and nuance]",
+  "pronunciation_guide": "[Detailed Vietnamese pronunciation guide for the entire sentence, breaking down difficult sounds and rhythm]",
+  "example_japanese": "[A similar example sentence in Japanese that uses similar grammar or vocabulary]",
+  "example_vietnamese": "[Vietnamese translation of the example sentence]",
+  "note": "[Detailed grammar analysis, including: sentence structure, key grammar points, verb forms, particles used, politeness level, cultural context, and any important linguistic notes for Vietnamese learners]"
+}
+
+Focus on explaining the ENTIRE SENTENCE as a complete unit, not individual words. Provide comprehensive grammar analysis and cultural context. Do not explain outside the JSON, just return the JSON only.`
+    } else {
+      return `You are a Japanese language teacher helping Vietnamese learners understand Japanese vocabulary and grammar. When given a Japanese word or grammar pattern, respond in the following JSON format. All explanations should be in simple Vietnamese. Use romaji and furigana for Japanese words.
 
 Return your answer in valid JSON with this exact structure:
 {
@@ -166,16 +250,8 @@ Return your answer in valid JSON with this exact structure:
   "note": "[any extra notes about nuance, politeness, usage, or alternatives]"
 }
 
-Do not explain outside the JSON, just return the JSON only.`,
-      },
-      {
-        role: 'user',
-        content: input,
-      },
-    ]
-
-    const response = await this.generateChatCompletion(messages)
-    return response.content
+Do not explain outside the JSON, just return the JSON only.`
+    }
   }
 
   /**

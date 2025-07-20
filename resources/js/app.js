@@ -28,7 +28,7 @@ function initializeComponents() {
     })
   })
 
-  // Add fade-in animation for quiz elements
+  // Enhanced intersection observer for animations
   const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px',
@@ -37,7 +37,7 @@ function initializeComponents() {
   const observer = new IntersectionObserver(function (entries) {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('animate-fade-in')
+        entry.target.classList.add('animate-fade-in-up')
       }
     })
   }, observerOptions)
@@ -46,8 +46,14 @@ function initializeComponents() {
   const fadeElements = document.querySelectorAll('.fade-on-scroll')
   fadeElements.forEach((el) => observer.observe(el))
 
+  // Initialize mobile-specific enhancements
+  initializeMobileEnhancements()
+
   // Initialize Japanese character display enhancements
   initializeJapaneseCharacterDisplay()
+
+  // Initialize touch feedback for mobile
+  initializeTouchFeedback()
 }
 
 // Initialize Japanese character display enhancements
@@ -85,4 +91,132 @@ function initializeJapaneseCharacterDisplay() {
       }
     }
   })
+}
+
+// Initialize mobile-specific enhancements
+function initializeMobileEnhancements() {
+  // Detect mobile device
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+
+  if (isMobile) {
+    // Add mobile class to body for CSS targeting
+    document.body.classList.add('mobile-device')
+
+    // Prevent zoom on double tap for quiz buttons
+    let lastTouchEnd = 0
+    document.addEventListener(
+      'touchend',
+      function (event) {
+        const now = new Date().getTime()
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault()
+        }
+        lastTouchEnd = now
+      },
+      false
+    )
+
+    // Add haptic feedback for supported devices
+    if ('vibrate' in navigator) {
+      document.addEventListener('click', function (e) {
+        if (
+          e.target.classList.contains('quiz-button') ||
+          e.target.classList.contains('answer-option')
+        ) {
+          navigator.vibrate(50) // Short vibration for button press
+        }
+      })
+    }
+  }
+
+  // Handle orientation changes
+  window.addEventListener('orientationchange', function () {
+    setTimeout(() => {
+      // Recalculate layout after orientation change
+      window.scrollTo(0, 0)
+
+      // Trigger resize event for any components that need to adjust
+      window.dispatchEvent(new Event('resize'))
+    }, 100)
+  })
+}
+
+// Initialize touch feedback for better mobile interaction
+function initializeTouchFeedback() {
+  // Add touch start/end events for better button feedback
+  document.addEventListener('touchstart', function (e) {
+    if (
+      e.target.classList.contains('quiz-button') ||
+      e.target.classList.contains('answer-option')
+    ) {
+      e.target.classList.add('touch-active')
+    }
+  })
+
+  document.addEventListener('touchend', function (e) {
+    if (
+      e.target.classList.contains('quiz-button') ||
+      e.target.classList.contains('answer-option')
+    ) {
+      e.target.classList.remove('touch-active')
+    }
+  })
+
+  // Add visual feedback for touch interactions
+  const style = document.createElement('style')
+  style.textContent = `
+    .touch-active {
+      transform: scale(0.95) !important;
+      opacity: 0.8 !important;
+      transition: all 0.1s ease !important;
+    }
+  `
+  document.head.appendChild(style)
+}
+
+// Enhanced animation utilities
+function animateElement(element, animationClass, duration = 500) {
+  if (!element) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    element.classList.add(animationClass)
+
+    setTimeout(() => {
+      element.classList.remove(animationClass)
+      resolve()
+    }, duration)
+  })
+}
+
+// Smooth scroll to element with offset for mobile
+function smoothScrollToElement(element, offset = 0) {
+  if (!element) return
+
+  const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+  const offsetPosition = elementPosition - offset
+
+  window.scrollTo({
+    top: offsetPosition,
+    behavior: 'smooth',
+  })
+}
+
+// Performance optimization for animations
+function requestAnimationFramePromise() {
+  return new Promise((resolve) => requestAnimationFrame(resolve))
+}
+
+// Debounce function for performance
+function debounce(func, wait) {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
 }

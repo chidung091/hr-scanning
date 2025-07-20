@@ -154,13 +154,13 @@
           <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
             <button
               id="start-hiragana-quiz"
-              class="bg-primary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all duration-200 text-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              class="bg-primary-600 text-white px-6 sm:px-8 py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-primary-700 active:bg-primary-800 transition-colors-smooth text-center shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 min-h-[44px] quiz-button"
             >
               ひ Start Hiragana Quiz
             </button>
             <button
               id="start-katakana-quiz"
-              class="bg-white text-primary-600 border-2 border-primary-600 px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-all duration-200 text-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              class="bg-white text-primary-600 border-2 border-primary-600 px-6 sm:px-8 py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-primary-50 active:bg-primary-100 transition-colors-smooth text-center shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 min-h-[44px] quiz-button"
             >
               カ Start Katakana Quiz
             </button>
@@ -170,23 +170,28 @@
     </div>
 
     <!-- Quiz Interface Section -->
-    <section id="quiz-interface" class="py-12 sm:py-16 lg:py-20 bg-white hidden">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+    <section id="quiz-interface" class="py-8 sm:py-12 lg:py-20 bg-white hidden">
+      <div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg quiz-container-mobile sm:p-8">
           <!-- Quiz Header -->
-          <div class="text-center mb-8">
-            <h2 id="quiz-title" class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+          <div class="text-center mb-6 sm:mb-8 animate-fade-in-up">
+            <h2
+              id="quiz-title"
+              class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 mobile-text-xl"
+            >
               Hiragana Quiz
             </h2>
-            <div class="flex justify-center items-center space-x-4 text-sm text-gray-600 mb-4">
-              <span id="question-counter">Question 1 of 20</span>
-              <span>•</span>
-              <span id="score-display">Score: 0</span>
+            <div
+              class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-gray-600 mb-4"
+            >
+              <span id="question-counter" class="mobile-text-lg">Question 1 of 20</span>
+              <span class="hidden sm:inline">•</span>
+              <span id="score-display" class="mobile-text-lg">Score: 0</span>
             </div>
             <!-- Hearts Display -->
-            <div class="flex justify-center items-center space-x-1 mb-2">
-              <span class="text-sm text-gray-600 mr-2">Lives:</span>
-              <div id="hearts-display" class="flex space-x-1">
+            <div class="flex justify-center items-center space-x-1 mb-2 hearts-mobile sm:hearts-desktop">
+              <span class="text-sm text-gray-600 mr-2 mobile-text-lg">Lives:</span>
+              <div id="hearts-display" class="flex space-x-1 transition-all-smooth">
                 <span class="heart text-red-500 text-xl">❤️</span>
                 <span class="heart text-red-500 text-xl">❤️</span>
                 <span class="heart text-red-500 text-xl">❤️</span>
@@ -195,56 +200,62 @@
           </div>
 
           <!-- Progress Bar -->
-          <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div class="w-full bg-gray-200 rounded-full h-2 sm:h-3 mb-6 sm:mb-8">
             <div
               id="progress-bar"
-              class="bg-primary-600 h-2 rounded-full transition-all duration-300"
+              class="bg-primary-600 h-2 sm:h-3 rounded-full transition-all duration-500 ease-out"
               style="width: 5%"
             >
             </div>
           </div>
 
           <!-- Question Display -->
-          <div class="text-center mb-8">
-            <div class="bg-gray-50 rounded-lg p-8 mb-6">
-              <div id="character-display" class="text-8xl sm:text-9xl font-bold text-gray-900 mb-4">
+          <div class="text-center mb-6 sm:mb-8 animate-slide-in-right">
+            <div class="bg-gray-50 rounded-lg p-6 sm:p-8 mb-4 sm:mb-6 transition-all-smooth">
+              <div
+                id="character-display"
+                class="text-6xl sm:text-8xl lg:text-9xl font-bold text-gray-900 mb-3 sm:mb-4 character-display-mobile transition-transform-smooth hover:scale-105 select-none"
+              >
                 あ
               </div>
-              <p class="text-lg text-gray-600">
+              <p class="text-base sm:text-lg text-gray-600 mobile-text-lg px-2 sm:px-0">
                 What is the romanization of this character?
               </p>
             </div>
           </div>
 
           <!-- Answer Options -->
-          <div id="answer-options" class="grid grid-cols-2 gap-4 mb-8">
+          <div
+            id="answer-options"
+            class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 animate-fade-in-up"
+          >
             <button
-              class="answer-option bg-gray-100 hover:bg-primary-50 border-2 border-transparent hover:border-primary-300 rounded-lg p-4 text-lg font-medium transition-all duration-200"
+              class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
             >
               a
             </button>
             <button
-              class="answer-option bg-gray-100 hover:bg-primary-50 border-2 border-transparent hover:border-primary-300 rounded-lg p-4 text-lg font-medium transition-all duration-200"
+              class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
             >
               ka
             </button>
             <button
-              class="answer-option bg-gray-100 hover:bg-primary-50 border-2 border-transparent hover:border-primary-300 rounded-lg p-4 text-lg font-medium transition-all duration-200"
+              class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
             >
               sa
             </button>
             <button
-              class="answer-option bg-gray-100 hover:bg-primary-50 border-2 border-transparent hover:border-primary-300 rounded-lg p-4 text-lg font-medium transition-all duration-200"
+              class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
             >
               ta
             </button>
           </div>
 
           <!-- Feedback Display -->
-          <div id="feedback-display" class="text-center mb-6 hidden">
-            <div id="feedback-message" class="text-lg font-semibold mb-2">
+          <div id="feedback-display" class="text-center mb-4 sm:mb-6 hidden animate-fade-in-up">
+            <div id="feedback-message" class="text-base sm:text-lg font-semibold mb-2 mobile-text-lg">
             </div>
-            <div id="correct-answer" class="text-gray-600">
+            <div id="correct-answer" class="text-gray-600 text-sm sm:text-base mobile-text-lg">
             </div>
           </div>
 
@@ -252,7 +263,7 @@
           <div class="text-center">
             <button
               id="next-question"
-              class="bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all duration-200 hidden"
+              class="bg-primary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 active:bg-primary-800 transition-colors-smooth transform hover:scale-105 active:scale-95 hidden min-h-[44px] quiz-button"
             >
               Next Question
             </button>
@@ -376,9 +387,20 @@
               >
                 <span id="submit-text">Explain</span>
                 <span id="submit-loading" class="hidden">
-                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+
                   </svg>
                   Processing...
                 </span>
@@ -387,10 +409,18 @@
           </div>
 
           <!-- Error Display -->
-          <div id="japanese-error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 hidden">
+          <div
+            id="japanese-error"
+            class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 hidden"
+          >
             <div class="flex items-center">
               <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
+
               </svg>
               <span id="error-message">An error occurred. Please try again.</span>
             </div>
@@ -399,52 +429,287 @@
           <!-- Results Display -->
           <div id="japanese-results" class="hidden">
             <div class="border-t pt-6">
-              <h3 class="text-xl font-semibold text-gray-900 mb-6 text-center">Explanation</h3>
+              <h3 class="text-xl font-semibold text-gray-900 mb-6 text-center">
+                Explanation
+              </h3>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left Column -->
-                <div class="space-y-4">
-                  <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-2">Input</h4>
-                    <p id="result-input" class="text-lg font-medium text-gray-900"></p>
+              <!-- Desktop Layout (preserved) -->
+              <div class="japanese-teacher-desktop-layout">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Left Column -->
+                  <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <h4 class="font-semibold text-gray-700 mb-2">
+                        Input
+                      </h4>
+                      <p id="result-input-desktop" class="text-lg font-medium text-gray-900">
+                      </p>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <h4 class="font-semibold text-gray-700 mb-2">
+                        Romaji
+                      </h4>
+                      <p id="result-romaji-desktop" class="text-lg text-gray-900">
+                      </p>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <h4 class="font-semibold text-gray-700 mb-2">
+                        Furigana
+                      </h4>
+                      <p id="result-furigana-desktop" class="text-lg text-gray-900">
+                      </p>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                      <h4 class="font-semibold text-blue-700 mb-2">
+                        Pronunciation Guide
+                      </h4>
+                      <p id="result-pronunciation-desktop" class="text-lg text-gray-900">
+                      </p>
+                    </div>
                   </div>
 
-                  <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-2">Romaji</h4>
-                    <p id="result-romaji" class="text-lg text-gray-900"></p>
-                  </div>
+                  <!-- Right Column -->
+                  <div class="space-y-4">
+                    <div class="bg-primary-50 p-4 rounded-lg">
+                      <h4 class="font-semibold text-primary-700 mb-2">
+                        Vietnamese Meaning
+                      </h4>
+                      <p id="result-meaning-desktop" class="text-lg text-gray-900">
+                      </p>
+                    </div>
 
-                  <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-2">Furigana</h4>
-                    <p id="result-furigana" class="text-lg text-gray-900"></p>
-                  </div>
-
-                  <div class="bg-blue-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-blue-700 mb-2">Pronunciation Guide</h4>
-                    <p id="result-pronunciation" class="text-lg text-gray-900"></p>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                      <h4 class="font-semibold text-green-700 mb-2">
+                        Example (Japanese)
+                      </h4>
+                      <p id="result-example-jp-desktop" class="text-lg text-gray-900 mb-2">
+                      </p>
+                      <h4 class="font-semibold text-green-700 mb-2">
+                        Example (Vietnamese)
+                      </h4>
+                      <p id="result-example-vn-desktop" class="text-gray-700">
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Right Column -->
-                <div class="space-y-4">
-                  <div class="bg-primary-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-primary-700 mb-2">Vietnamese Meaning</h4>
-                    <p id="result-meaning" class="text-lg text-gray-900"></p>
-                  </div>
-
-                  <div class="bg-green-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-green-700 mb-2">Example (Japanese)</h4>
-                    <p id="result-example-jp" class="text-lg text-gray-900 mb-2"></p>
-                    <h4 class="font-semibold text-green-700 mb-2">Example (Vietnamese)</h4>
-                    <p id="result-example-vn" class="text-gray-700"></p>
-                  </div>
+                <!-- Notes Section -->
+                <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                  <h4 class="font-semibold text-yellow-700 mb-2">
+                    Usage Notes
+                  </h4>
+                  <p id="result-note-desktop" class="text-gray-700">
+                  </p>
                 </div>
               </div>
 
-              <!-- Notes Section -->
-              <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
-                <h4 class="font-semibold text-yellow-700 mb-2">Usage Notes</h4>
-                <p id="result-note" class="text-gray-700"></p>
+              <!-- Mobile Swipe Layout -->
+              <div class="japanese-teacher-mobile-layout" role="region" aria-label="Japanese explanation slides">
+                <!-- Progress Bar -->
+                <div class="japanese-teacher-progress" role="progressbar" aria-label="Explanation progress">
+                  <div
+                    id="japanese-teacher-progress-bar"
+                    class="japanese-teacher-progress-bar"
+                    style="width: 16.67%"
+                    aria-valuenow="1"
+                    aria-valuemin="1"
+                    aria-valuemax="6"
+                  >
+                  </div>
+                </div>
+
+                <!-- Swipe Container -->
+                <div class="japanese-teacher-mobile-container" role="tabpanel" aria-live="polite">
+                  <!-- Navigation Arrows -->
+                  <button id="japanese-teacher-prev" class="japanese-teacher-nav prev" aria-label="Previous section">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15,18 9,12 15,6" />
+
+                    </svg>
+                  </button>
+                  <button id="japanese-teacher-next" class="japanese-teacher-nav next" aria-label="Next section">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9,18 15,12 9,6" />
+
+                    </svg>
+                  </button>
+
+                  <!-- Swipe Wrapper -->
+                  <div id="japanese-teacher-swipe-wrapper" class="japanese-teacher-swipe-wrapper" role="tablist">
+                    <!-- Slide 1: Input & Basic Info -->
+                    <div
+                      class="japanese-teacher-slide"
+                      role="tabpanel"
+                      aria-label="Japanese word and furigana"
+                      tabindex="0"
+                    >
+                      <div class="japanese-teacher-slide-content">
+                        <div class="text-center mb-4">
+                          <h4 class="text-lg font-semibold text-gray-800 mb-2">
+                            Japanese Word
+                          </h4>
+                          <p id="result-input-mobile" class="text-2xl font-bold text-gray-900 mb-2">
+                          </p>
+                          <p id="result-furigana-mobile" class="text-lg text-gray-600">
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Slide 2: Pronunciation -->
+                    <div class="japanese-teacher-slide" role="tabpanel" aria-label="Pronunciation guide" tabindex="0">
+                      <div class="japanese-teacher-slide-content">
+                        <div class="text-center">
+                          <h4 class="text-lg font-semibold text-blue-700 mb-4">
+                            Pronunciation
+                          </h4>
+                          <p id="result-romaji-mobile" class="text-xl font-medium text-gray-900 mb-4">
+                          </p>
+                          <div class="bg-blue-50 p-4 rounded-lg">
+                            <p id="result-pronunciation-mobile" class="text-gray-700 leading-relaxed">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Slide 3: Vietnamese Meaning -->
+                    <div class="japanese-teacher-slide" role="tabpanel" aria-label="Vietnamese meaning" tabindex="0">
+                      <div class="japanese-teacher-slide-content">
+                        <div class="text-center">
+                          <h4 class="text-lg font-semibold text-primary-700 mb-4">
+                            Vietnamese Meaning
+                          </h4>
+                          <div class="bg-primary-50 p-4 rounded-lg">
+                            <p id="result-meaning-mobile" class="text-lg text-gray-900 leading-relaxed">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Slide 4: Japanese Example -->
+                    <div
+                      class="japanese-teacher-slide"
+                      role="tabpanel"
+                      aria-label="Japanese example sentence"
+                      tabindex="0"
+                    >
+                      <div class="japanese-teacher-slide-content">
+                        <div class="text-center">
+                          <h4 class="text-lg font-semibold text-green-700 mb-4">
+                            Example Sentence
+                          </h4>
+                          <div class="bg-green-50 p-4 rounded-lg mb-4">
+                            <p id="result-example-jp-mobile" class="text-lg font-medium text-gray-900 mb-2">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Slide 5: Vietnamese Example -->
+                    <div
+                      class="japanese-teacher-slide"
+                      role="tabpanel"
+                      aria-label="Vietnamese example translation"
+                      tabindex="0"
+                    >
+                      <div class="japanese-teacher-slide-content">
+                        <div class="text-center">
+                          <h4 class="text-lg font-semibold text-green-700 mb-4">
+                            Example Translation
+                          </h4>
+                          <div class="bg-green-50 p-4 rounded-lg">
+                            <p id="result-example-vn-mobile" class="text-lg text-gray-700 leading-relaxed">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Slide 6: Usage Notes -->
+                    <div class="japanese-teacher-slide" role="tabpanel" aria-label="Usage notes and tips" tabindex="0">
+                      <div class="japanese-teacher-slide-content">
+                        <div class="text-center">
+                          <h4 class="text-lg font-semibold text-yellow-700 mb-4">
+                            Usage Notes
+                          </h4>
+                          <div class="bg-yellow-50 p-4 rounded-lg">
+                            <p id="result-note-mobile" class="text-gray-700 leading-relaxed">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pagination Dots -->
+                <div
+                  id="japanese-teacher-pagination"
+                  class="japanese-teacher-pagination"
+                  role="tablist"
+                  aria-label="Explanation sections"
+                >
+                  <div
+                    class="japanese-teacher-dot active"
+                    data-slide="0"
+                    role="tab"
+                    aria-label="Japanese word"
+                    aria-selected="true"
+                    tabindex="0"
+                  >
+                  </div>
+                  <div
+                    class="japanese-teacher-dot"
+                    data-slide="1"
+                    role="tab"
+                    aria-label="Pronunciation"
+                    aria-selected="false"
+                    tabindex="-1"
+                  >
+                  </div>
+                  <div
+                    class="japanese-teacher-dot"
+                    data-slide="2"
+                    role="tab"
+                    aria-label="Vietnamese meaning"
+                    aria-selected="false"
+                    tabindex="-1"
+                  >
+                  </div>
+                  <div
+                    class="japanese-teacher-dot"
+                    data-slide="3"
+                    role="tab"
+                    aria-label="Japanese example"
+                    aria-selected="false"
+                    tabindex="-1"
+                  >
+                  </div>
+                  <div
+                    class="japanese-teacher-dot"
+                    data-slide="4"
+                    role="tab"
+                    aria-label="Vietnamese example"
+                    aria-selected="false"
+                    tabindex="-1"
+                  >
+                  </div>
+                  <div
+                    class="japanese-teacher-dot"
+                    data-slide="5"
+                    role="tab"
+                    aria-label="Usage notes"
+                    aria-selected="false"
+                    tabindex="-1"
+                  >
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -798,17 +1063,41 @@
           this.errorMessage = document.getElementById("error-message");
         }
         bindEvents() {
-          this.startHiraganaBtn.addEventListener("click", () => this.startQuiz("hiragana"));
-          this.startKatakanaBtn.addEventListener("click", () => this.startQuiz("katakana"));
-          this.nextButton.addEventListener("click", () => this.nextQuestion());
-          this.restartBtn.addEventListener("click", () => this.restartQuiz());
-          this.switchModeBtn.addEventListener("click", () => this.switchMode());
+          this.startHiraganaBtn.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.startQuiz("hiragana");
+          });
+          this.startKatakanaBtn.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.startQuiz("katakana");
+          });
+          this.nextButton.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.nextQuestion();
+          });
+          this.restartBtn.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.restartQuiz();
+          });
+          this.switchModeBtn.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.switchMode();
+          });
           // Game Over Modal events
-          this.gameOverRestartBtn.addEventListener("click", () => this.restartFromGameOver());
-          this.gameOverHomeBtn.addEventListener("click", () => this.goHome());
+          this.gameOverRestartBtn.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.restartFromGameOver();
+          });
+          this.gameOverHomeBtn.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.goHome();
+          });
           // Japanese Teacher events
-          this.japaneseSubmit.addEventListener("click", () => this.submitJapaneseTeacher());
-          this.japaneseInput.addEventListener("keypress", (e) => {
+          this.japaneseSubmit.addEventListener("click", e => {
+            this.animateButtonPress(e.target);
+            this.submitJapaneseTeacher();
+          });
+          this.japaneseInput.addEventListener("keypress", e => {
             if (e.key === "Enter") {
               this.submitJapaneseTeacher();
             }
@@ -903,7 +1192,9 @@
           this.questionCounter.textContent = `Question ${this.questionNumber} of ${this.totalQuestions}`;
           this.scoreDisplay.textContent = `Score: ${this.score}`;
           this.updateHeartsDisplay();
-          this.progressBar.style.width = `${this.questionNumber / this.totalQuestions * 100}%`;
+          // Animate progress bar
+          const progressPercentage = this.questionNumber / this.totalQuestions * 100;
+          this.animateProgressBar(progressPercentage);
           this.characterDisplay.textContent = this.currentQuestion.character;
           // Clear previous options
           this.answerOptions.innerHTML = "";
@@ -922,16 +1213,22 @@
         }
         updateHeartsDisplay() {
           if (!this.heartsDisplay) return;
+          // Store previous hearts count for animation
+          const previousHearts = this.heartsDisplay.querySelectorAll(".heart.text-red-500").length;
           this.heartsDisplay.innerHTML = "";
           for (let i = 0; i < this.maxHearts; i++) {
             const heart = document.createElement("span");
-            heart.className = "heart text-xl";
+            heart.className = "heart text-xl transition-all-smooth";
             if (i < this.hearts) {
               heart.textContent = "❤️";
               heart.classList.add("text-red-500");
             } else {
               heart.textContent = "🤍";
               heart.classList.add("text-gray-300");
+              // Animate heart loss if this heart was just lost
+              if (i === this.hearts && previousHearts > this.hearts) {
+                setTimeout(() => this.animateHeartLoss(heart), 100);
+              }
             }
             this.heartsDisplay.appendChild(heart);
           }
@@ -961,9 +1258,66 @@
           this.progressSection.classList.remove("hidden");
           this.japaneseTeacherSection.classList.remove("hidden");
         }
+        // Animation Methods
+        animateButtonPress(button) {
+          if (!button) return;
+          button.classList.add("animate-button-press");
+          setTimeout(() => {
+            button.classList.remove("animate-button-press");
+          }, 150);
+        }
+        animateCorrectAnswer(button) {
+          if (!button) return;
+          button.classList.add("animate-correct-answer");
+          setTimeout(() => {
+            button.classList.remove("animate-correct-answer");
+          }, 600);
+        }
+        animateIncorrectAnswer(button) {
+          if (!button) return;
+          button.classList.add("animate-incorrect-answer");
+          setTimeout(() => {
+            button.classList.remove("animate-incorrect-answer");
+          }, 500);
+        }
+        animateHeartLoss(heartElement) {
+          if (!heartElement) return;
+          heartElement.classList.add("animate-heart-loss");
+          // Don't remove the class as it should stay in the lost state
+        }
+        animateQuestionTransition() {
+          const questionDisplay = document.querySelector("#character-display").parentElement;
+          const answerOptions = document.getElementById("answer-options");
+          // Fade out current content
+          questionDisplay.style.opacity = "0";
+          answerOptions.style.opacity = "0";
+          setTimeout(() => {
+            // Fade in new content
+            questionDisplay.style.opacity = "1";
+            answerOptions.style.opacity = "1";
+            questionDisplay.classList.add("animate-slide-in-right");
+            answerOptions.classList.add("animate-fade-in-up");
+            // Clean up animation classes
+            setTimeout(() => {
+              questionDisplay.classList.remove("animate-slide-in-right");
+              answerOptions.classList.remove("animate-fade-in-up");
+            }, 500);
+          }, 200);
+        }
+        animateProgressBar(percentage) {
+          const progressBar = document.getElementById("progress-bar");
+          if (!progressBar) return;
+          progressBar.style.width = `${percentage}%`;
+          progressBar.classList.add("animate-pulse-gentle");
+          setTimeout(() => {
+            progressBar.classList.remove("animate-pulse-gentle");
+          }, 1e3);
+        }
         async selectAnswer(selectedAnswer, buttonElement) {
           if (this.isAnswered) return;
           this.isAnswered = true;
+          // Animate button press
+          this.animateButtonPress(buttonElement);
           try {
             const response = await fetch(`/api/quiz/${this.sessionId}/answer`, {
               method: "POST",
@@ -1008,12 +1362,14 @@
             btn.disabled = true;
             btn.classList.remove("hover:bg-primary-50", "hover:border-primary-300");
           });
-          // Highlight correct and incorrect answers
+          // Highlight correct and incorrect answers with animations
           allButtons.forEach(btn => {
             if (btn.textContent === correctAnswer) {
               btn.classList.add("bg-green-100", "border-green-500", "text-green-800");
+              this.animateCorrectAnswer(btn);
             } else if (btn === selectedButton && !isCorrect) {
               btn.classList.add("bg-red-100", "border-red-500", "text-red-800");
+              this.animateIncorrectAnswer(btn);
             }
           });
           // Show feedback message
@@ -1044,7 +1400,12 @@
               this.currentQuestion = data.question;
               this.hearts = data.hearts;
               this.isGameOver = data.isGameOver;
-              this.displayQuestion();
+              // Animate question transition
+              this.animateQuestionTransition();
+              // Display question after a short delay for smooth transition
+              setTimeout(() => {
+                this.displayQuestion();
+              }, 200);
             }
           } catch (error) {
             console.error("Error getting next question:", error);
@@ -1125,64 +1486,67 @@
           document.getElementById("total-correct").textContent = totalCorrect;
           document.getElementById("overall-accuracy").textContent = `${overallAccuracy}%`;
         }
-
         // Japanese Teacher Methods
         async submitJapaneseTeacher() {
           const input = this.japaneseInput.value.trim();
-
           if (!input) {
             this.showJapaneseError("Please enter a Japanese word or grammar pattern.");
             return;
           }
-
           this.setJapaneseLoading(true);
           this.hideJapaneseError();
           this.hideJapaneseResults();
-
           try {
-            const response = await fetch('/api/japanese-teacher', {
-              method: 'POST',
+            const response = await fetch("/api/japanese-teacher", {
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': this.csrfToken
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": this.csrfToken
               },
-              body: JSON.stringify({ input })
+              body: JSON.stringify({
+                input: input
+              })
             });
-
             const data = await response.json();
-
             if (!response.ok) {
-              throw new Error(data.error || 'Failed to get explanation');
+              throw new Error(data.error || "Failed to get explanation");
             }
-
             if (data.success && data.data) {
               this.displayJapaneseResults(data.data);
             } else {
-              throw new Error('Invalid response format');
+              throw new Error("Invalid response format");
             }
           } catch (error) {
-            console.error('Japanese Teacher Error:', error);
-            this.showJapaneseError(error.message || 'An error occurred. Please try again.');
+            console.error("Japanese Teacher Error:", error);
+            this.showJapaneseError(error.message || "An error occurred. Please try again.");
           } finally {
             this.setJapaneseLoading(false);
           }
         }
-
         displayJapaneseResults(data) {
-          // Populate result fields
-          document.getElementById("result-input").textContent = data.input || '';
-          document.getElementById("result-romaji").textContent = data.romaji || '';
-          document.getElementById("result-furigana").textContent = data.furigana || '';
-          document.getElementById("result-pronunciation").textContent = data.pronunciation_guide || '';
-          document.getElementById("result-meaning").textContent = data.meaning_vietnamese || '';
-          document.getElementById("result-example-jp").textContent = data.example_japanese || '';
-          document.getElementById("result-example-vn").textContent = data.example_vietnamese || '';
-          document.getElementById("result-note").textContent = data.note || '';
-
+          // Populate desktop layout fields
+          document.getElementById("result-input-desktop").textContent = data.input || "";
+          document.getElementById("result-romaji-desktop").textContent = data.romaji || "";
+          document.getElementById("result-furigana-desktop").textContent = data.furigana || "";
+          document.getElementById("result-pronunciation-desktop").textContent = data.pronunciation_guide || "";
+          document.getElementById("result-meaning-desktop").textContent = data.meaning_vietnamese || "";
+          document.getElementById("result-example-jp-desktop").textContent = data.example_japanese || "";
+          document.getElementById("result-example-vn-desktop").textContent = data.example_vietnamese || "";
+          document.getElementById("result-note-desktop").textContent = data.note || "";
+          // Populate mobile layout fields
+          document.getElementById("result-input-mobile").textContent = data.input || "";
+          document.getElementById("result-romaji-mobile").textContent = data.romaji || "";
+          document.getElementById("result-furigana-mobile").textContent = data.furigana || "";
+          document.getElementById("result-pronunciation-mobile").textContent = data.pronunciation_guide || "";
+          document.getElementById("result-meaning-mobile").textContent = data.meaning_vietnamese || "";
+          document.getElementById("result-example-jp-mobile").textContent = data.example_japanese || "";
+          document.getElementById("result-example-vn-mobile").textContent = data.example_vietnamese || "";
+          document.getElementById("result-note-mobile").textContent = data.note || "";
+          // Initialize mobile swipe functionality
+          this.initializeMobileSwipe();
           // Show results
           this.showJapaneseResults();
         }
-
         setJapaneseLoading(loading) {
           this.japaneseSubmit.disabled = loading;
           if (loading) {
@@ -1193,22 +1557,253 @@
             this.submitLoading.classList.add("hidden");
           }
         }
-
         showJapaneseError(message) {
           this.errorMessage.textContent = message;
           this.japaneseError.classList.remove("hidden");
         }
-
         hideJapaneseError() {
           this.japaneseError.classList.add("hidden");
         }
-
         showJapaneseResults() {
           this.japaneseResults.classList.remove("hidden");
         }
-
         hideJapaneseResults() {
           this.japaneseResults.classList.add("hidden");
+        }
+        // Mobile Swipe Navigation Methods
+        initializeMobileSwipe() {
+          this.currentSlide = 0;
+          this.totalSlides = 6;
+          this.swipeWrapper = document.getElementById("japanese-teacher-swipe-wrapper");
+          this.progressBar = document.getElementById("japanese-teacher-progress-bar");
+          this.prevButton = document.getElementById("japanese-teacher-prev");
+          this.nextButton = document.getElementById("japanese-teacher-next");
+          this.pagination = document.getElementById("japanese-teacher-pagination");
+          if (!this.swipeWrapper) return;
+          // Initialize touch events
+          this.initializeTouchEvents();
+          // Initialize navigation buttons
+          this.initializeNavigationButtons();
+          // Initialize pagination dots
+          this.initializePaginationDots();
+          // Initialize keyboard navigation
+          this.initializeKeyboardNavigation();
+          // Initialize responsive behavior
+          this.initializeResponsiveBehavior();
+          // Update initial state
+          this.updateSwipeState();
+        }
+        initializeTouchEvents() {
+          let startX = 0;
+          let startY = 0;
+          let currentX = 0;
+          let currentY = 0;
+          let isDragging = false;
+          let startTime = 0;
+          const handleTouchStart = e => {
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            startTime = Date.now();
+            isDragging = true;
+            this.swipeWrapper.style.transition = "none";
+          };
+          const handleTouchMove = e => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            currentX = touch.clientX;
+            currentY = touch.clientY;
+            const deltaX = currentX - startX;
+            const deltaY = currentY - startY;
+            // Prevent vertical scrolling if horizontal swipe is detected
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+              e.preventDefault();
+              const currentTransform = -this.currentSlide * 100;
+              const newTransform = currentTransform + deltaX / this.swipeWrapper.offsetWidth * 100;
+              this.swipeWrapper.style.transform = `translateX(${newTransform}%)`;
+            }
+          };
+          const handleTouchEnd = e => {
+            if (!isDragging) return;
+            isDragging = false;
+            const deltaX = currentX - startX;
+            const deltaY = currentY - startY;
+            const deltaTime = Date.now() - startTime;
+            const velocity = Math.abs(deltaX) / deltaTime;
+            // Restore transition
+            this.swipeWrapper.style.transition = "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+            // Determine if swipe should trigger slide change
+            const threshold = this.swipeWrapper.offsetWidth * .3;
+            const shouldSwipe = Math.abs(deltaX) > threshold || velocity > .5;
+            if (shouldSwipe && Math.abs(deltaX) > Math.abs(deltaY)) {
+              if (deltaX > 0 && this.currentSlide > 0) {
+                this.goToSlide(this.currentSlide - 1);
+              } else if (deltaX < 0 && this.currentSlide < this.totalSlides - 1) {
+                this.goToSlide(this.currentSlide + 1);
+              } else {
+                this.goToSlide(this.currentSlide);
+              }
+            } else {
+              this.goToSlide(this.currentSlide);
+            }
+          };
+          // Add touch event listeners
+          this.swipeWrapper.addEventListener("touchstart", handleTouchStart, {
+            passive: false
+          });
+          this.swipeWrapper.addEventListener("touchmove", handleTouchMove, {
+            passive: false
+          });
+          this.swipeWrapper.addEventListener("touchend", handleTouchEnd);
+        }
+        initializeNavigationButtons() {
+          if (this.prevButton) {
+            this.prevButton.addEventListener("click", e => {
+              this.animateButtonPress(e.target);
+              this.previousSlide();
+            });
+          }
+          if (this.nextButton) {
+            this.nextButton.addEventListener("click", e => {
+              this.animateButtonPress(e.target);
+              this.nextSlide();
+            });
+          }
+        }
+        initializePaginationDots() {
+          if (!this.pagination) return;
+          const dots = this.pagination.querySelectorAll(".japanese-teacher-dot");
+          dots.forEach((dot, index) => {
+            dot.addEventListener("click", e => {
+              this.animateButtonPress(e.target);
+              this.goToSlide(index);
+            });
+          });
+        }
+        goToSlide(slideIndex) {
+          if (slideIndex < 0 || slideIndex >= this.totalSlides) return;
+          this.currentSlide = slideIndex;
+          const translateX = -slideIndex * 100;
+          this.swipeWrapper.style.transform = `translateX(${translateX}%)`;
+          this.updateSwipeState();
+        }
+        nextSlide() {
+          if (this.currentSlide < this.totalSlides - 1) {
+            this.goToSlide(this.currentSlide + 1);
+          }
+        }
+        previousSlide() {
+          if (this.currentSlide > 0) {
+            this.goToSlide(this.currentSlide - 1);
+          }
+        }
+        updateSwipeState() {
+          // Update progress bar
+          const progress = (this.currentSlide + 1) / this.totalSlides * 100;
+          if (this.progressBar) {
+            this.progressBar.style.width = `${progress}%`;
+            this.progressBar.setAttribute("aria-valuenow", this.currentSlide + 1);
+          }
+          // Update navigation buttons
+          if (this.prevButton) {
+            this.prevButton.disabled = this.currentSlide === 0;
+            this.prevButton.style.opacity = this.currentSlide === 0 ? "0.5" : "1";
+            this.prevButton.setAttribute("aria-disabled", this.currentSlide === 0);
+          }
+          if (this.nextButton) {
+            this.nextButton.disabled = this.currentSlide === this.totalSlides - 1;
+            this.nextButton.style.opacity = this.currentSlide === this.totalSlides - 1 ? "0.5" : "1";
+            this.nextButton.setAttribute("aria-disabled", this.currentSlide === this.totalSlides - 1);
+          }
+          // Update pagination dots with ARIA attributes
+          if (this.pagination) {
+            const dots = this.pagination.querySelectorAll(".japanese-teacher-dot");
+            dots.forEach((dot, index) => {
+              if (index === this.currentSlide) {
+                dot.classList.add("active");
+                dot.setAttribute("aria-selected", "true");
+                dot.setAttribute("tabindex", "0");
+              } else {
+                dot.classList.remove("active");
+                dot.setAttribute("aria-selected", "false");
+                dot.setAttribute("tabindex", "-1");
+              }
+            });
+          }
+          // Update slide visibility for screen readers
+          const slides = this.swipeWrapper?.querySelectorAll(".japanese-teacher-slide");
+          if (slides) {
+            slides.forEach((slide, index) => {
+              if (index === this.currentSlide) {
+                slide.setAttribute("aria-hidden", "false");
+                slide.setAttribute("tabindex", "0");
+              } else {
+                slide.setAttribute("aria-hidden", "true");
+                slide.setAttribute("tabindex", "-1");
+              }
+            });
+          }
+        }
+        initializeKeyboardNavigation() {
+          // Add keyboard event listener for Japanese Teacher section
+          const handleKeyDown = e => {
+            // Only handle keyboard navigation when Japanese Teacher results are visible
+            if (this.japaneseResults && !this.japaneseResults.classList.contains("hidden")) {
+              // Check if we're on mobile layout
+              const isMobile = window.innerWidth <= 768;
+              if (!isMobile) return;
+              switch (e.key) {
+               case "ArrowLeft":
+                e.preventDefault();
+                this.previousSlide();
+                break;
+      
+               case "ArrowRight":
+                e.preventDefault();
+                this.nextSlide();
+                break;
+      
+               case "Home":
+                e.preventDefault();
+                this.goToSlide(0);
+                break;
+      
+               case "End":
+                e.preventDefault();
+                this.goToSlide(this.totalSlides - 1);
+                break;
+      
+               case "Escape":
+                e.preventDefault();
+                this.hideJapaneseResults();
+                break;
+              }
+            }
+          };
+          // Add event listener to document
+          document.addEventListener("keydown", handleKeyDown);
+          // Store reference for cleanup if needed
+          this.keyboardHandler = handleKeyDown;
+        }
+        initializeResponsiveBehavior() {
+          // Handle window resize to ensure proper layout switching
+          const handleResize = () => {
+            const isMobile = window.innerWidth <= 768;
+            // Reset mobile swipe state when switching to desktop
+            if (!isMobile && this.swipeWrapper) {
+              this.currentSlide = 0;
+              this.swipeWrapper.style.transform = "translateX(0%)";
+              this.updateSwipeState();
+            }
+          };
+          // Add resize event listener
+          window.addEventListener("resize", handleResize);
+          // Store reference for cleanup if needed
+          this.resizeHandler = handleResize;
+        }
+        // Enhanced method to check if mobile layout is active
+        isMobileLayout() {
+          return window.innerWidth <= 768;
         }
       }
       // Initialize the quiz when the page loads

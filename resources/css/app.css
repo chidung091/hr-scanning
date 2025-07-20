@@ -35,3 +35,449 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* Mobile-first responsive design improvements */
+@media (max-width: 640px) {
+  /* Ensure proper touch targets - minimum 44px */
+  .answer-option {
+    min-height: 44px !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+
+  /* Improve button spacing on mobile */
+  .quiz-button {
+    min-height: 44px;
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+
+  /* Better typography for mobile */
+  .mobile-text-lg {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .mobile-text-xl {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  /* Improved spacing for mobile quiz interface */
+  .quiz-container-mobile {
+    padding: 16px;
+    margin: 0 8px;
+  }
+
+  /* Character display improvements for mobile */
+  .character-display-mobile {
+    font-size: 4rem;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Hearts display mobile optimization */
+  .hearts-mobile {
+    transform: scale(1.2);
+    margin: 8px 0;
+  }
+}
+
+/* Animation classes for enhanced user experience */
+@keyframes buttonPress {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes correctAnswer {
+  0% {
+    transform: scale(1);
+    background-color: rgb(220 252 231);
+  }
+  50% {
+    transform: scale(1.05);
+    background-color: rgb(187 247 208);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgb(220 252 231);
+  }
+}
+
+@keyframes incorrectAnswer {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes heartLoss {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.3;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Animation utility classes */
+.animate-button-press {
+  animation: buttonPress 0.15s ease-in-out;
+}
+
+.animate-correct-answer {
+  animation: correctAnswer 0.6s ease-in-out;
+}
+
+.animate-incorrect-answer {
+  animation: incorrectAnswer 0.5s ease-in-out;
+}
+
+.animate-heart-loss {
+  animation: heartLoss 0.8s ease-in-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.animate-pulse-gentle {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-all-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-transform-smooth {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-colors-smooth {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Enhanced mobile accessibility and UX */
+@media (max-width: 640px) {
+  /* Prevent zoom on input focus for iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Better touch feedback */
+  .quiz-button:active,
+  .answer-option:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+
+  /* Improved focus states for accessibility */
+  .quiz-button:focus,
+  .answer-option:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Better spacing for mobile quiz interface */
+  .mobile-quiz-spacing {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* Optimized character display for small screens */
+  .character-display-mobile {
+    font-size: 3.5rem !important;
+    line-height: 1.1;
+    padding: 20px;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .answer-option {
+    min-height: 48px;
+    padding: 14px 18px;
+  }
+
+  .character-display-mobile {
+    font-size: 5rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .answer-option {
+    border-width: 3px;
+  }
+
+  .bg-primary-600 {
+    background-color: #1d4ed8 !important;
+  }
+
+  .text-gray-600 {
+    color: #374151 !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-button-press,
+  .animate-correct-answer,
+  .animate-incorrect-answer,
+  .animate-heart-loss,
+  .animate-fade-in-up,
+  .animate-slide-in-right,
+  .animate-pulse-gentle {
+    animation: none !important;
+  }
+
+  .transition-all-smooth,
+  .transition-transform-smooth,
+  .transition-colors-smooth {
+    transition: none !important;
+  }
+
+  /* Japanese Teacher swipe animations */
+  .japanese-teacher-swipe-wrapper {
+    transition: none !important;
+  }
+
+  .japanese-teacher-progress-bar {
+    transition: none !important;
+  }
+
+  .japanese-teacher-dot {
+    transition: none !important;
+  }
+
+  .japanese-teacher-nav {
+    transition: none !important;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .bg-gray-50 {
+    background-color: #1f2937;
+  }
+
+  .text-gray-900 {
+    color: #f9fafb;
+  }
+
+  .text-gray-600 {
+    color: #d1d5db;
+  }
+
+  .bg-white {
+    background-color: #111827;
+  }
+}
+
+/* Japanese Teacher Mobile Swipe Navigation */
+.japanese-teacher-mobile-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.japanese-teacher-swipe-wrapper {
+  display: flex;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.japanese-teacher-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.japanese-teacher-slide-content {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Pagination dots */
+.japanese-teacher-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 0 16px;
+}
+
+.japanese-teacher-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #d1d5db;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.japanese-teacher-dot.active {
+  background-color: #3b82f6;
+  transform: scale(1.2);
+}
+
+.japanese-teacher-dot:hover {
+  background-color: #9ca3af;
+}
+
+/* Navigation arrows for accessibility */
+.japanese-teacher-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.japanese-teacher-nav:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.japanese-teacher-nav.prev {
+  left: 8px;
+}
+
+.japanese-teacher-nav.next {
+  right: 8px;
+}
+
+.japanese-teacher-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress indicator */
+.japanese-teacher-progress {
+  background: #f3f4f6;
+  height: 4px;
+  border-radius: 2px;
+  margin: 16px;
+  overflow: hidden;
+}
+
+.japanese-teacher-progress-bar {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .japanese-teacher-desktop-layout {
+    display: none;
+  }
+
+  .japanese-teacher-mobile-layout {
+    display: block;
+  }
+
+  .japanese-teacher-slide-content {
+    padding: 16px;
+    min-height: 180px;
+  }
+
+  .japanese-teacher-nav {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Desktop and tablet - hide mobile layout */
+@media (min-width: 769px) {
+  .japanese-teacher-mobile-layout {
+    display: none;
+  }
+
+  .japanese-teacher-desktop-layout {
+    display: block;
+  }
+}
