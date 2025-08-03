@@ -67,12 +67,7 @@ export const statusValidator = vine.compile(
  */
 export const fileUploadValidator = vine.compile(
   vine.object({
-    file: vine
-      .file({
-        size: '10mb',
-        extnames: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png'],
-      })
-      .optional(),
+    file: vine.any().optional(),
   })
 )
 

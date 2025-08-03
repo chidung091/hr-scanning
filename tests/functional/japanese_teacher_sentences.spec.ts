@@ -14,7 +14,10 @@ test.group('Japanese Teacher Sentence Handling', (group) => {
     sinon.restore()
   })
 
-  test('should handle complete sentences with comprehensive explanations', async ({ client, assert }) => {
+  test('should handle complete sentences with comprehensive explanations', async ({
+    client,
+    assert,
+  }) => {
     // Mock response for a complete sentence
     const mockSentenceResponse = JSON.stringify({
       input: '今日は天気がいいです。',

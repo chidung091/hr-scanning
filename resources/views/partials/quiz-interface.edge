@@ -1,0 +1,102 @@
+<!-- Quiz Interface Section -->
+<section id="quiz-interface" class="py-8 sm:py-12 lg:py-20 bg-white hidden">
+  <div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-lg quiz-container-mobile sm:p-8">
+      <!-- Quiz Header -->
+      <div class="text-center mb-6 sm:mb-8 animate-fade-in-up">
+        <h2
+          id="quiz-title"
+          class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 mobile-text-xl"
+        >
+          Hiragana Quiz
+        </h2>
+        <div
+          class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-gray-600 mb-4"
+        >
+          <span id="question-counter" class="mobile-text-lg">Question 1 of 20</span>
+          <span class="hidden sm:inline">•</span>
+          <span id="score-display" class="mobile-text-lg">Score: 0</span>
+        </div>
+        <!-- Hearts Display -->
+        <div class="flex justify-center items-center space-x-1 mb-2 hearts-mobile sm:hearts-desktop">
+          <span class="text-sm text-gray-600 mr-2 mobile-text-lg">Lives:</span>
+          <div id="hearts-display" class="flex space-x-1 transition-all-smooth">
+            <span class="heart text-red-500 text-xl">❤️</span>
+            <span class="heart text-red-500 text-xl">❤️</span>
+            <span class="heart text-red-500 text-xl">❤️</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="w-full bg-gray-200 rounded-full h-2 sm:h-3 mb-6 sm:mb-8">
+        <div
+          id="progress-bar"
+          class="bg-primary-600 h-2 sm:h-3 rounded-full transition-all duration-500 ease-out"
+          style="width: 5%"
+        >
+        </div>
+      </div>
+
+      <!-- Question Display -->
+      <div class="text-center mb-6 sm:mb-8 animate-slide-in-right">
+        <div class="bg-gray-50 rounded-lg p-6 sm:p-8 mb-4 sm:mb-6 transition-all-smooth">
+          <div
+            id="character-display"
+            class="text-6xl sm:text-8xl lg:text-9xl font-bold text-gray-900 mb-3 sm:mb-4 character-display-mobile transition-transform-smooth hover:scale-105 select-none"
+          >
+            あ
+          </div>
+          <p class="text-base sm:text-lg text-gray-600 mobile-text-lg px-2 sm:px-0">
+            What is the romanization of this character?
+          </p>
+        </div>
+      </div>
+
+      <!-- Answer Options -->
+      <div
+        id="answer-options"
+        class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 animate-fade-in-up"
+      >
+        <button
+          class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
+        >
+          a
+        </button>
+        <button
+          class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
+        >
+          ka
+        </button>
+        <button
+          class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
+        >
+          sa
+        </button>
+        <button
+          class="answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button"
+        >
+          ta
+        </button>
+      </div>
+
+      <!-- Feedback Display -->
+      <div id="feedback-display" class="text-center mb-4 sm:mb-6 hidden animate-fade-in-up">
+        <div id="feedback-message" class="text-base sm:text-lg font-semibold mb-2 mobile-text-lg">
+        </div>
+        <div id="correct-answer" class="text-gray-600 text-sm sm:text-base mobile-text-lg">
+        </div>
+      </div>
+
+      <!-- Next Button -->
+      <div class="text-center">
+        <button
+          id="next-question"
+          class="bg-primary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 active:bg-primary-800 transition-colors-smooth transform hover:scale-105 active:scale-95 hidden min-h-[44px] quiz-button"
+        >
+          Next Question
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

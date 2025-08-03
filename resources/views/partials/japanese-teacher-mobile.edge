@@ -1,0 +1,98 @@
+<!-- Mobile Swipe Layout -->
+<div class="japanese-teacher-mobile-layout" role="region" aria-label="Japanese explanation slides">
+  <!-- Progress Bar -->
+  <div class="japanese-teacher-progress" role="progressbar" aria-label="Explanation progress">
+    <div
+      id="japanese-teacher-progress-bar"
+      class="japanese-teacher-progress-bar"
+      style="width: 16.67%"
+      aria-valuenow="1"
+      aria-valuemin="1"
+      aria-valuemax="6"
+    >
+    </div>
+  </div>
+
+  <!-- Swipe Container -->
+  <div class="japanese-teacher-mobile-container" role="tabpanel" aria-live="polite">
+    <!-- Navigation Arrows -->
+    <button id="japanese-teacher-prev" class="japanese-teacher-nav prev" aria-label="Previous section">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15,18 9,12 15,6" />
+      </svg>
+    </button>
+    <button id="japanese-teacher-next" class="japanese-teacher-nav next" aria-label="Next section">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9,18 15,12 9,6" />
+      </svg>
+    </button>
+
+    <!-- Swipe Wrapper -->
+    <div id="japanese-teacher-swipe-wrapper" class="japanese-teacher-swipe-wrapper" role="tablist">
+      @include('partials/japanese-teacher-slides')
+    </div>
+  </div>
+
+  <!-- Pagination Dots -->
+  <div
+    id="japanese-teacher-pagination"
+    class="japanese-teacher-pagination"
+    role="tablist"
+    aria-label="Explanation sections"
+  >
+    <div
+      class="japanese-teacher-dot active"
+      data-slide="0"
+      role="tab"
+      aria-label="Japanese word"
+      aria-selected="true"
+      tabindex="0"
+    >
+    </div>
+    <div
+      class="japanese-teacher-dot"
+      data-slide="1"
+      role="tab"
+      aria-label="Pronunciation"
+      aria-selected="false"
+      tabindex="-1"
+    >
+    </div>
+    <div
+      class="japanese-teacher-dot"
+      data-slide="2"
+      role="tab"
+      aria-label="Vietnamese meaning"
+      aria-selected="false"
+      tabindex="-1"
+    >
+    </div>
+    <div
+      class="japanese-teacher-dot"
+      data-slide="3"
+      role="tab"
+      aria-label="Japanese example"
+      aria-selected="false"
+      tabindex="-1"
+    >
+    </div>
+    <div
+      class="japanese-teacher-dot"
+      data-slide="4"
+      role="tab"
+      aria-label="Vietnamese example"
+      aria-selected="false"
+      tabindex="-1"
+    >
+    </div>
+    <div
+      class="japanese-teacher-dot"
+      data-slide="5"
+      role="tab"
+      aria-label="Usage notes"
+      aria-selected="false"
+      tabindex="-1"
+    >
+    </div>
+  </div>
+</div>

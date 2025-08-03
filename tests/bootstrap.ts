@@ -103,8 +103,8 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
           console.log('✅ HTTP server started successfully')
         } catch (error) {
           console.error('❌ Failed to start HTTP server:', error)
-          console.error('Error details:', error.message)
-          console.error('Stack trace:', error.stack)
+          console.error('Error details:', (error as Error).message)
+          console.error('Stack trace:', (error as Error).stack)
           throw error
         }
       })

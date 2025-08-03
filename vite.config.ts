@@ -6,7 +6,7 @@ const isDocker = process.env.IS_DOCKER === 'true' // bạn set IS_DOCKER=true tr
 export default defineConfig({
   plugins: [
     adonisjs({
-      entrypoints: ['resources/css/app.css', 'resources/js/app.js'],
+      entrypoints: ['resources/css/app.css', 'resources/js/app.ts'],
       reload: ['resources/views/**/*.edge'],
     }),
   ],

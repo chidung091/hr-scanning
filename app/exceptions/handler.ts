@@ -1,6 +1,8 @@
 import app from '@adonisjs/core/services/app'
 import { HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
+// Ensure Edge module augmentation is loaded
+import '@adonisjs/core/providers/edge_provider'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**

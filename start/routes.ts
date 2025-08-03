@@ -26,9 +26,9 @@ router.post('/api/japanese-teacher', [HomeController, 'japaneseTeacher'])
 
 // Swagger API Documentation routes
 router.get('/swagger', async () => {
-  return AutoSwagger.default.docs(router.toJSON(), swagger)
+  return AutoSwagger.docs(router.toJSON(), swagger)
 })
 
 router.get('/docs', async () => {
-  return AutoSwagger.default.ui('/swagger', swagger)
+  return AutoSwagger.ui('/swagger', swagger)
 })

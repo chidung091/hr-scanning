@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrfToken }}" />
     <title>
-      Japanese Learning Quiz - Master Hiragana & Katakana
+      @section('title')
+        Japanese Learning Quiz - Master Hiragana & Katakana
+      @end
     </title>
 
     <link rel="preconnect" href="https://fonts.bunny.net" />
@@ -43,13 +45,10 @@
   </head>
   <body class="min-h-screen bg-gray-50 font-sans">
     @include('partials/navigation')
-    @include('partials/hero-section')
-    @include('partials/quiz-interface')
-    @include('partials/quiz-results')
-    @include('partials/game-over-modal')
-    @include('partials/japanese-teacher')
-    @include('partials/about-section')
-    @include('partials/progress-section')
+
+    @section('content')
+    @end
+    
     @include('partials/footer')
 
     <!-- Load modular TypeScript application -->

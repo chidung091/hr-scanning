@@ -1,4 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
+// Ensure Edge module augmentation is loaded
+import '@adonisjs/core/providers/edge_provider'
 import JapaneseCharactersService, { type QuizQuestion } from '#services/japanese_characters_service'
 import OpenAIService from '#services/openai_service'
 
@@ -17,10 +19,18 @@ interface QuizSession {
   }>
   startTime: Date
   isGameOver: boolean
+  lastActivity: Date
 }
 
 export default class HomeController {
   private static quizSessions: Map<string, QuizSession> = new Map()
+  private static readonly SESSION_TTL_MS = 30 * 60 * 1000 // 30 minutes
+  private static cleanupInterval: NodeJS.Timeout | null = null
+
+  static {
+    // Initialize cleanup when the class is first loaded
+    this.startSessionCleanup()
+  }
 
   /**
    * @index
@@ -59,6 +69,7 @@ export default class HomeController {
       answers: [],
       startTime: new Date(),
       isGameOver: false,
+      lastActivity: new Date(),
     }
 
     HomeController.quizSessions.set(sessionId, session)
@@ -83,7 +94,7 @@ export default class HomeController {
    */
   async getQuestion({ params, response }: HttpContext) {
     const { sessionId } = params
-    const session = HomeController.quizSessions.get(sessionId)
+    const session = HomeController.getSessionWithActivity(sessionId)
 
     if (!session) {
       return response.notFound({ error: 'Quiz session not found' })
@@ -126,7 +137,7 @@ export default class HomeController {
     const { sessionId } = params
     const { answer } = request.only(['answer'])
 
-    const session = HomeController.quizSessions.get(sessionId)
+    const session = HomeController.getSessionWithActivity(sessionId)
 
     if (!session) {
       return response.notFound({ error: 'Quiz session not found' })
@@ -189,7 +200,7 @@ export default class HomeController {
    */
   async getProgress({ params, response }: HttpContext) {
     const { sessionId } = params
-    const session = HomeController.quizSessions.get(sessionId)
+    const session = HomeController.getSessionWithActivity(sessionId)
 
     if (!session) {
       return response.notFound({ error: 'Quiz session not found' })
@@ -284,5 +295,77 @@ export default class HomeController {
 
   private generateSessionId(): string {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+  }
+
+  /**
+   * Start periodic cleanup of expired sessions
+   */
+  private static startSessionCleanup(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval)
+    }
+
+    // Run cleanup every 5 minutes
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanupExpiredSessions()
+      },
+      5 * 60 * 1000
+    )
+  }
+
+  /**
+   * Clean up expired quiz sessions
+   */
+  private static cleanupExpiredSessions(): void {
+    const now = new Date()
+    const expiredSessions: string[] = []
+
+    for (const [sessionId, session] of this.quizSessions.entries()) {
+      const timeSinceLastActivity = now.getTime() - session.lastActivity.getTime()
+      if (timeSinceLastActivity > this.SESSION_TTL_MS) {
+        expiredSessions.push(sessionId)
+      }
+    }
+
+    for (const sessionId of expiredSessions) {
+      this.quizSessions.delete(sessionId)
+    }
+
+    if (expiredSessions.length > 0) {
+      console.log(`Cleaned up ${expiredSessions.length} expired quiz sessions`)
+    }
+  }
+
+  /**
+   * Update session activity timestamp
+   */
+  private static updateSessionActivity(sessionId: string): void {
+    const session = this.quizSessions.get(sessionId)
+    if (session) {
+      session.lastActivity = new Date()
+    }
+  }
+
+  /**
+   * Get session with activity update
+   */
+  private static getSessionWithActivity(sessionId: string): QuizSession | undefined {
+    const session = this.quizSessions.get(sessionId)
+    if (session) {
+      this.updateSessionActivity(sessionId)
+      return session
+    }
+    return undefined
+  }
+
+  /**
+   * Stop session cleanup (for testing or shutdown)
+   */
+  static stopSessionCleanup(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval)
+      this.cleanupInterval = null
+    }
   }
 }

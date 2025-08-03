@@ -1,0 +1,74 @@
+<!-- Japanese Teacher Section -->
+<section id="japanese-teacher" class="py-12 sm:py-16 lg:py-20 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 sm:mb-16">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 px-4 sm:px-0">
+        🎌 Japanese Teacher
+      </h2>
+      <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0 leading-relaxed">
+        Get detailed explanations of Japanese words and grammar patterns in Vietnamese.
+        Enter any Japanese text and receive romaji, furigana, meanings, examples, and usage notes.
+      </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+      <!-- Input Form -->
+      <div class="mb-8">
+        <label for="japanese-input" class="block text-sm font-medium text-gray-700 mb-2">
+          Enter Japanese word or grammar pattern:
+        </label>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <input
+            type="text"
+            id="japanese-input"
+            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg"
+            placeholder="例: 頑張ります"
+            autocomplete="off"
+          />
+          <button
+            id="japanese-submit"
+            class="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span id="submit-text">Explain</span>
+            <span id="submit-loading" class="hidden">
+              <svg
+                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Processing...
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div
+        id="japanese-error"
+        class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 hidden"
+      >
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span id="error-message">An error occurred. Please try again.</span>
+        </div>
+      </div>
+
+      <!-- Results Display -->
+      @include('partials/japanese-teacher-results')
+    </div>
+  </div>
+</section>

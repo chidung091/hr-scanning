@@ -1,0 +1,144 @@
+<!-- Progress Section -->
+<section id="progress" class="py-12 sm:py-16 lg:py-20 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 sm:mb-16">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 px-4 sm:px-0">
+        📊 Your Learning Progress
+      </h2>
+      <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4 sm:px-0 leading-relaxed">
+        Track your progress as you master Japanese characters. Each quiz helps you improve your recognition speed and accuracy.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Hiragana Progress -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <div class="bg-primary-100 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+            <div class="text-xl font-bold">
+              ひ
+            </div>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900">
+            Hiragana Progress
+          </h3>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm text-gray-600 mb-1">
+              <span>Overall Accuracy</span>
+              <span id="hiragana-accuracy">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                id="hiragana-progress-bar"
+                class="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                style="width: 0%"
+              >
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="text-center">
+              <div id="hiragana-quizzes" class="text-2xl font-bold text-primary-600">
+                0
+              </div>
+              <div class="text-gray-600">
+                Quizzes Taken
+              </div>
+            </div>
+            <div class="text-center">
+              <div id="hiragana-best" class="text-2xl font-bold text-primary-600">
+                0
+              </div>
+              <div class="text-gray-600">
+                Best Score
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Katakana Progress -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <div class="bg-primary-100 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+            <div class="text-xl font-bold">
+              カ
+            </div>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900">
+            Katakana Progress
+          </h3>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm text-gray-600 mb-1">
+              <span>Overall Accuracy</span>
+              <span id="katakana-accuracy">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                id="katakana-progress-bar"
+                class="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                style="width: 0%"
+              >
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="text-center">
+              <div id="katakana-quizzes" class="text-2xl font-bold text-primary-600">
+                0
+              </div>
+              <div class="text-gray-600">
+                Quizzes Taken
+              </div>
+            </div>
+            <div class="text-center">
+              <div id="katakana-best" class="text-2xl font-bold text-primary-600">
+                0
+              </div>
+              <div class="text-gray-600">
+                Best Score
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">
+        Quick Stats
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+        <div>
+          <div id="total-questions" class="text-2xl font-bold text-primary-600">
+            0
+          </div>
+          <div class="text-gray-600">
+            Total Questions
+          </div>
+        </div>
+        <div>
+          <div id="total-correct" class="text-2xl font-bold text-green-600">
+            0
+          </div>
+          <div class="text-gray-600">
+            Correct Answers
+          </div>
+        </div>
+        <div>
+          <div id="overall-accuracy" class="text-2xl font-bold text-blue-600">
+            0%
+          </div>
+          <div class="text-gray-600">
+            Overall Accuracy
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
