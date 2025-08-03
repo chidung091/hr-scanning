@@ -1,7 +1,7 @@
-import { QuizAPI } from '../services/QuizAPI.ts'
-import { AnimationUtils } from '../utils/animations.ts'
-import { MobileDetection } from '../utils/mobileDetection.ts'
-import type { JapaneseExplanation } from '../types/index.ts'
+import { QuizAPI } from '../services/QuizAPI'
+import { AnimationUtils } from '../utils/animations'
+import { MobileDetection } from '../utils/mobileDetection'
+import type { JapaneseExplanation } from '../types/index'
 
 interface ResultElements {
   input: HTMLElement | null

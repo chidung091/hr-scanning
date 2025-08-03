@@ -1,14 +1,14 @@
-import { QuizAPI } from '../services/QuizAPI.ts'
-import { StorageService } from '../services/StorageService.ts'
-import { AnimationUtils } from '../utils/animations.ts'
-import { MobileDetection } from '../utils/mobileDetection.ts'
+import { QuizAPI } from '../services/QuizAPI'
+import { StorageService } from '../services/StorageService'
+import { AnimationUtils } from '../utils/animations'
+import { MobileDetection } from '../utils/mobileDetection'
 import type {
   QuizType,
   Question,
   QuizStartResponse,
   AnswerResponse,
   QuestionResponse,
-} from '../types/index.ts'
+} from '../types/index'
 
 /**
  * Quiz Component - Handles the main quiz functionality

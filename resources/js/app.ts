@@ -1,9 +1,9 @@
-import { Quiz } from './components/Quiz.ts'
-import { JapaneseTeacher } from './components/JapaneseTeacher.ts'
-import { ProgressTracker } from './components/ProgressTracker.ts'
-import { MobileDetection } from './utils/mobileDetection.ts'
-import { AnimationUtils } from './utils/animations.ts'
-import type { AppState, Orientation } from './types/index.ts'
+import { Quiz } from './components/Quiz'
+import { JapaneseTeacher } from './components/JapaneseTeacher'
+import { ProgressTracker } from './components/ProgressTracker'
+import { MobileDetection } from './utils/mobileDetection'
+import { AnimationUtils } from './utils/animations'
+import type { AppState, Orientation } from './types/index'
 
 /**
  * Main Application Class

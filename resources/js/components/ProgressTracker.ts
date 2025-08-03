@@ -1,6 +1,6 @@
-import { StorageService } from '../services/StorageService.ts'
-import { AnimationUtils } from '../utils/animations.ts'
-import type { QuizType, ProgressStats } from '../types/index.ts'
+import { StorageService } from '../services/StorageService'
+import { AnimationUtils } from '../utils/animations'
+import type { QuizType, ProgressStats } from '../types/index'
 
 interface ProgressElements {
   accuracy: HTMLElement | null
