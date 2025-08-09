@@ -65,7 +65,10 @@
     "sinon": "^21.0.0",
     "ts-node-maintained": "^10.9.5",
     "typescript": "~5.8",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "tailwindcss": "^3.4.13",
+    "postcss": "^8.4.47",
+    "autoprefixer": "^10.4.20"
   },
   "dependencies": {
     "@adonisjs/core": "^6.18.0",
