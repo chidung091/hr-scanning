@@ -12,8 +12,14 @@ import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
 
 const HomeController = () => import('#controllers/home_controller')
+const QuizController = () => import('#controllers/quiz_controller')
 
 router.get('/', [HomeController, 'index'])
+
+// N5 Quiz routes
+router.get('/quiz/n5', [QuizController, 'viewIndex'])
+router.get('/quiz/n5/new', [QuizController, 'newQuiz'])
+router.post('/quiz/n5/explain', [QuizController, 'explain'])
 
 // Japanese Quiz API routes
 router.post('/api/quiz/start', [HomeController, 'startQuiz'])
