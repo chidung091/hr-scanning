@@ -1,0 +1,149 @@
+@extends('layouts/main')
+
+@section('title', 'Luyện N5 trắc nghiệm')
+
+@section('content')
+<div class="max-w-xl mx-auto p-4" id="quiz-app">
+  <div id="start-screen" class="text-center">
+    <button id="start-btn" class="px-4 py-2 bg-primary-500 text-white rounded" aria-label="Bắt đầu">Bắt đầu</button>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div id="progress" class="mb-2 text-sm"></div>
+    <div id="question" class="mb-4 font-semibold"></div>
+    <div id="choices" class="flex flex-col gap-2"></div>
+    <div id="loading" class="hidden text-sm text-gray-500">Đang tải...</div>
+  </div>
+
+  <div id="result-screen" class="hidden text-center">
+    <div id="score" class="mb-4 font-bold"></div>
+    <button id="retry-btn" class="px-4 py-2 bg-primary-500 text-white rounded" aria-label="Làm lại">Làm lại</button>
+  </div>
+</div>
+
+<div id="modal" class="fixed inset-0 flex items-center justify-center bg-black/50 hidden" role="dialog" aria-modal="true">
+  <div class="bg-white p-4 rounded shadow max-w-sm w-full">
+    <p class="mb-2" id="modal-answer"></p>
+    <p id="modal-explanation" class="text-sm mb-4"></p>
+    <div class="flex justify-end gap-2">
+      <button id="modal-retry" class="px-3 py-1 bg-gray-200 rounded" aria-label="Làm lại">Làm lại</button>
+      <button id="modal-next" class="px-3 py-1 bg-primary-500 text-white rounded" aria-label="Qua câu tiếp">Qua câu tiếp</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    const startBtn = document.getElementById('start-btn')
+    const startScreen = document.getElementById('start-screen')
+    const quizScreen = document.getElementById('quiz-screen')
+    const resultScreen = document.getElementById('result-screen')
+    const questionEl = document.getElementById('question')
+    const choicesEl = document.getElementById('choices')
+    const progressEl = document.getElementById('progress')
+    const scoreEl = document.getElementById('score')
+    const retryBtn = document.getElementById('retry-btn')
+    const loadingEl = document.getElementById('loading')
+    const modal = document.getElementById('modal')
+    const modalAnswer = document.getElementById('modal-answer')
+    const modalExplanation = document.getElementById('modal-explanation')
+    const modalRetry = document.getElementById('modal-retry')
+    const modalNext = document.getElementById('modal-next')
+
+    let questions = []
+    let index = 0
+    let score = 0
+
+    startBtn.addEventListener('click', loadQuiz)
+    retryBtn.addEventListener('click', () => {
+      resultScreen.classList.add('hidden')
+      startScreen.classList.remove('hidden')
+      startBtn.disabled = false
+    })
+
+    async function loadQuiz() {
+      startBtn.disabled = true
+      try {
+        const res = await fetch('/quiz/n5/new')
+        const data = await res.json()
+        questions = data.questions || []
+        index = 0
+        score = 0
+        startScreen.classList.add('hidden')
+        quizScreen.classList.remove('hidden')
+        showQuestion()
+      } catch (e) {
+        alert('Không thể tải câu hỏi, thử lại.')
+        startBtn.disabled = false
+      }
+    }
+
+    function showQuestion() {
+      const q = questions[index]
+      progressEl.textContent = `${index + 1}/${questions.length} | Điểm: ${score}`
+      questionEl.textContent = q.prompt
+      choicesEl.innerHTML = ''
+      q.choices.forEach((c) => {
+        const btn = document.createElement('button')
+        btn.textContent = `${c.key}. ${c.text}`
+        btn.className = 'px-4 py-2 border rounded text-left'
+        btn.setAttribute('aria-label', `Đáp án ${c.key}`)
+        btn.addEventListener('click', () => choose(c.key))
+        choicesEl.appendChild(btn)
+      })
+    }
+
+    async function choose(key) {
+      const q = questions[index]
+      const buttons = choicesEl.querySelectorAll('button')
+      buttons.forEach((b) => (b.disabled = true))
+      if (key === q.answer) {
+        score++
+        setTimeout(nextQuestion, 300)
+        return
+      }
+      loadingEl.classList.remove('hidden')
+      try {
+        const res = await fetch('/quiz/n5/explain', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken,
+          },
+          body: JSON.stringify({ question: q, selected: key }),
+        })
+        const data = await res.json()
+        modalAnswer.textContent = 'Đáp án đúng: ' + data.correct
+        modalExplanation.textContent = data.explanation
+        modal.classList.remove('hidden')
+        modalRetry.onclick = () => {
+          modal.classList.add('hidden')
+          buttons.forEach((b) => (b.disabled = false))
+        }
+        modalNext.onclick = () => {
+          modal.classList.add('hidden')
+          nextQuestion()
+        }
+      } catch (e) {
+        alert('Không thể tải câu hỏi, thử lại.')
+        buttons.forEach((b) => (b.disabled = false))
+      } finally {
+        loadingEl.classList.add('hidden')
+      }
+    }
+
+    function nextQuestion() {
+      index++
+      if (index >= questions.length) {
+        quizScreen.classList.add('hidden')
+        resultScreen.classList.remove('hidden')
+        scoreEl.textContent = `Bạn đạt ${score}/${questions.length} điểm`
+      } else {
+        showQuestion()
+      }
+    }
+  })()
+</script>
+@endsection
+
