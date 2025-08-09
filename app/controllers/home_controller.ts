@@ -105,9 +105,9 @@ export default class HomeController {
         })
       }
 
-      const openaiService = new OpenAIService()
+      const openaiService = OpenAIService.getInstance()
 
-      if (!openaiService.isConfigured()) {
+      if (!openaiService.configured) {
         return response.internalServerError({
           error: 'OpenAI service is not properly configured. Please check API key.',
         })
