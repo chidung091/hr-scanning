@@ -1,0 +1,912 @@
+[
+  {
+    "character": "ア",
+    "romanization": "a",
+    "type": "katakana"
+  },
+  {
+    "character": "イ",
+    "romanization": "i",
+    "type": "katakana"
+  },
+  {
+    "character": "ウ",
+    "romanization": "u",
+    "type": "katakana"
+  },
+  {
+    "character": "エ",
+    "romanization": "e",
+    "type": "katakana"
+  },
+  {
+    "character": "オ",
+    "romanization": "o",
+    "type": "katakana"
+  },
+  {
+    "character": "カ",
+    "romanization": "ka",
+    "type": "katakana"
+  },
+  {
+    "character": "キ",
+    "romanization": "ki",
+    "type": "katakana"
+  },
+  {
+    "character": "ク",
+    "romanization": "ku",
+    "type": "katakana"
+  },
+  {
+    "character": "ケ",
+    "romanization": "ke",
+    "type": "katakana"
+  },
+  {
+    "character": "コ",
+    "romanization": "ko",
+    "type": "katakana"
+  },
+  {
+    "character": "サ",
+    "romanization": "sa",
+    "type": "katakana"
+  },
+  {
+    "character": "シ",
+    "romanization": "shi",
+    "type": "katakana"
+  },
+  {
+    "character": "ス",
+    "romanization": "su",
+    "type": "katakana"
+  },
+  {
+    "character": "セ",
+    "romanization": "se",
+    "type": "katakana"
+  },
+  {
+    "character": "ソ",
+    "romanization": "so",
+    "type": "katakana"
+  },
+  {
+    "character": "タ",
+    "romanization": "ta",
+    "type": "katakana"
+  },
+  {
+    "character": "チ",
+    "romanization": "chi",
+    "type": "katakana"
+  },
+  {
+    "character": "ツ",
+    "romanization": "tsu",
+    "type": "katakana"
+  },
+  {
+    "character": "テ",
+    "romanization": "te",
+    "type": "katakana"
+  },
+  {
+    "character": "ト",
+    "romanization": "to",
+    "type": "katakana"
+  },
+  {
+    "character": "ナ",
+    "romanization": "na",
+    "type": "katakana"
+  },
+  {
+    "character": "ニ",
+    "romanization": "ni",
+    "type": "katakana"
+  },
+  {
+    "character": "ヌ",
+    "romanization": "nu",
+    "type": "katakana"
+  },
+  {
+    "character": "ネ",
+    "romanization": "ne",
+    "type": "katakana"
+  },
+  {
+    "character": "ノ",
+    "romanization": "no",
+    "type": "katakana"
+  },
+  {
+    "character": "ハ",
+    "romanization": "ha",
+    "type": "katakana"
+  },
+  {
+    "character": "ヒ",
+    "romanization": "hi",
+    "type": "katakana"
+  },
+  {
+    "character": "フ",
+    "romanization": "fu",
+    "type": "katakana"
+  },
+  {
+    "character": "ヘ",
+    "romanization": "he",
+    "type": "katakana"
+  },
+  {
+    "character": "ホ",
+    "romanization": "ho",
+    "type": "katakana"
+  },
+  {
+    "character": "マ",
+    "romanization": "ma",
+    "type": "katakana"
+  },
+  {
+    "character": "ミ",
+    "romanization": "mi",
+    "type": "katakana"
+  },
+  {
+    "character": "ム",
+    "romanization": "mu",
+    "type": "katakana"
+  },
+  {
+    "character": "メ",
+    "romanization": "me",
+    "type": "katakana"
+  },
+  {
+    "character": "モ",
+    "romanization": "mo",
+    "type": "katakana"
+  },
+  {
+    "character": "ヤ",
+    "romanization": "ya",
+    "type": "katakana"
+  },
+  {
+    "character": "ユ",
+    "romanization": "yu",
+    "type": "katakana"
+  },
+  {
+    "character": "ヨ",
+    "romanization": "yo",
+    "type": "katakana"
+  },
+  {
+    "character": "ラ",
+    "romanization": "ra",
+    "type": "katakana"
+  },
+  {
+    "character": "リ",
+    "romanization": "ri",
+    "type": "katakana"
+  },
+  {
+    "character": "ル",
+    "romanization": "ru",
+    "type": "katakana"
+  },
+  {
+    "character": "レ",
+    "romanization": "re",
+    "type": "katakana"
+  },
+  {
+    "character": "ロ",
+    "romanization": "ro",
+    "type": "katakana"
+  },
+  {
+    "character": "ワ",
+    "romanization": "wa",
+    "type": "katakana"
+  },
+  {
+    "character": "ヲ",
+    "romanization": "wo",
+    "type": "katakana"
+  },
+  {
+    "character": "ン",
+    "romanization": "n",
+    "type": "katakana"
+  },
+  {
+    "character": "ガ",
+    "romanization": "ga",
+    "type": "katakana"
+  },
+  {
+    "character": "ギ",
+    "romanization": "gi",
+    "type": "katakana"
+  },
+  {
+    "character": "グ",
+    "romanization": "gu",
+    "type": "katakana"
+  },
+  {
+    "character": "ゲ",
+    "romanization": "ge",
+    "type": "katakana"
+  },
+  {
+    "character": "ゴ",
+    "romanization": "go",
+    "type": "katakana"
+  },
+  {
+    "character": "ザ",
+    "romanization": "za",
+    "type": "katakana"
+  },
+  {
+    "character": "ジ",
+    "romanization": "ji",
+    "type": "katakana"
+  },
+  {
+    "character": "ズ",
+    "romanization": "zu",
+    "type": "katakana"
+  },
+  {
+    "character": "ゼ",
+    "romanization": "ze",
+    "type": "katakana"
+  },
+  {
+    "character": "ゾ",
+    "romanization": "zo",
+    "type": "katakana"
+  },
+  {
+    "character": "ダ",
+    "romanization": "da",
+    "type": "katakana"
+  },
+  {
+    "character": "ヂ",
+    "romanization": "ji",
+    "type": "katakana"
+  },
+  {
+    "character": "ヅ",
+    "romanization": "zu",
+    "type": "katakana"
+  },
+  {
+    "character": "デ",
+    "romanization": "de",
+    "type": "katakana"
+  },
+  {
+    "character": "ド",
+    "romanization": "do",
+    "type": "katakana"
+  },
+  {
+    "character": "バ",
+    "romanization": "ba",
+    "type": "katakana"
+  },
+  {
+    "character": "ビ",
+    "romanization": "bi",
+    "type": "katakana"
+  },
+  {
+    "character": "ブ",
+    "romanization": "bu",
+    "type": "katakana"
+  },
+  {
+    "character": "ベ",
+    "romanization": "be",
+    "type": "katakana"
+  },
+  {
+    "character": "ボ",
+    "romanization": "bo",
+    "type": "katakana"
+  },
+  {
+    "character": "パ",
+    "romanization": "pa",
+    "type": "katakana"
+  },
+  {
+    "character": "ピ",
+    "romanization": "pi",
+    "type": "katakana"
+  },
+  {
+    "character": "プ",
+    "romanization": "pu",
+    "type": "katakana"
+  },
+  {
+    "character": "ペ",
+    "romanization": "pe",
+    "type": "katakana"
+  },
+  {
+    "character": "ポ",
+    "romanization": "po",
+    "type": "katakana"
+  },
+  {
+    "character": "キャ",
+    "romanization": "kya",
+    "type": "katakana"
+  },
+  {
+    "character": "キュ",
+    "romanization": "kyu",
+    "type": "katakana"
+  },
+  {
+    "character": "キョ",
+    "romanization": "kyo",
+    "type": "katakana"
+  },
+  {
+    "character": "シャ",
+    "romanization": "sha",
+    "type": "katakana"
+  },
+  {
+    "character": "シュ",
+    "romanization": "shu",
+    "type": "katakana"
+  },
+  {
+    "character": "ショ",
+    "romanization": "sho",
+    "type": "katakana"
+  },
+  {
+    "character": "チャ",
+    "romanization": "cha",
+    "type": "katakana"
+  },
+  {
+    "character": "チュ",
+    "romanization": "chu",
+    "type": "katakana"
+  },
+  {
+    "character": "チョ",
+    "romanization": "cho",
+    "type": "katakana"
+  },
+  {
+    "character": "ニャ",
+    "romanization": "nya",
+    "type": "katakana"
+  },
+  {
+    "character": "ニュ",
+    "romanization": "nyu",
+    "type": "katakana"
+  },
+  {
+    "character": "ニョ",
+    "romanization": "nyo",
+    "type": "katakana"
+  },
+  {
+    "character": "ヒャ",
+    "romanization": "hya",
+    "type": "katakana"
+  },
+  {
+    "character": "ヒュ",
+    "romanization": "hyu",
+    "type": "katakana"
+  },
+  {
+    "character": "ヒョ",
+    "romanization": "hyo",
+    "type": "katakana"
+  },
+  {
+    "character": "ミャ",
+    "romanization": "mya",
+    "type": "katakana"
+  },
+  {
+    "character": "ミュ",
+    "romanization": "myu",
+    "type": "katakana"
+  },
+  {
+    "character": "ミョ",
+    "romanization": "myo",
+    "type": "katakana"
+  },
+  {
+    "character": "リャ",
+    "romanization": "rya",
+    "type": "katakana"
+  },
+  {
+    "character": "リュ",
+    "romanization": "ryu",
+    "type": "katakana"
+  },
+  {
+    "character": "リョ",
+    "romanization": "ryo",
+    "type": "katakana"
+  },
+  {
+    "character": "ギャ",
+    "romanization": "gya",
+    "type": "katakana"
+  },
+  {
+    "character": "ギュ",
+    "romanization": "gyu",
+    "type": "katakana"
+  },
+  {
+    "character": "ギョ",
+    "romanization": "gyo",
+    "type": "katakana"
+  },
+  {
+    "character": "ジャ",
+    "romanization": "ja",
+    "type": "katakana"
+  },
+  {
+    "character": "ジュ",
+    "romanization": "ju",
+    "type": "katakana"
+  },
+  {
+    "character": "ジョ",
+    "romanization": "jo",
+    "type": "katakana"
+  },
+  {
+    "character": "ビャ",
+    "romanization": "bya",
+    "type": "katakana"
+  },
+  {
+    "character": "ビュ",
+    "romanization": "byu",
+    "type": "katakana"
+  },
+  {
+    "character": "ビョ",
+    "romanization": "byo",
+    "type": "katakana"
+  },
+  {
+    "character": "ピャ",
+    "romanization": "pya",
+    "type": "katakana"
+  },
+  {
+    "character": "ピュ",
+    "romanization": "pyu",
+    "type": "katakana"
+  },
+  {
+    "character": "ピョ",
+    "romanization": "pyo",
+    "type": "katakana"
+  },
+  {
+    "character": "アー",
+    "romanization": "aa",
+    "type": "katakana"
+  },
+  {
+    "character": "イー",
+    "romanization": "ii",
+    "type": "katakana"
+  },
+  {
+    "character": "ウー",
+    "romanization": "uu",
+    "type": "katakana"
+  },
+  {
+    "character": "エー",
+    "romanization": "ee",
+    "type": "katakana"
+  },
+  {
+    "character": "オー",
+    "romanization": "oo",
+    "type": "katakana"
+  },
+  {
+    "character": "ファ",
+    "romanization": "fa",
+    "type": "katakana"
+  },
+  {
+    "character": "フィ",
+    "romanization": "fi",
+    "type": "katakana"
+  },
+  {
+    "character": "フェ",
+    "romanization": "fe",
+    "type": "katakana"
+  },
+  {
+    "character": "フォ",
+    "romanization": "fo",
+    "type": "katakana"
+  },
+  {
+    "character": "ヴァ",
+    "romanization": "va",
+    "type": "katakana"
+  },
+  {
+    "character": "ヴィ",
+    "romanization": "vi",
+    "type": "katakana"
+  },
+  {
+    "character": "ヴェ",
+    "romanization": "ve",
+    "type": "katakana"
+  },
+  {
+    "character": "ヴォ",
+    "romanization": "vo",
+    "type": "katakana"
+  },
+  {
+    "character": "ティ",
+    "romanization": "ti",
+    "type": "katakana"
+  },
+  {
+    "character": "ディ",
+    "romanization": "di",
+    "type": "katakana"
+  },
+  {
+    "character": "デュ",
+    "romanization": "dyu",
+    "type": "katakana"
+  },
+  {
+    "character": "トゥ",
+    "romanization": "tu",
+    "type": "katakana"
+  },
+  {
+    "character": "ドゥ",
+    "romanization": "du",
+    "type": "katakana"
+  },
+  {
+    "character": "ッカ",
+    "romanization": "kka",
+    "type": "katakana"
+  },
+  {
+    "character": "ッキ",
+    "romanization": "kki",
+    "type": "katakana"
+  },
+  {
+    "character": "ック",
+    "romanization": "kku",
+    "type": "katakana"
+  },
+  {
+    "character": "ッケ",
+    "romanization": "kke",
+    "type": "katakana"
+  },
+  {
+    "character": "ッコ",
+    "romanization": "kko",
+    "type": "katakana"
+  },
+  {
+    "character": "ッサ",
+    "romanization": "ssa",
+    "type": "katakana"
+  },
+  {
+    "character": "ッシ",
+    "romanization": "sshi",
+    "type": "katakana"
+  },
+  {
+    "character": "ッス",
+    "romanization": "ssu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッセ",
+    "romanization": "sse",
+    "type": "katakana"
+  },
+  {
+    "character": "ッソ",
+    "romanization": "sso",
+    "type": "katakana"
+  },
+  {
+    "character": "ッタ",
+    "romanization": "tta",
+    "type": "katakana"
+  },
+  {
+    "character": "ッチ",
+    "romanization": "tchi",
+    "type": "katakana"
+  },
+  {
+    "character": "ッツ",
+    "romanization": "ttsu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッテ",
+    "romanization": "tte",
+    "type": "katakana"
+  },
+  {
+    "character": "ット",
+    "romanization": "tto",
+    "type": "katakana"
+  },
+  {
+    "character": "ッパ",
+    "romanization": "ppa",
+    "type": "katakana"
+  },
+  {
+    "character": "ッピ",
+    "romanization": "ppi",
+    "type": "katakana"
+  },
+  {
+    "character": "ップ",
+    "romanization": "ppu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッペ",
+    "romanization": "ppe",
+    "type": "katakana"
+  },
+  {
+    "character": "ッポ",
+    "romanization": "ppo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッバ",
+    "romanization": "bba",
+    "type": "katakana"
+  },
+  {
+    "character": "ッビ",
+    "romanization": "bbi",
+    "type": "katakana"
+  },
+  {
+    "character": "ッブ",
+    "romanization": "bbu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッベ",
+    "romanization": "bbe",
+    "type": "katakana"
+  },
+  {
+    "character": "ッボ",
+    "romanization": "bbo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッガ",
+    "romanization": "gga",
+    "type": "katakana"
+  },
+  {
+    "character": "ッギ",
+    "romanization": "ggi",
+    "type": "katakana"
+  },
+  {
+    "character": "ッグ",
+    "romanization": "ggu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッゲ",
+    "romanization": "gge",
+    "type": "katakana"
+  },
+  {
+    "character": "ッゴ",
+    "romanization": "ggo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッザ",
+    "romanization": "zza",
+    "type": "katakana"
+  },
+  {
+    "character": "ッジ",
+    "romanization": "jji",
+    "type": "katakana"
+  },
+  {
+    "character": "ッズ",
+    "romanization": "zzu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッゼ",
+    "romanization": "zze",
+    "type": "katakana"
+  },
+  {
+    "character": "ッゾ",
+    "romanization": "zzo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッダ",
+    "romanization": "dda",
+    "type": "katakana"
+  },
+  {
+    "character": "ッヂ",
+    "romanization": "jji",
+    "type": "katakana"
+  },
+  {
+    "character": "ッヅ",
+    "romanization": "zzu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッデ",
+    "romanization": "dde",
+    "type": "katakana"
+  },
+  {
+    "character": "ッド",
+    "romanization": "ddo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッキャ",
+    "romanization": "kkya",
+    "type": "katakana"
+  },
+  {
+    "character": "ッキュ",
+    "romanization": "kkyu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッキョ",
+    "romanization": "kkyo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッシャ",
+    "romanization": "ssha",
+    "type": "katakana"
+  },
+  {
+    "character": "ッシュ",
+    "romanization": "sshu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッショ",
+    "romanization": "ssho",
+    "type": "katakana"
+  },
+  {
+    "character": "ッチャ",
+    "romanization": "tcha",
+    "type": "katakana"
+  },
+  {
+    "character": "ッチュ",
+    "romanization": "tchu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッチョ",
+    "romanization": "tcho",
+    "type": "katakana"
+  },
+  {
+    "character": "ッピャ",
+    "romanization": "ppya",
+    "type": "katakana"
+  },
+  {
+    "character": "ッピュ",
+    "romanization": "ppyu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッピョ",
+    "romanization": "ppyo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッフ",
+    "romanization": "ffu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッファ",
+    "romanization": "ffa",
+    "type": "katakana"
+  },
+  {
+    "character": "ッフィ",
+    "romanization": "ffi",
+    "type": "katakana"
+  },
+  {
+    "character": "ッフェ",
+    "romanization": "ffe",
+    "type": "katakana"
+  },
+  {
+    "character": "ッフォ",
+    "romanization": "ffo",
+    "type": "katakana"
+  },
+  {
+    "character": "ッヴ",
+    "romanization": "vvu",
+    "type": "katakana"
+  },
+  {
+    "character": "ッティ",
+    "romanization": "tti",
+    "type": "katakana"
+  },
+  {
+    "character": "ッディ",
+    "romanization": "ddi",
+    "type": "katakana"
+  }
+]

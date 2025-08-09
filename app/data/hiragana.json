@@ -1,0 +1,817 @@
+[
+  {
+    "character": "あ",
+    "romanization": "a",
+    "type": "hiragana"
+  },
+  {
+    "character": "い",
+    "romanization": "i",
+    "type": "hiragana"
+  },
+  {
+    "character": "う",
+    "romanization": "u",
+    "type": "hiragana"
+  },
+  {
+    "character": "え",
+    "romanization": "e",
+    "type": "hiragana"
+  },
+  {
+    "character": "お",
+    "romanization": "o",
+    "type": "hiragana"
+  },
+  {
+    "character": "か",
+    "romanization": "ka",
+    "type": "hiragana"
+  },
+  {
+    "character": "き",
+    "romanization": "ki",
+    "type": "hiragana"
+  },
+  {
+    "character": "く",
+    "romanization": "ku",
+    "type": "hiragana"
+  },
+  {
+    "character": "け",
+    "romanization": "ke",
+    "type": "hiragana"
+  },
+  {
+    "character": "こ",
+    "romanization": "ko",
+    "type": "hiragana"
+  },
+  {
+    "character": "さ",
+    "romanization": "sa",
+    "type": "hiragana"
+  },
+  {
+    "character": "し",
+    "romanization": "shi",
+    "type": "hiragana"
+  },
+  {
+    "character": "す",
+    "romanization": "su",
+    "type": "hiragana"
+  },
+  {
+    "character": "せ",
+    "romanization": "se",
+    "type": "hiragana"
+  },
+  {
+    "character": "そ",
+    "romanization": "so",
+    "type": "hiragana"
+  },
+  {
+    "character": "た",
+    "romanization": "ta",
+    "type": "hiragana"
+  },
+  {
+    "character": "ち",
+    "romanization": "chi",
+    "type": "hiragana"
+  },
+  {
+    "character": "つ",
+    "romanization": "tsu",
+    "type": "hiragana"
+  },
+  {
+    "character": "て",
+    "romanization": "te",
+    "type": "hiragana"
+  },
+  {
+    "character": "と",
+    "romanization": "to",
+    "type": "hiragana"
+  },
+  {
+    "character": "な",
+    "romanization": "na",
+    "type": "hiragana"
+  },
+  {
+    "character": "に",
+    "romanization": "ni",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぬ",
+    "romanization": "nu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ね",
+    "romanization": "ne",
+    "type": "hiragana"
+  },
+  {
+    "character": "の",
+    "romanization": "no",
+    "type": "hiragana"
+  },
+  {
+    "character": "は",
+    "romanization": "ha",
+    "type": "hiragana"
+  },
+  {
+    "character": "ひ",
+    "romanization": "hi",
+    "type": "hiragana"
+  },
+  {
+    "character": "ふ",
+    "romanization": "fu",
+    "type": "hiragana"
+  },
+  {
+    "character": "へ",
+    "romanization": "he",
+    "type": "hiragana"
+  },
+  {
+    "character": "ほ",
+    "romanization": "ho",
+    "type": "hiragana"
+  },
+  {
+    "character": "ま",
+    "romanization": "ma",
+    "type": "hiragana"
+  },
+  {
+    "character": "み",
+    "romanization": "mi",
+    "type": "hiragana"
+  },
+  {
+    "character": "む",
+    "romanization": "mu",
+    "type": "hiragana"
+  },
+  {
+    "character": "め",
+    "romanization": "me",
+    "type": "hiragana"
+  },
+  {
+    "character": "も",
+    "romanization": "mo",
+    "type": "hiragana"
+  },
+  {
+    "character": "や",
+    "romanization": "ya",
+    "type": "hiragana"
+  },
+  {
+    "character": "ゆ",
+    "romanization": "yu",
+    "type": "hiragana"
+  },
+  {
+    "character": "よ",
+    "romanization": "yo",
+    "type": "hiragana"
+  },
+  {
+    "character": "ら",
+    "romanization": "ra",
+    "type": "hiragana"
+  },
+  {
+    "character": "り",
+    "romanization": "ri",
+    "type": "hiragana"
+  },
+  {
+    "character": "る",
+    "romanization": "ru",
+    "type": "hiragana"
+  },
+  {
+    "character": "れ",
+    "romanization": "re",
+    "type": "hiragana"
+  },
+  {
+    "character": "ろ",
+    "romanization": "ro",
+    "type": "hiragana"
+  },
+  {
+    "character": "わ",
+    "romanization": "wa",
+    "type": "hiragana"
+  },
+  {
+    "character": "を",
+    "romanization": "wo",
+    "type": "hiragana"
+  },
+  {
+    "character": "ん",
+    "romanization": "n",
+    "type": "hiragana"
+  },
+  {
+    "character": "が",
+    "romanization": "ga",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぎ",
+    "romanization": "gi",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぐ",
+    "romanization": "gu",
+    "type": "hiragana"
+  },
+  {
+    "character": "げ",
+    "romanization": "ge",
+    "type": "hiragana"
+  },
+  {
+    "character": "ご",
+    "romanization": "go",
+    "type": "hiragana"
+  },
+  {
+    "character": "ざ",
+    "romanization": "za",
+    "type": "hiragana"
+  },
+  {
+    "character": "じ",
+    "romanization": "ji",
+    "type": "hiragana"
+  },
+  {
+    "character": "ず",
+    "romanization": "zu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぜ",
+    "romanization": "ze",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぞ",
+    "romanization": "zo",
+    "type": "hiragana"
+  },
+  {
+    "character": "だ",
+    "romanization": "da",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぢ",
+    "romanization": "ji",
+    "type": "hiragana"
+  },
+  {
+    "character": "づ",
+    "romanization": "zu",
+    "type": "hiragana"
+  },
+  {
+    "character": "で",
+    "romanization": "de",
+    "type": "hiragana"
+  },
+  {
+    "character": "ど",
+    "romanization": "do",
+    "type": "hiragana"
+  },
+  {
+    "character": "ば",
+    "romanization": "ba",
+    "type": "hiragana"
+  },
+  {
+    "character": "び",
+    "romanization": "bi",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぶ",
+    "romanization": "bu",
+    "type": "hiragana"
+  },
+  {
+    "character": "べ",
+    "romanization": "be",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぼ",
+    "romanization": "bo",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぱ",
+    "romanization": "pa",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぴ",
+    "romanization": "pi",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぷ",
+    "romanization": "pu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぺ",
+    "romanization": "pe",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぽ",
+    "romanization": "po",
+    "type": "hiragana"
+  },
+  {
+    "character": "きゃ",
+    "romanization": "kya",
+    "type": "hiragana"
+  },
+  {
+    "character": "きゅ",
+    "romanization": "kyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "きょ",
+    "romanization": "kyo",
+    "type": "hiragana"
+  },
+  {
+    "character": "しゃ",
+    "romanization": "sha",
+    "type": "hiragana"
+  },
+  {
+    "character": "しゅ",
+    "romanization": "shu",
+    "type": "hiragana"
+  },
+  {
+    "character": "しょ",
+    "romanization": "sho",
+    "type": "hiragana"
+  },
+  {
+    "character": "ちゃ",
+    "romanization": "cha",
+    "type": "hiragana"
+  },
+  {
+    "character": "ちゅ",
+    "romanization": "chu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ちょ",
+    "romanization": "cho",
+    "type": "hiragana"
+  },
+  {
+    "character": "にゃ",
+    "romanization": "nya",
+    "type": "hiragana"
+  },
+  {
+    "character": "にゅ",
+    "romanization": "nyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "にょ",
+    "romanization": "nyo",
+    "type": "hiragana"
+  },
+  {
+    "character": "ひゃ",
+    "romanization": "hya",
+    "type": "hiragana"
+  },
+  {
+    "character": "ひゅ",
+    "romanization": "hyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ひょ",
+    "romanization": "hyo",
+    "type": "hiragana"
+  },
+  {
+    "character": "みゃ",
+    "romanization": "mya",
+    "type": "hiragana"
+  },
+  {
+    "character": "みゅ",
+    "romanization": "myu",
+    "type": "hiragana"
+  },
+  {
+    "character": "みょ",
+    "romanization": "myo",
+    "type": "hiragana"
+  },
+  {
+    "character": "りゃ",
+    "romanization": "rya",
+    "type": "hiragana"
+  },
+  {
+    "character": "りゅ",
+    "romanization": "ryu",
+    "type": "hiragana"
+  },
+  {
+    "character": "りょ",
+    "romanization": "ryo",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぎゃ",
+    "romanization": "gya",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぎゅ",
+    "romanization": "gyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぎょ",
+    "romanization": "gyo",
+    "type": "hiragana"
+  },
+  {
+    "character": "じゃ",
+    "romanization": "ja",
+    "type": "hiragana"
+  },
+  {
+    "character": "じゅ",
+    "romanization": "ju",
+    "type": "hiragana"
+  },
+  {
+    "character": "じょ",
+    "romanization": "jo",
+    "type": "hiragana"
+  },
+  {
+    "character": "びゃ",
+    "romanization": "bya",
+    "type": "hiragana"
+  },
+  {
+    "character": "びゅ",
+    "romanization": "byu",
+    "type": "hiragana"
+  },
+  {
+    "character": "びょ",
+    "romanization": "byo",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぴゃ",
+    "romanization": "pya",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぴゅ",
+    "romanization": "pyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "ぴょ",
+    "romanization": "pyo",
+    "type": "hiragana"
+  },
+  {
+    "character": "あー",
+    "romanization": "aa",
+    "type": "hiragana"
+  },
+  {
+    "character": "いー",
+    "romanization": "ii",
+    "type": "hiragana"
+  },
+  {
+    "character": "うー",
+    "romanization": "uu",
+    "type": "hiragana"
+  },
+  {
+    "character": "えー",
+    "romanization": "ee",
+    "type": "hiragana"
+  },
+  {
+    "character": "おー",
+    "romanization": "oo",
+    "type": "hiragana"
+  },
+  {
+    "character": "おう",
+    "romanization": "ou",
+    "type": "hiragana"
+  },
+  {
+    "character": "えい",
+    "romanization": "ei",
+    "type": "hiragana"
+  },
+  {
+    "character": "っか",
+    "romanization": "kka",
+    "type": "hiragana"
+  },
+  {
+    "character": "っき",
+    "romanization": "kki",
+    "type": "hiragana"
+  },
+  {
+    "character": "っく",
+    "romanization": "kku",
+    "type": "hiragana"
+  },
+  {
+    "character": "っけ",
+    "romanization": "kke",
+    "type": "hiragana"
+  },
+  {
+    "character": "っこ",
+    "romanization": "kko",
+    "type": "hiragana"
+  },
+  {
+    "character": "っさ",
+    "romanization": "ssa",
+    "type": "hiragana"
+  },
+  {
+    "character": "っし",
+    "romanization": "sshi",
+    "type": "hiragana"
+  },
+  {
+    "character": "っす",
+    "romanization": "ssu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っせ",
+    "romanization": "sse",
+    "type": "hiragana"
+  },
+  {
+    "character": "っそ",
+    "romanization": "sso",
+    "type": "hiragana"
+  },
+  {
+    "character": "った",
+    "romanization": "tta",
+    "type": "hiragana"
+  },
+  {
+    "character": "っち",
+    "romanization": "tchi",
+    "type": "hiragana"
+  },
+  {
+    "character": "っつ",
+    "romanization": "ttsu",
+    "type": "hiragana"
+  },
+  {
+    "character": "って",
+    "romanization": "tte",
+    "type": "hiragana"
+  },
+  {
+    "character": "っと",
+    "romanization": "tto",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぱ",
+    "romanization": "ppa",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぴ",
+    "romanization": "ppi",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぷ",
+    "romanization": "ppu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぺ",
+    "romanization": "ppe",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぽ",
+    "romanization": "ppo",
+    "type": "hiragana"
+  },
+  {
+    "character": "っば",
+    "romanization": "bba",
+    "type": "hiragana"
+  },
+  {
+    "character": "っび",
+    "romanization": "bbi",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぶ",
+    "romanization": "bbu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っべ",
+    "romanization": "bbe",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぼ",
+    "romanization": "bbo",
+    "type": "hiragana"
+  },
+  {
+    "character": "っが",
+    "romanization": "gga",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぎ",
+    "romanization": "ggi",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぐ",
+    "romanization": "ggu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っげ",
+    "romanization": "gge",
+    "type": "hiragana"
+  },
+  {
+    "character": "っご",
+    "romanization": "ggo",
+    "type": "hiragana"
+  },
+  {
+    "character": "っざ",
+    "romanization": "zza",
+    "type": "hiragana"
+  },
+  {
+    "character": "っじ",
+    "romanization": "jji",
+    "type": "hiragana"
+  },
+  {
+    "character": "っず",
+    "romanization": "zzu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぜ",
+    "romanization": "zze",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぞ",
+    "romanization": "zzo",
+    "type": "hiragana"
+  },
+  {
+    "character": "っだ",
+    "romanization": "dda",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぢ",
+    "romanization": "jji",
+    "type": "hiragana"
+  },
+  {
+    "character": "っづ",
+    "romanization": "zzu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っで",
+    "romanization": "dde",
+    "type": "hiragana"
+  },
+  {
+    "character": "っど",
+    "romanization": "ddo",
+    "type": "hiragana"
+  },
+  {
+    "character": "っきゃ",
+    "romanization": "kkya",
+    "type": "hiragana"
+  },
+  {
+    "character": "っきゅ",
+    "romanization": "kkyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っきょ",
+    "romanization": "kkyo",
+    "type": "hiragana"
+  },
+  {
+    "character": "っしゃ",
+    "romanization": "ssha",
+    "type": "hiragana"
+  },
+  {
+    "character": "っしゅ",
+    "romanization": "sshu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っしょ",
+    "romanization": "ssho",
+    "type": "hiragana"
+  },
+  {
+    "character": "っちゃ",
+    "romanization": "tcha",
+    "type": "hiragana"
+  },
+  {
+    "character": "っちゅ",
+    "romanization": "tchu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っちょ",
+    "romanization": "tcho",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぴゃ",
+    "romanization": "ppya",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぴゅ",
+    "romanization": "ppyu",
+    "type": "hiragana"
+  },
+  {
+    "character": "っぴょ",
+    "romanization": "ppyo",
+    "type": "hiragana"
+  }
+]
