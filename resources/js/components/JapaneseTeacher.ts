@@ -199,10 +199,10 @@ export class JapaneseTeacher {
     if (elements.input) elements.input.textContent = data.input || ''
     if (elements.romaji) elements.romaji.textContent = data.romaji || ''
     if (elements.furigana) elements.furigana.textContent = data.furigana || ''
-    if (elements.pronunciation) elements.pronunciation.textContent = data.pronunciation || ''
-    if (elements.meaning) elements.meaning.textContent = data.meaning || ''
-    if (elements.exampleJp) elements.exampleJp.textContent = data.example_jp || ''
-    if (elements.exampleVn) elements.exampleVn.textContent = data.example_vn || ''
+    if (elements.pronunciation) elements.pronunciation.textContent = data.pronunciation_guide || ''
+    if (elements.meaning) elements.meaning.textContent = data.meaning_vietnamese || ''
+    if (elements.exampleJp) elements.exampleJp.textContent = data.example_japanese || ''
+    if (elements.exampleVn) elements.exampleVn.textContent = data.example_vietnamese || ''
     if (elements.note) elements.note.textContent = data.note || ''
   }
 

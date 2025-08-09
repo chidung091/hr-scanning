@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import env from '#start/env'
+import logger from '@adonisjs/core/services/logger'
 
 export interface OpenAIConfig {
   apiKey: string
@@ -176,6 +177,7 @@ export default class OpenAIService {
     ]
 
     const response = await this.generateChatCompletion(messages)
+    logger.info('response from openAI', response)
     return response.content
   }
 

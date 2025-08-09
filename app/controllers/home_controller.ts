@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 // Ensure Edge module augmentation is loaded
 import '@adonisjs/core/providers/edge_provider'
+import logger from '@adonisjs/core/services/logger'
 import OpenAIService from '#services/openai_service'
 import QuizSessionService from '#services/quiz_session_service'
 
@@ -114,13 +115,14 @@ export default class HomeController {
       }
 
       const aiResponse = await openaiService.explainJapaneseForVietnamese(input.trim())
-
+      logger.info('aiResponse: %s', aiResponse)
       // Try to parse the JSON response
       let parsedResponse
       try {
         parsedResponse = JSON.parse(aiResponse)
+        logger.info('parsedResponse: %o', parsedResponse)
       } catch (parseError) {
-        console.error('Failed to parse OpenAI response as JSON:', parseError)
+        logger.error('Failed to parse OpenAI response as JSON:', parseError)
         return response.internalServerError({
           error: 'Failed to parse AI response. Please try again.',
         })

@@ -56,10 +56,10 @@ export interface JapaneseExplanation {
   input: string
   romaji: string
   furigana: string
-  pronunciation: string
-  meaning: string
-  example_jp: string
-  example_vn: string
+  pronunciation_guide: string
+  meaning_vietnamese: string
+  example_japanese: string
+  example_vietnamese: string
   note: string
 }
 
