@@ -1,4 +1,6 @@
 import { Quiz } from './components/Quiz'
+import { QuizState } from './components/QuizState'
+import { QuizView } from './components/QuizView'
 import { JapaneseTeacher } from './components/JapaneseTeacher'
 import { ProgressTracker } from './components/ProgressTracker'
 import { MobileDetection } from './utils/mobileDetection'
@@ -74,7 +76,9 @@ class JapaneseQuizApp {
    */
   private initializeComponents(): void {
     // Initialize Quiz component
-    this.quiz = new Quiz()
+    const quizState = new QuizState()
+    const quizView = new QuizView()
+    this.quiz = new Quiz(quizState, quizView)
 
     // Initialize Japanese Teacher component
     this.japaneseTeacher = new JapaneseTeacher()
