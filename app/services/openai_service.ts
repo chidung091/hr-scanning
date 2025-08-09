@@ -23,10 +23,12 @@ export interface ChatCompletionResponse {
 }
 
 export default class OpenAIService {
-  private client: OpenAI
+  private static instance: OpenAIService | null = null
+  private client?: OpenAI
   private config: OpenAIConfig
+  public configured: boolean
 
-  constructor() {
+  private constructor() {
     this.config = {
       apiKey: env.get('OPENAI_API_KEY', ''),
       model: env.get('OPENAI_MODEL', 'gpt-4o-mini'),
@@ -34,19 +36,29 @@ export default class OpenAIService {
       temperature: Number(env.get('OPENAI_TEMPERATURE', '0.7')),
     }
 
-    if (!this.config.apiKey) {
-      throw new Error('OpenAI API key is required. Please set OPENAI_API_KEY environment variable.')
-    }
+    this.configured = !!this.config.apiKey
 
-    this.client = new OpenAI({
-      apiKey: this.config.apiKey,
-    })
+    if (this.configured) {
+      this.client = new OpenAI({
+        apiKey: this.config.apiKey,
+      })
+    }
+  }
+
+  static getInstance(): OpenAIService {
+    if (!this.instance) {
+      this.instance = new OpenAIService()
+    }
+    return this.instance
   }
 
   /**
    * Generate a chat completion using OpenAI
    */
   async generateChatCompletion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
+    if (!this.configured || !this.client) {
+      throw new Error('OpenAI service is not configured')
+    }
     try {
       const completion = await this.client.chat.completions.create({
         model: this.config.model,
@@ -258,7 +270,7 @@ Do not explain outside the JSON, just return the JSON only.`
    * Check if the service is properly configured
    */
   isConfigured(): boolean {
-    return !!this.config.apiKey
+    return this.configured
   }
 
   /**
