@@ -4,14 +4,14 @@ import env from '#start/env'
 import OpenAIService from '#services/openai_service'
 
 test.group('OpenAIService configuration', (group) => {
-  const getStub = env.get as unknown as sinon.SinonStub
+  let getStub: sinon.SinonStub
+
+  group.each.setup(() => {
+    getStub = sinon.stub(env, 'get')
+  })
 
   group.each.teardown(() => {
-    getStub.callsFake((key: string, defaultValue?: any) => {
-      if (key === 'OPENAI_API_KEY') return 'test-api-key'
-      if (key === 'NODE_ENV') return 'test'
-      return defaultValue
-    })
+    getStub.restore()
     ;(OpenAIService as any).instance = null
   })
 
@@ -38,6 +38,12 @@ test.group('OpenAIService configuration', (group) => {
   })
 
   test('getInstance returns the same instance', ({ assert }) => {
+    getStub.callsFake((key: string, defaultValue?: any) => {
+      if (key === 'OPENAI_API_KEY') return 'test-key'
+      if (key === 'NODE_ENV') return 'test'
+      return defaultValue
+    })
+
     const first = OpenAIService.getInstance()
     const second = OpenAIService.getInstance()
     assert.strictEqual(first, second)
