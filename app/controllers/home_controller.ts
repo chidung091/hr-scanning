@@ -1,37 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 // Ensure Edge module augmentation is loaded
 import '@adonisjs/core/providers/edge_provider'
-import JapaneseCharactersService, { type QuizQuestion } from '#services/japanese_characters_service'
 import OpenAIService from '#services/openai_service'
-
-interface QuizSession {
-  id: string
-  type: 'hiragana' | 'katakana'
-  questions: QuizQuestion[]
-  currentQuestionIndex: number
-  score: number
-  hearts: number
-  maxHearts: number
-  answers: Array<{
-    question: QuizQuestion
-    userAnswer: string
-    isCorrect: boolean
-  }>
-  startTime: Date
-  isGameOver: boolean
-  lastActivity: Date
-}
+import QuizSessionService from '#services/quiz_session_service'
 
 export default class HomeController {
-  private static quizSessions: Map<string, QuizSession> = new Map()
-  private static readonly SESSION_TTL_MS = 30 * 60 * 1000 // 30 minutes
-  private static cleanupInterval: NodeJS.Timeout | null = null
-
-  static {
-    // Initialize cleanup when the class is first loaded
-    this.startSessionCleanup()
-  }
-
   /**
    * @index
    * @summary Display the Japanese learning quiz homepage
@@ -55,34 +28,8 @@ export default class HomeController {
       return response.badRequest({ error: 'Invalid quiz type. Must be "hiragana" or "katakana"' })
     }
 
-    const questions = JapaneseCharactersService.generateQuizQuestions(type, 20)
-    const sessionId = this.generateSessionId()
-
-    const session: QuizSession = {
-      id: sessionId,
-      type,
-      questions,
-      currentQuestionIndex: 0,
-      score: 0,
-      hearts: 3,
-      maxHearts: 3,
-      answers: [],
-      startTime: new Date(),
-      isGameOver: false,
-      lastActivity: new Date(),
-    }
-
-    HomeController.quizSessions.set(sessionId, session)
-
-    return response.json({
-      sessionId,
-      type,
-      totalQuestions: questions.length,
-      currentQuestion: questions[0],
-      hearts: session.hearts,
-      maxHearts: session.maxHearts,
-      isGameOver: session.isGameOver,
-    })
+    const result = QuizSessionService.startSession(type)
+    return response.json(result)
   }
 
   /**
@@ -94,36 +41,11 @@ export default class HomeController {
    */
   async getQuestion({ params, response }: HttpContext) {
     const { sessionId } = params
-    const session = HomeController.getSessionWithActivity(sessionId)
-
-    if (!session) {
+    const result = QuizSessionService.getQuestion(sessionId)
+    if (!result) {
       return response.notFound({ error: 'Quiz session not found' })
     }
-
-    if (session.currentQuestionIndex >= session.questions.length || session.isGameOver) {
-      return response.json({
-        completed: true,
-        score: session.score,
-        totalQuestions: session.questions.length,
-        answers: session.answers,
-        hearts: session.hearts,
-        maxHearts: session.maxHearts,
-        isGameOver: session.isGameOver,
-        gameOverReason: session.hearts === 0 ? 'no_hearts' : 'completed',
-      })
-    }
-
-    const currentQuestion = session.questions[session.currentQuestionIndex]
-
-    return response.json({
-      question: currentQuestion,
-      questionNumber: session.currentQuestionIndex + 1,
-      totalQuestions: session.questions.length,
-      score: session.score,
-      hearts: session.hearts,
-      maxHearts: session.maxHearts,
-      isGameOver: session.isGameOver,
-    })
+    return response.json(result)
   }
 
   /**
@@ -137,58 +59,16 @@ export default class HomeController {
     const { sessionId } = params
     const { answer } = request.only(['answer'])
 
-    const session = HomeController.getSessionWithActivity(sessionId)
-
-    if (!session) {
+    const result = QuizSessionService.submitAnswer(sessionId, answer)
+    if (!result) {
       return response.notFound({ error: 'Quiz session not found' })
     }
 
-    if (session.currentQuestionIndex >= session.questions.length || session.isGameOver) {
-      return response.badRequest({ error: 'Quiz already completed or game over' })
+    if ('error' in result) {
+      return response.badRequest({ error: result.error })
     }
 
-    const currentQuestion = session.questions[session.currentQuestionIndex]
-    const isCorrect = answer === currentQuestion.correctAnswer
-
-    if (isCorrect) {
-      session.score++
-    } else {
-      // Lose a heart for incorrect answer
-      session.hearts--
-      if (session.hearts <= 0) {
-        session.isGameOver = true
-      }
-    }
-
-    session.answers.push({
-      question: currentQuestion,
-      userAnswer: answer,
-      isCorrect,
-    })
-
-    session.currentQuestionIndex++
-
-    const isCompleted =
-      session.currentQuestionIndex >= session.questions.length || session.isGameOver
-
-    return response.json({
-      isCorrect,
-      correctAnswer: currentQuestion.correctAnswer,
-      score: session.score,
-      questionNumber: session.currentQuestionIndex,
-      totalQuestions: session.questions.length,
-      completed: isCompleted,
-      hearts: session.hearts,
-      maxHearts: session.maxHearts,
-      isGameOver: session.isGameOver,
-      gameOverReason: session.isGameOver && session.hearts === 0 ? 'no_hearts' : null,
-      ...(isCompleted && {
-        finalScore: session.score,
-        percentage: Math.round((session.score / session.questions.length) * 100),
-        answers: session.answers,
-        heartsRemaining: session.hearts,
-      }),
-    })
+    return response.json(result)
   }
 
   /**
@@ -200,28 +80,13 @@ export default class HomeController {
    */
   async getProgress({ params, response }: HttpContext) {
     const { sessionId } = params
-    const session = HomeController.getSessionWithActivity(sessionId)
+    const result = QuizSessionService.getProgress(sessionId)
 
-    if (!session) {
+    if (!result) {
       return response.notFound({ error: 'Quiz session not found' })
     }
 
-    return response.json({
-      sessionId: session.id,
-      type: session.type,
-      currentQuestionIndex: session.currentQuestionIndex,
-      totalQuestions: session.questions.length,
-      score: session.score,
-      percentage:
-        session.questions.length > 0
-          ? Math.round((session.score / session.currentQuestionIndex) * 100)
-          : 0,
-      completed: session.currentQuestionIndex >= session.questions.length || session.isGameOver,
-      hearts: session.hearts,
-      maxHearts: session.maxHearts,
-      isGameOver: session.isGameOver,
-      gameOverReason: session.isGameOver && session.hearts === 0 ? 'no_hearts' : null,
-    })
+    return response.json(result)
   }
 
   /**
@@ -290,82 +155,6 @@ export default class HomeController {
       return response.internalServerError({
         error: 'An error occurred while processing your request. Please try again.',
       })
-    }
-  }
-
-  private generateSessionId(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-  }
-
-  /**
-   * Start periodic cleanup of expired sessions
-   */
-  private static startSessionCleanup(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval)
-    }
-
-    // Run cleanup every 5 minutes
-    this.cleanupInterval = setInterval(
-      () => {
-        this.cleanupExpiredSessions()
-      },
-      5 * 60 * 1000
-    )
-  }
-
-  /**
-   * Clean up expired quiz sessions
-   */
-  private static cleanupExpiredSessions(): void {
-    const now = new Date()
-    const expiredSessions: string[] = []
-
-    for (const [sessionId, session] of this.quizSessions.entries()) {
-      const timeSinceLastActivity = now.getTime() - session.lastActivity.getTime()
-      if (timeSinceLastActivity > this.SESSION_TTL_MS) {
-        expiredSessions.push(sessionId)
-      }
-    }
-
-    for (const sessionId of expiredSessions) {
-      this.quizSessions.delete(sessionId)
-    }
-
-    if (expiredSessions.length > 0) {
-      console.log(`Cleaned up ${expiredSessions.length} expired quiz sessions`)
-    }
-  }
-
-  /**
-   * Update session activity timestamp
-   */
-  private static updateSessionActivity(sessionId: string): void {
-    const session = this.quizSessions.get(sessionId)
-    if (session) {
-      session.lastActivity = new Date()
-    }
-  }
-
-  /**
-   * Get session with activity update
-   */
-  private static getSessionWithActivity(sessionId: string): QuizSession | undefined {
-    const session = this.quizSessions.get(sessionId)
-    if (session) {
-      this.updateSessionActivity(sessionId)
-      return session
-    }
-    return undefined
-  }
-
-  /**
-   * Stop session cleanup (for testing or shutdown)
-   */
-  static stopSessionCleanup(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval)
-      this.cleanupInterval = null
     }
   }
 }
