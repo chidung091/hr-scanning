@@ -1,8 +1,41 @@
-@layout('layouts/main')
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrfToken }}" />
+    <title>Luyện N5 trắc nghiệm</title>
 
-@section('title', 'Luyện N5 trắc nghiệm')
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
-@section('content')
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [ "Inter", "sans-serif" ]
+            },
+            colors: {
+              primary: {
+                DEFAULT: "#3b82f6",
+                50: "#eff6ff",
+                100: "#dbeafe",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                900: "#1e3a8a"
+              }
+            }
+          }
+        }
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-gray-50 font-sans">
+    @include('partials/navigation')
 <div class="max-w-xl mx-auto p-4" id="quiz-app">
   <div id="start-screen" class="text-center">
     <button id="start-btn" class="px-4 py-2 bg-primary-500 text-white rounded" aria-label="Bắt đầu">Bắt đầu</button>
@@ -145,5 +178,7 @@
     }
   })()
 </script>
-@endsection
+    @include('partials/footer')
+  </body>
+</html>
 
