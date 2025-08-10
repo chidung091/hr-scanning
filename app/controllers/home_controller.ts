@@ -25,11 +25,13 @@ export default class HomeController {
   async startQuiz({ request, response }: HttpContext) {
     const { type } = request.only(['type'])
 
-    if (!type || (type !== 'hiragana' && type !== 'katakana')) {
-      return response.badRequest({ error: 'Invalid quiz type. Must be "hiragana" or "katakana"' })
+    if (!type || !['hiragana', 'katakana', 'n5'].includes(type)) {
+      return response.badRequest({
+        error: 'Invalid quiz type. Must be "hiragana", "katakana", or "n5"',
+      })
     }
 
-    const result = QuizSessionService.startSession(type)
+    const result = await QuizSessionService.startSession(type)
     return response.json(result)
   }
 

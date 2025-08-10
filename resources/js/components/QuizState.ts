@@ -2,6 +2,7 @@ import { QuizAPI } from '../services/QuizAPI'
 import type {
   QuizType,
   Question,
+  N5QuizQuestion,
   QuizStartResponse,
   AnswerResponse,
   QuestionResponse,
@@ -14,7 +15,7 @@ export class QuizState {
   private quizAPI: QuizAPI
   private sessionId: string | null = null
   private quizType: QuizType | null = null
-  private currentQuestion: Question | null = null
+  private currentQuestion: Question | N5QuizQuestion | null = null
   private score = 0
   private questionNumber = 0
   private totalQuestions = 20
@@ -99,7 +100,7 @@ export class QuizState {
     return this.quizType
   }
 
-  public getCurrentQuestion(): Question | null {
+  public getCurrentQuestion(): Question | N5QuizQuestion | null {
     return this.currentQuestion
   }
 

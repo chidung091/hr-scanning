@@ -37,6 +37,28 @@ export class Quiz {
       this.startQuiz('katakana')
     })
 
+    // Add N5 quiz button event listener
+    const startN5Btn = document.getElementById('start-n5-quiz-btn')
+    startN5Btn?.addEventListener('click', async (e) => {
+      const button = e.target as HTMLElement
+      this.view.animateButtonPress(button)
+
+      // Show loading state for N5 quiz (AI generation takes time)
+      const originalText = button.textContent
+      button.textContent = 'Loading...'
+      button.classList.add('opacity-50', 'cursor-not-allowed')
+      button.setAttribute('disabled', 'true')
+
+      try {
+        await this.startQuiz('n5')
+      } finally {
+        // Restore button state
+        button.textContent = originalText
+        button.classList.remove('opacity-50', 'cursor-not-allowed')
+        button.removeAttribute('disabled')
+      }
+    })
+
     this.view.nextButton?.addEventListener('click', (e) => {
       this.view.animateButtonPress(e.target as HTMLElement)
       this.nextQuestion()
@@ -89,6 +111,11 @@ export class Quiz {
   /** Start a new quiz */
   public async startQuiz(type: QuizType): Promise<void> {
     try {
+      // Show loading state for N5 quiz (AI generation takes time)
+      if (type === 'n5') {
+        this.view.showLoading('Generating JLPT N5 Quiz...')
+      }
+
       await this.state.startQuiz(type)
       this.view.showQuizInterface(type)
 
@@ -106,6 +133,8 @@ export class Quiz {
       }
     } catch (error) {
       console.error('Error starting quiz:', error)
+      // Hide loading overlay in case of error
+      this.view.hideLoading()
       alert('Failed to start quiz. Please try again.')
     }
   }
