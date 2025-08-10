@@ -1,15 +1,16 @@
 import JapaneseCharactersService, { type QuizQuestion } from '#services/japanese_characters_service'
+import N5QuizService, { type N5QuizQuestion } from '#services/n5_quiz_service'
 
 interface QuizSession {
   id: string
-  type: 'hiragana' | 'katakana'
-  questions: QuizQuestion[]
+  type: 'hiragana' | 'katakana' | 'n5'
+  questions: QuizQuestion[] | N5QuizQuestion[]
   currentQuestionIndex: number
   score: number
   hearts: number
   maxHearts: number
   answers: Array<{
-    question: QuizQuestion
+    question: QuizQuestion | N5QuizQuestion
     userAnswer: string
     isCorrect: boolean
   }>
@@ -27,8 +28,18 @@ class QuizSessionService {
     this.startCleanup()
   }
 
-  startSession(type: 'hiragana' | 'katakana') {
-    const questions = JapaneseCharactersService.generateQuizQuestions(type, 20)
+  async startSession(type: 'hiragana' | 'katakana' | 'n5') {
+    console.log('QuizSessionService.startSession called with type:', type)
+    let questions: QuizQuestion[] | N5QuizQuestion[]
+
+    if (type === 'n5') {
+      console.log('Calling N5QuizService.generateQuiz()')
+      const n5Data = await N5QuizService.generateQuiz()
+      questions = n5Data.questions
+    } else {
+      questions = JapaneseCharactersService.generateQuizQuestions(type, 20)
+    }
+
     const sessionId = this.generateSessionId()
 
     const session: QuizSession = {
@@ -101,7 +112,15 @@ class QuizSessionService {
     }
 
     const currentQuestion = session.questions[session.currentQuestionIndex]
-    const isCorrect = answer === currentQuestion.correctAnswer
+    let isCorrect: boolean
+
+    if (session.type === 'n5') {
+      const n5Question = currentQuestion as N5QuizQuestion
+      isCorrect = answer === n5Question.answer
+    } else {
+      const charQuestion = currentQuestion as QuizQuestion
+      isCorrect = answer === charQuestion.correctAnswer
+    }
 
     if (isCorrect) {
       session.score++
@@ -123,9 +142,14 @@ class QuizSessionService {
     const isCompleted =
       session.currentQuestionIndex >= session.questions.length || session.isGameOver
 
+    const correctAnswer =
+      session.type === 'n5'
+        ? (currentQuestion as N5QuizQuestion).answer
+        : (currentQuestion as QuizQuestion).correctAnswer
+
     return {
       isCorrect,
-      correctAnswer: currentQuestion.correctAnswer,
+      correctAnswer,
       score: session.score,
       questionNumber: session.currentQuestionIndex,
       totalQuestions: session.questions.length,

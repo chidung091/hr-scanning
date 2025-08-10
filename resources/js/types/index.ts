@@ -6,9 +6,9 @@ export interface Question {
 
 export interface QuizSession {
   sessionId: string
-  quizType: 'hiragana' | 'katakana'
+  quizType: 'hiragana' | 'katakana' | 'n5'
   totalQuestions: number
-  currentQuestion: Question
+  currentQuestion: Question | N5QuizQuestion
   score: number
   questionNumber: number
   hearts: number
@@ -23,7 +23,7 @@ export interface QuizSession {
 export interface QuizStartResponse {
   sessionId: string
   totalQuestions: number
-  currentQuestion: Question
+  currentQuestion: Question | N5QuizQuestion
   hearts: number
   maxHearts: number
   isGameOver: boolean
@@ -43,7 +43,7 @@ export interface AnswerResponse {
 }
 
 export interface QuestionResponse {
-  question?: Question
+  question?: Question | N5QuizQuestion
   completed: boolean
   isGameOver: boolean
   gameOverReason?: 'no_hearts' | 'completed'
@@ -74,7 +74,7 @@ export interface ProgressStats {
 export interface AppState {
   quiz?: {
     sessionId: string | null
-    quizType: 'hiragana' | 'katakana' | null
+    quizType: 'hiragana' | 'katakana' | 'n5' | null
     score: number
     questionNumber: number
     hearts: number
@@ -86,7 +86,7 @@ export interface AppState {
   timestamp: string
 }
 
-export type QuizType = 'hiragana' | 'katakana'
+export type QuizType = 'hiragana' | 'katakana' | 'n5'
 export type Orientation = 'portrait' | 'landscape'
 
 export interface MobileEnhancementOptions {
@@ -99,4 +99,18 @@ export interface AnimationConfig {
   duration?: number
   easing?: string
   delay?: number
+}
+
+export interface N5QuizChoice {
+  key: 'A' | 'B' | 'C' | 'D'
+  text: string
+}
+
+export interface N5QuizQuestion {
+  id: string
+  type: 'grammar' | 'vocabulary' | 'kana' | 'reading'
+  prompt: string
+  choices: N5QuizChoice[]
+  answer: 'A' | 'B' | 'C' | 'D'
+  explanation: string
 }

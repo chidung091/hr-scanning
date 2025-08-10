@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import '@adonisjs/core/providers/edge_provider'
-import QuizService, { QuizQuestion } from '#services/quiz_service'
+import N5QuizService, { N5QuizQuestion } from '#services/n5_quiz_service'
 
 export default class QuizController {
   viewIndex({ view }: HttpContext) {
@@ -8,7 +8,7 @@ export default class QuizController {
   }
 
   async newQuiz({ response }: HttpContext) {
-    const data = await QuizService.generateQuiz()
+    const data = await N5QuizService.generateQuiz()
     return response.json(data)
   }
 
@@ -17,7 +17,7 @@ export default class QuizController {
     if (!question || typeof selected !== 'string') {
       return response.badRequest({ error: 'Invalid payload' })
     }
-    const result = await QuizService.explain(question as QuizQuestion, selected)
+    const result = await N5QuizService.explain(question as N5QuizQuestion, selected)
     return response.json(result)
   }
 }

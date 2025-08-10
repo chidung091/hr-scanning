@@ -3,6 +3,7 @@ import type { QuizType, ProgressStats } from '../types/index.ts'
 interface StoredStats {
   hiragana: ProgressStats | null
   katakana: ProgressStats | null
+  n5: ProgressStats | null
 }
 
 interface StoredProgressStats {
@@ -126,6 +127,7 @@ export class StorageService {
     return {
       hiragana: null,
       katakana: null,
+      n5: null,
     }
   }
 }
