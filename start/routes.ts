@@ -16,10 +16,10 @@ const QuizController = () => import('#controllers/quiz_controller')
 
 router.get('/', [HomeController, 'index'])
 
-// N5 Quiz routes
-router.get('/quiz/n5', [QuizController, 'viewIndex'])
-router.get('/quiz/n5/new', [QuizController, 'newQuiz'])
-router.post('/quiz/n5/explain', [QuizController, 'explain'])
+// N5 Quiz routes (deprecated - session-based API is now primary)
+// router.get('/quiz/n5', [QuizController, 'viewIndex'])
+// router.get('/quiz/n5/new', [QuizController, 'newQuiz'])
+// router.post('/quiz/n5/explain', [QuizController, 'explain'])
 
 // Japanese Quiz API routes
 router.post('/api/quiz/start', [HomeController, 'startQuiz'])
