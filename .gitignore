@@ -224,3 +224,6 @@ newrelic_agent.log
 .history/
 .vscode-upload.json
 .gitpod.yml
+
+
+ai_logs/
