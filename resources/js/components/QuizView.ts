@@ -174,22 +174,57 @@ export class QuizView {
     }
 
     if (this.characterDisplay) {
-      // Handle different question types
+      // Remove any temporary loading styling
+      this.characterDisplay.classList.remove('text-gray-400')
+
+      // Handle different question types and adjust styling accordingly
       if ('character' in question) {
-        // Character quiz question
+        // Character quiz question - use large font for single characters
         this.characterDisplay.textContent = question.character
+        // Reset to large character display styling
+        this.characterDisplay.className = 'text-6xl sm:text-8xl lg:text-9xl font-bold text-gray-900 mb-3 sm:mb-4 character-display-mobile transition-transform-smooth hover:scale-105 select-none'
       } else {
-        // N5 quiz question
+        // N5 quiz question - use smaller font for longer text content
         this.characterDisplay.textContent = question.prompt
+        // Apply smaller text styling for N5 questions
+        this.characterDisplay.className = 'text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4 leading-relaxed transition-transform-smooth select-none text-left px-2 sm:px-4'
       }
     }
 
     // Handle different option formats
-    const options = 'options' in question ? question.options : question.choices.map(c => `${c.key}. ${c.text}`)
+    const options = 'options' in question ? question.options : question.choices.map((c) => `${c.key}. ${c.text}`)
     this.createAnswerOptions(options, onSelect, 'choices' in question)
 
+    // Reset feedback and next button and clear any prior explanation element
     this.feedbackDisplay?.classList.add('hidden')
     this.nextButton?.classList.add('hidden')
+
+    const existingExplanation = document.getElementById('explanation-text')
+    existingExplanation?.remove()
+  }
+
+  /** Prepare UI for loading the next question to avoid stale content */
+  public prepareForNextQuestion(): void {
+    // Hide feedback and next button immediately
+    this.feedbackDisplay?.classList.add('hidden')
+    this.nextButton?.classList.add('hidden')
+
+    // Clear any prior explanation element
+    const existingExplanation = document.getElementById('explanation-text')
+    existingExplanation?.remove()
+
+    // Clear answer options right away
+    if (this.answerOptions) {
+      this.answerOptions.innerHTML = ''
+    }
+
+    // Show lightweight loading indicator in the question area
+    if (this.characterDisplay) {
+      this.characterDisplay.textContent = 'Loading next question...'
+      this.characterDisplay.classList.add('text-gray-400')
+      // Reset to a neutral styling for loading state
+      this.characterDisplay.className = 'text-lg sm:text-xl font-medium text-gray-400 mb-3 sm:mb-4 transition-transform-smooth select-none text-center'
+    }
   }
 
   /** Create answer option buttons */
@@ -202,7 +237,7 @@ export class QuizView {
 
     this.answerOptions.innerHTML = ''
 
-    options.forEach((option, index) => {
+    options.forEach((option) => {
       const button = document.createElement('button')
       button.className =
         'answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button'
@@ -254,15 +289,25 @@ export class QuizView {
   public showFeedback(
     isCorrect: boolean,
     correctAnswer: string,
-    selectedButton: HTMLElement
+    selectedButton: HTMLElement,
+    currentQuestion?: Question | N5QuizQuestion
   ): void {
     const allButtons = this.answerOptions?.querySelectorAll(
       '.answer-option'
     ) as NodeListOf<HTMLButtonElement>
+
+    // Determine matching logic for correct answer (supports N5 keys like "A.")
+    const isN5 = currentQuestion && 'choices' in currentQuestion
+    const correctKey = isN5 ? (correctAnswer || '').trim()[0] : null
+
     allButtons?.forEach((btn) => {
       btn.disabled = true
       btn.classList.remove('hover:bg-primary-50', 'hover:border-primary-300')
-      if (btn.textContent === correctAnswer) {
+
+      const btnText = btn.textContent || ''
+      const matchesCorrect = isN5 ? btnText.trim().startsWith(`${correctKey}.`) : btnText === correctAnswer
+
+      if (matchesCorrect) {
         btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800')
         AnimationUtils.animateCorrectAnswer(btn)
       } else if (btn === selectedButton && !isCorrect) {
@@ -276,11 +321,24 @@ export class QuizView {
       this.feedbackMessage.className = `text-lg font-semibold mb-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}`
     }
 
+    // Correct answer line (keep existing behavior)
     if (!isCorrect && this.correctAnswer) {
       this.correctAnswer.textContent = `Correct answer: ${correctAnswer}`
       this.correctAnswer.classList.remove('hidden')
     } else if (this.correctAnswer) {
       this.correctAnswer.classList.add('hidden')
+    }
+
+    // Show explanation for N5 when incorrect
+    if (!isCorrect && isN5 && currentQuestion && 'explanation' in currentQuestion) {
+      const existing = document.getElementById('explanation-text')
+      if (!existing) {
+        const expl = document.createElement('div')
+        expl.id = 'explanation-text'
+        expl.className = 'mt-2 text-sm sm:text-base text-gray-700 bg-yellow-50 border border-yellow-200 rounded p-3 text-left'
+        expl.textContent = currentQuestion.explanation
+        this.feedbackDisplay?.appendChild(expl)
+      }
     }
 
     this.feedbackDisplay?.classList.remove('hidden')

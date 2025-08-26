@@ -153,7 +153,13 @@ export class Quiz {
     try {
       const data: AnswerResponse = await this.state.submitAnswer(selectedAnswer)
 
-      this.view.showFeedback(data.isCorrect, data.correctAnswer, buttonElement)
+      const currentQuestion = this.state.getCurrentQuestion()
+      this.view.showFeedback(
+        data.isCorrect,
+        data.correctAnswer,
+        buttonElement,
+        currentQuestion || undefined
+      )
       this.view.updateHeartsDisplay(this.state.getHearts(), this.state.getMaxHearts())
 
       if (data.isGameOver && data.gameOverReason === 'no_hearts') {
@@ -163,6 +169,7 @@ export class Quiz {
       } else if (data.completed) {
         this.handleQuizCompletion(data.finalScore || this.state.getScore(), data.heartsRemaining || this.state.getHearts())
       } else {
+        // Always require acknowledgement before proceeding; explanation (for N5 wrong) is visible here
         this.view.showNextButton()
       }
     } catch (error) {
@@ -177,36 +184,43 @@ export class Quiz {
     if (!this.state.getSessionId()) return
 
     try {
+      // Immediately prepare UI to avoid showing stale content
+      this.view.prepareForNextQuestion()
+
+      // Optimistically animate the transition without delaying data fetch
+      const questionDisplay = this.view.characterDisplay?.parentElement as HTMLElement
+      const answerOptions = this.view.answerOptions as HTMLElement
+      if (questionDisplay && answerOptions) {
+        // Fire-and-forget animation; don't await to avoid extra delay
+        this.view.animateQuestionTransition(questionDisplay, answerOptions)
+      }
+
+      // Fetch next question
       const data: QuestionResponse = await this.state.getNextQuestion()
 
       if (data.completed) {
         if (data.isGameOver && data.gameOverReason === 'no_hearts') {
           this.view.showGameOverModal(this.state.getScore(), this.state.getQuestionNumber())
         } else {
-          this.handleQuizCompletion(data.finalScore || this.state.getScore(), data.heartsRemaining || this.state.getHearts())
+          this.handleQuizCompletion(
+            data.finalScore || this.state.getScore(),
+            data.heartsRemaining || this.state.getHearts()
+          )
         }
-      } else {
-        const question = this.state.getCurrentQuestion()
-        const questionDisplay = this.view.characterDisplay?.parentElement as HTMLElement
-        const answerOptions = this.view.answerOptions as HTMLElement
+        return
+      }
 
-        if (questionDisplay && answerOptions) {
-          await this.view.animateQuestionTransition(questionDisplay, answerOptions)
-        }
-
-        setTimeout(() => {
-          if (question) {
-            this.view.displayQuestion(
-              this.state.getQuestionNumber(),
-              this.state.getTotalQuestions(),
-              this.state.getScore(),
-              question,
-              this.state.getHearts(),
-              this.state.getMaxHearts(),
-              (answer, btn) => this.selectAnswer(answer, btn)
-            )
-          }
-        }, 200)
+      const question = this.state.getCurrentQuestion()
+      if (question) {
+        this.view.displayQuestion(
+          this.state.getQuestionNumber(),
+          this.state.getTotalQuestions(),
+          this.state.getScore(),
+          question,
+          this.state.getHearts(),
+          this.state.getMaxHearts(),
+          (answer, btn) => this.selectAnswer(answer, btn)
+        )
       }
     } catch (error) {
       console.error('Error getting next question:', error)

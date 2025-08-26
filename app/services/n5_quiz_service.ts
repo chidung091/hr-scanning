@@ -23,21 +23,38 @@ const EXPECTED_COUNT = 10
 const SYSTEM_PROMPT = `You are a JLPT N5 quiz generator.
 
 Strict output rules:
-- Return ONLY a single JSON object. No preface, no explanations, no markdown fences, no extra text.
-- Do NOT wrap JSON in code fences or backticks.
-- All values must be valid JSON strings. Escape quotes if needed. No trailing commas.
-- The explanation must be in Vietnamese, but still inside the JSON as a string.
+- Return ONLY a single JSON object on ONE LINE (minified). No preface, no explanations, no Markdown/code fences, no extra text, no trailing newline.
+- Do NOT include BOM (\uFEFF) or any zero-width characters (\u200B-\u200D, \u2060).
+- The JSON must be valid and directly parseable by JSON.parse with no leading/trailing whitespace.
+- All leaf values (non-object, non-array) must be JSON strings. Arrays/objects follow the schema below.
+- The "explanation" must be in Vietnamese (≤ 2 sentences), inside the JSON as a string.
+- Generate exactly 10 questions with unique ids "q1"..."q10". No duplicates.
 
-Task:
-Generate exactly 10 JLPT N5 questions. Each question must have:
-- id: unique identifier (q1, q2, ...)
-- type: one of "grammar", "vocabulary", "kana", "reading"
-- prompt: the question text
-- choices: array of exactly 4 options with keys A, B, C, D
-- answer: the correct key (A, B, C, or D)
-- explanation: brief Vietnamese explanation for the correct answer
 
-Output JSON schema example (use as a template; fill with your own 10 questions):
+Question requirements (each item in "questions"):
+- id: "q1"..."q10" (string, unique)
+- type: one of "grammar", "vocabulary", "kana", "reading" (string)
+  * grammar: trợ từ, ます/ました, い/な-adj, あります/います…
+   - Sentences must be natural and grammatical
+   - If you use a blank "__", it must replace a missing element only. 
+   - Do NOT use blanks for a particle or word that already exists in the sentence (avoid duplicates like "これは__日本の本です。").
+  * vocabulary: nghĩa từ, chọn từ phù hợp ngữ cảnh
+  * kana: Hiragana/Katakana đúng
+  * reading: đoạn ngắn (2–3 câu) cấp N5, hỏi ý chính/chi tiết
+- prompt: question text (string). For "reading", include the short passage inside this field.
+- choices: array of exactly 4 objects, in order A, B, C, D.
+  Each choice object:
+    { "key": "A"|"B"|"C"|"D", "text": "<option text>" }
+  Keys must be unique; texts should be concise and not identical.
+- answer: "A"|"B"|"C"|"D" (string) and MUST match one of the choice keys.
+- explanation: brief Vietnamese explanation (≤2 sentences), no spoilers beyond the correct reasoning.
+
+Content rules:
+- Keep all content at JLPT N5 level.
+- Use UTF-8; escape quotes when needed.
+- Do not reuse the sample; write new, original questions.
+
+Output JSON template (fill with your 10 questions):
 {
   "questions": [
     {
@@ -45,13 +62,13 @@ Output JSON schema example (use as a template; fill with your own 10 questions):
       "type": "grammar",
       "prompt": "Chọn trợ từ đúng: わたし__がくせいです。",
       "choices": [
-        {"key": "A", "text": "は"},
-        {"key": "B", "text": "を"},
-        {"key": "C", "text": "に"},
-        {"key": "D", "text": "が"}
+        { "key": "A", "text": "は" },
+        { "key": "B", "text": "を" },
+        { "key": "C", "text": "に" },
+        { "key": "D", "text": "が" }
       ],
       "answer": "A",
-      "explanation": "は là trợ từ chỉ chủ đề của câu."
+      "explanation": "“は” là trợ từ chủ đề; câu giới thiệu bản thân dùng は."
     }
   ]
 }`
@@ -391,28 +408,75 @@ function extractFirstBalancedJson(s: string): string | null {
 
 function sanitizeJsonString(s: string): string {
   let out = s
-  // Normalize Unicode quotes
-  out = out.replace(/[\u2018\u2019]/g, "'")
-  out = out.replace(/[\u201C\u201D]/g, '"')
-  // Remove trailing commas before } or ]
-  out = out.replace(/,(\s*[}\]])/g, '$1')
+
   // Remove BOM if present
   if (out.charCodeAt(0) === 0xfeff) out = out.slice(1)
+
+  // Normalize Unicode quotes to standard ASCII quotes
+  out = out.replace(/[\u2018\u2019]/g, "'")
+  out = out.replace(/[\u201C\u201D]/g, '"')
+
+  // Very targeted fix for the specific Vietnamese quote issue
+  // Fix patterns like: "explanation":""に" được sử dụng...
+  out = out.replace(/"explanation":"([^"]*)"([^"]*)" được/g, '"explanation":"$1\\"$2\\" được')
+  out = out.replace(/"explanation":"([^"]*)"([^"]*)" có/g, '"explanation":"$1\\"$2\\" có')
+  out = out.replace(/"explanation":"([^"]*)"([^"]*)" là/g, '"explanation":"$1\\"$2\\" là')
+
+  // Fix similar patterns in text fields
+  out = out.replace(/"text":"([^"]*)"([^"]*)"}/g, '"text":"$1\\"$2\\""')
+
+  // Remove trailing commas before } or ]
+  out = out.replace(/,(\s*[}\]])/g, '$1')
+
   return out
 }
 
+/**
+ * Optimized JSON parsing for OpenAI model responses
+ * Attempts direct parsing first (most common case) before fallback processing
+ */
 export function tryParseModelJson(raw: string): any | null {
-  // Step 1: strip code fences
+  if (!raw) return null
+
+  // Step 0: Direct parse attempt (optimized for well-formed responses)
+  // OpenAI typically returns clean JSON when properly prompted
+  let initial = raw
+  if (initial.charCodeAt(0) === 0xfeff) initial = initial.slice(1)
+  initial = initial.trim()
+  try {
+    return JSON.parse(initial)
+  } catch {
+    // Continue to fallback parsing only if direct parse fails
+  }
+
+  // Step 1: Handle markdown code fences (fallback for non-compliant responses)
   let cleaned = stripCodeFences(raw)
+
+  // Quick check: if it doesn't look like JSON at all, skip expensive parsing
+  if (!cleaned.trim().startsWith('{')) {
+    logger.warn('Response does not appear to be JSON format')
+    return null
+  }
+
   // Step 2: extract balanced JSON object if extra prose exists
   const balanced = extractFirstBalancedJson(cleaned)
-  if (balanced) cleaned = balanced
-  // Step 3: sanitize common issues
+  if (balanced && balanced !== cleaned) {
+    try {
+      return JSON.parse(balanced)
+    } catch {
+      cleaned = balanced
+    }
+  }
+
+  // Step 3: sanitize common issues (final attempt)
   cleaned = sanitizeJsonString(cleaned)
   try {
     return JSON.parse(cleaned)
   } catch (e) {
-    logger.warn('JSON parse failed. Sample (first 200 chars): %s', cleaned.slice(0, 200))
+    logger.warn(
+      'JSON parse failed after all attempts. Sample (first 200 chars): %s',
+      cleaned.slice(0, 200)
+    )
     return null
   }
 }
@@ -512,57 +576,61 @@ export default class N5QuizService {
         requestMeta: { messages },
       })
 
-      const parsed = tryParseModelJson(raw)
+      if (raw) {
+        // Parse the JSON response first
+        const parsed = tryParseModelJson(raw)
+        if (parsed) {
+          const questions = validateQuestions(parsed)
+          if (questions) {
+            logger.info('Successfully parsed %d N5 questions from AI', questions.length)
 
-      if (parsed) {
-        const questions = validateQuestions(parsed)
-        if (questions) {
-          logger.info('Successfully parsed %d N5 questions from AI', questions.length)
+            // Update log with success and question count
+            await writeAiLog({
+              enabled: process.env.N5_AI_LOG === 'true',
+              raw,
+              parsedOk: true,
+              questionsCount: questions.length,
+              finalQuestions: questions,
+              requestMeta: { messages },
+            })
 
-          // Update log with success and question count
-          await writeAiLog({
-            enabled: process.env.N5_AI_LOG === 'true',
-            raw,
-            parsedOk: true,
-            questionsCount: questions.length,
-            finalQuestions: questions,
-            requestMeta: { messages },
-          })
+            return { questions }
+          }
 
-          return { questions }
-        }
-        // Try to salvage partially valid questions
-        const salvaged = salvageQuestions(parsed)
-        if (salvaged.length === 20) {
-          logger.info('Salvaged 20 N5 questions from AI output')
+          // Try to salvage partially valid questions from parsed data
+          const salvaged = salvageQuestions(parsed)
+          if (salvaged.length === EXPECTED_COUNT) {
+            logger.info('Salvaged %d N5 questions from AI output', EXPECTED_COUNT)
 
-          await writeAiLog({
-            enabled: process.env.N5_AI_LOG === 'true',
-            raw,
-            parsedOk: true,
-            questionsCount: salvaged.length,
-            finalQuestions: salvaged,
-            requestMeta: { messages },
-          })
+            await writeAiLog({
+              enabled: process.env.N5_AI_LOG === 'true',
+              raw,
+              parsedOk: true,
+              questionsCount: salvaged.length,
+              finalQuestions: salvaged,
+              requestMeta: { messages },
+            })
 
-          return { questions: salvaged }
-        }
-        if (salvaged.length >= 10) {
-          logger.info(
-            'Partially salvaged %d questions, topping up with demo to 20',
-            salvaged.length
-          )
+            return { questions: salvaged }
+          }
+          if (salvaged.length >= Math.ceil(EXPECTED_COUNT / 2)) {
+            logger.info(
+              'Partially salvaged %d questions, topping up with demo to %d',
+              salvaged.length,
+              EXPECTED_COUNT
+            )
 
-          await writeAiLog({
-            enabled: process.env.N5_AI_LOG === 'true',
-            raw,
-            parsedOk: true,
-            questionsCount: salvaged.length,
-            finalQuestions: salvaged,
-            requestMeta: { messages },
-          })
+            await writeAiLog({
+              enabled: process.env.N5_AI_LOG === 'true',
+              raw,
+              parsedOk: true,
+              questionsCount: salvaged.length,
+              finalQuestions: salvaged,
+              requestMeta: { messages },
+            })
 
-          return { questions: salvaged }
+            return { questions: salvaged }
+          }
         }
       }
 

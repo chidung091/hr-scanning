@@ -32,7 +32,7 @@ export default class OpenAIService {
   private constructor() {
     this.config = {
       apiKey: env.get('OPENAI_API_KEY', ''),
-      model: env.get('OPENAI_MODEL', 'gpt-4o-mini'),
+      model: env.get('OPENAI_MODEL', 'gpt-4o'),
       maxTokens: Number(env.get('OPENAI_MAX_TOKENS', '10000')),
       temperature: Number(env.get('OPENAI_TEMPERATURE', '0.7')),
     }
