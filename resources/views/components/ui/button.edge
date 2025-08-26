@@ -1,0 +1,10 @@
+<!-- UI Button Component: usage expects passing classes like quiz-button or variants -->
+<button
+  @props(['id' => null, 'variant' => 'primary', 'class' => '', 'disabled' => false])
+  id="{{ id }}"
+  class="btn {{ class }} {{ variant === 'primary' ? 'btn-primary' : '' }}"
+  {{ disabled ? 'disabled' : '' }}
+>
+  {{ slot }}
+</button>
+

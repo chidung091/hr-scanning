@@ -101,11 +101,11 @@ export class QuizView {
     if (this.quizInterface) {
       const loadingOverlay = document.createElement('div')
       loadingOverlay.id = 'quiz-loading-overlay'
-      loadingOverlay.className = 'absolute inset-0 bg-white bg-opacity-95 flex flex-col items-center justify-center min-h-[400px] space-y-4 z-50'
+      loadingOverlay.className = 'absolute inset-0 bg-surface bg-opacity-95 flex flex-col items-center justify-center min-h-[400px] space-y-4 z-50'
       loadingOverlay.innerHTML = `
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        <p class="text-lg text-gray-600">${message}</p>
-        <p class="text-sm text-gray-500">Generating questions with AI...</p>
+        <p class="text-lg text-primary-700">${message}</p>
+        <p class="text-sm text-gray-600">Generating questions with AI...</p>
       `
 
       // Make quiz interface container relative for absolute positioning
@@ -182,12 +182,12 @@ export class QuizView {
         // Character quiz question - use large font for single characters
         this.characterDisplay.textContent = question.character
         // Reset to large character display styling
-        this.characterDisplay.className = 'text-6xl sm:text-8xl lg:text-9xl font-bold text-gray-900 mb-3 sm:mb-4 character-display-mobile transition-transform-smooth hover:scale-105 select-none'
+        this.characterDisplay.className = 'text-6xl sm:text-8xl lg:text-9xl font-bold text-black-900 mb-3 sm:mb-4 character-display-mobile transition-transform-smooth hover:scale-105 select-none text-center'
       } else {
         // N5 quiz question - use smaller font for longer text content
         this.characterDisplay.textContent = question.prompt
         // Apply smaller text styling for N5 questions
-        this.characterDisplay.className = 'text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4 leading-relaxed transition-transform-smooth select-none text-left px-2 sm:px-4'
+        this.characterDisplay.className = 'text-lg sm:text-xl lg:text-2xl font-semibold text-black-900 mb-3 sm:mb-4 leading-relaxed transition-transform-smooth select-none text-center px-2 sm:px-4'
       }
     }
 
@@ -239,8 +239,11 @@ export class QuizView {
 
     options.forEach((option) => {
       const button = document.createElement('button')
-      button.className =
-        'answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 text-base sm:text-lg font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button'
+      const baseButtonClasses =
+        'answer-option bg-gray-100 hover:bg-primary-50 active:bg-primary-100 border-2 border-transparent hover:border-primary-300 focus:border-primary-500 rounded-lg p-4 sm:p-4 font-medium transition-colors-smooth transform hover:scale-[1.02] active:scale-[0.98] min-h-[44px] quiz-button'
+      button.className = isN5Question
+        ? `${baseButtonClasses} sm:text-lg`
+        : `${baseButtonClasses} text-base sm:text-lg`
 
       if (isN5Question) {
         // For N5 questions, the option already includes the key (A., B., etc.)

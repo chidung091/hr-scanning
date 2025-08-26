@@ -29,7 +29,12 @@
 
     <!-- Swipe Wrapper -->
     <div id="japanese-teacher-swipe-wrapper" class="japanese-teacher-swipe-wrapper" role="tablist">
-      @include('partials/japanese-teacher-slides')
+      @include('components/teacher/mobile/slide_input')
+      @include('components/teacher/mobile/slide_pronunciation')
+      @include('components/teacher/mobile/slide_meaning')
+      @include('components/teacher/mobile/slide_example_jp')
+      @include('components/teacher/mobile/slide_example_vn')
+      @include('components/teacher/mobile/slide_notes')
     </div>
   </div>
 
