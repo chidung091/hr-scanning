@@ -37,6 +37,28 @@ export class Quiz {
       this.startQuiz('katakana')
     })
 
+    // Add N5 quiz button event listener
+    const startN5Btn = document.getElementById('start-n5-quiz-btn')
+    startN5Btn?.addEventListener('click', async (e) => {
+      const button = e.target as HTMLElement
+      this.view.animateButtonPress(button)
+
+      // Show loading state for N5 quiz (AI generation takes time)
+      const originalText = button.textContent
+      button.textContent = 'Loading...'
+      button.classList.add('opacity-50', 'cursor-not-allowed')
+      button.setAttribute('disabled', 'true')
+
+      try {
+        await this.startQuiz('n5')
+      } finally {
+        // Restore button state
+        button.textContent = originalText
+        button.classList.remove('opacity-50', 'cursor-not-allowed')
+        button.removeAttribute('disabled')
+      }
+    })
+
     this.view.nextButton?.addEventListener('click', (e) => {
       this.view.animateButtonPress(e.target as HTMLElement)
       this.nextQuestion()
@@ -89,6 +111,11 @@ export class Quiz {
   /** Start a new quiz */
   public async startQuiz(type: QuizType): Promise<void> {
     try {
+      // Show loading state for N5 quiz (AI generation takes time)
+      if (type === 'n5') {
+        this.view.showLoading('Generating JLPT N5 Quiz...')
+      }
+
       await this.state.startQuiz(type)
       this.view.showQuizInterface(type)
 
@@ -106,6 +133,8 @@ export class Quiz {
       }
     } catch (error) {
       console.error('Error starting quiz:', error)
+      // Hide loading overlay in case of error
+      this.view.hideLoading()
       alert('Failed to start quiz. Please try again.')
     }
   }
@@ -124,7 +153,13 @@ export class Quiz {
     try {
       const data: AnswerResponse = await this.state.submitAnswer(selectedAnswer)
 
-      this.view.showFeedback(data.isCorrect, data.correctAnswer, buttonElement)
+      const currentQuestion = this.state.getCurrentQuestion()
+      this.view.showFeedback(
+        data.isCorrect,
+        data.correctAnswer,
+        buttonElement,
+        currentQuestion || undefined
+      )
       this.view.updateHeartsDisplay(this.state.getHearts(), this.state.getMaxHearts())
 
       if (data.isGameOver && data.gameOverReason === 'no_hearts') {
@@ -134,6 +169,7 @@ export class Quiz {
       } else if (data.completed) {
         this.handleQuizCompletion(data.finalScore || this.state.getScore(), data.heartsRemaining || this.state.getHearts())
       } else {
+        // Always require acknowledgement before proceeding; explanation (for N5 wrong) is visible here
         this.view.showNextButton()
       }
     } catch (error) {
@@ -148,36 +184,43 @@ export class Quiz {
     if (!this.state.getSessionId()) return
 
     try {
+      // Immediately prepare UI to avoid showing stale content
+      this.view.prepareForNextQuestion()
+
+      // Optimistically animate the transition without delaying data fetch
+      const questionDisplay = this.view.characterDisplay?.parentElement as HTMLElement
+      const answerOptions = this.view.answerOptions as HTMLElement
+      if (questionDisplay && answerOptions) {
+        // Fire-and-forget animation; don't await to avoid extra delay
+        this.view.animateQuestionTransition(questionDisplay, answerOptions)
+      }
+
+      // Fetch next question
       const data: QuestionResponse = await this.state.getNextQuestion()
 
       if (data.completed) {
         if (data.isGameOver && data.gameOverReason === 'no_hearts') {
           this.view.showGameOverModal(this.state.getScore(), this.state.getQuestionNumber())
         } else {
-          this.handleQuizCompletion(data.finalScore || this.state.getScore(), data.heartsRemaining || this.state.getHearts())
+          this.handleQuizCompletion(
+            data.finalScore || this.state.getScore(),
+            data.heartsRemaining || this.state.getHearts()
+          )
         }
-      } else {
-        const question = this.state.getCurrentQuestion()
-        const questionDisplay = this.view.characterDisplay?.parentElement as HTMLElement
-        const answerOptions = this.view.answerOptions as HTMLElement
+        return
+      }
 
-        if (questionDisplay && answerOptions) {
-          await this.view.animateQuestionTransition(questionDisplay, answerOptions)
-        }
-
-        setTimeout(() => {
-          if (question) {
-            this.view.displayQuestion(
-              this.state.getQuestionNumber(),
-              this.state.getTotalQuestions(),
-              this.state.getScore(),
-              question,
-              this.state.getHearts(),
-              this.state.getMaxHearts(),
-              (answer, btn) => this.selectAnswer(answer, btn)
-            )
-          }
-        }, 200)
+      const question = this.state.getCurrentQuestion()
+      if (question) {
+        this.view.displayQuestion(
+          this.state.getQuestionNumber(),
+          this.state.getTotalQuestions(),
+          this.state.getScore(),
+          question,
+          this.state.getHearts(),
+          this.state.getMaxHearts(),
+          (answer, btn) => this.selectAnswer(answer, btn)
+        )
       }
     } catch (error) {
       console.error('Error getting next question:', error)

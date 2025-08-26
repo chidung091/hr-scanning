@@ -32,8 +32,8 @@ export default class OpenAIService {
   private constructor() {
     this.config = {
       apiKey: env.get('OPENAI_API_KEY', ''),
-      model: env.get('OPENAI_MODEL', 'gpt-4o-mini'),
-      maxTokens: Number(env.get('OPENAI_MAX_TOKENS', '1000')),
+      model: env.get('OPENAI_MODEL', 'gpt-4o'),
+      maxTokens: Number(env.get('OPENAI_MAX_TOKENS', '10000')),
       temperature: Number(env.get('OPENAI_TEMPERATURE', '0.7')),
     }
 
@@ -67,7 +67,7 @@ export default class OpenAIService {
         max_tokens: this.config.maxTokens,
         temperature: this.config.temperature,
       })
-
+      logger.info('completion: %s', this.config.maxTokens)
       const choice = completion.choices[0]
       if (!choice?.message?.content) {
         throw new Error('No content received from OpenAI')
